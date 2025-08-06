@@ -139,7 +139,7 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
     if (is_enabled_auth('none') ) {
         if ($frm->username !== core_user::clean_field($frm->username, 'username')) {
             $errormsg = get_string('username').': '.get_string("invalidusername");
-            $errorcode = 2;
+            $errorcode = 2; //comment
             $user = null;
         }
     }
