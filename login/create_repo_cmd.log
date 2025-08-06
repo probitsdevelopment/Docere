@@ -1,0 +1,4 @@
+curl -s -H "Authorization: token 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" ^
+     -H "Accept: application/vnd.github+json" ^
+     -d "{\"name\":\"student-jeevan\", \"private\":true}" ^
+     https://api.github.com/orgs/probits-enterprise/repos

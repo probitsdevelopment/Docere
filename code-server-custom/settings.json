@@ -1,0 +1,10 @@
+
+{
+  "extensions.allowed": {
+    "microsoft": true,
+    "esbenp.prettier-vscode": true,
+    "github": false,
+    "ms-azuretools.vscode-docker": false,
+    "*": false
+  }
+}
