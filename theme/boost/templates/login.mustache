@@ -1,61 +1,87 @@
-{{!
-    This file is part of Moodle - http://moodle.org/
-
-    Moodle is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Moodle is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-}}
-{{!
-    @template theme_boost/login
-
-    Login page template
-
-    Example context (json):
-    {
-        "output": {
-            "doctype": "<!DOCTYPE html>",
-            "page_title": "Login page",
-            "favicon": "favicon.ico",
-            "main_content": "<h1>Headers keep HTML validators happy</h1>"
-        }
-    }
-}}
+{{! theme/boost/templates/login.mustache (customized) }}
 {{> theme_boost/head }}
 
 <body {{{ bodyattributes }}}>
 {{> core/local/toast/wrapper}}
 
 <div id="page-wrapper">
+  {{{ output.standard_top_of_body_html }}}
 
-    {{{ output.standard_top_of_body_html }}}
+  <style>
+    /* --- Inline styles for login page only --- */
+    .probits-login { min-height: 100vh; display: grid; grid-template-columns: 1fr; }
+    @media (min-width: 768px) { .probits-login { grid-template-columns: 1fr 1fr; } }
 
-    <div id="page" class="container-fluid pt-5 mt-0">
-        <div id="page-content" class="row">
-            <div id="region-main-box" class="col-12">
-                <section id="region-main" class="col-12 h-100" aria-label="{{#str}}content{{/str}}">
-                <div class="login-wrapper">
-                    <div class="login-container">
-                    {{{ output.main_content }}}
-                    </div>
-                </div>
-                </section>
-            </div>
+    .probits-hero {
+      display: none;
+      background: radial-gradient(1200px 600px at -10% -10%, rgba(64,132,255,.25), transparent 60%),
+                  radial-gradient(800px 400px at 120% 110%, rgba(255,95,109,.2), transparent 60%),
+                  linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #fff;
+      padding: 56px 32px;
+    }
+    @media (min-width: 768px) { .probits-hero { display: flex; align-items: center; justify-content: center; } }
+
+    .probits-hero-inner { max-width: 520px; text-align: center; }
+    .probits-logo { max-width: 160px; height: auto; margin-bottom: 20px; filter: drop-shadow(0 6px 16px rgba(0,0,0,.25)); }
+    .probits-title { font-weight: 800; font-size: clamp(24px, 4vw, 36px); margin: 8px 0 10px; letter-spacing: .2px; }
+    .probits-subtitle { opacity: .95; font-size: clamp(14px, 2.5vw, 16px); margin: 0; }
+
+    .probits-main { display: flex; align-items: center; justify-content: center; padding: 40px 16px; }
+    .probits-card {
+      width: 100%; max-width: 420px; background: #fff; border-radius: 16px; padding: 28px;
+      border: 1px solid rgba(15,23,42,.06); box-shadow: 0 10px 30px rgba(2,6,23,.06);
+    }
+
+    /* Refine Moodle form elements inside card */
+    .probits-card .form-control { border-radius: 10px; padding: .6rem .9rem; }
+    .probits-card .btn-primary { border-radius: 10px; padding: .6rem 1rem; font-weight: 600; }
+    .probits-meta { margin-top: 12px; text-align: center; }
+    .probits-link { text-decoration: none; }
+    .probits-link:hover { text-decoration: underline; }
+
+    /* Make the whole page edge-to-edge */
+    #page.container-fluid { padding-left: 0; padding-right: 0; }
+    #page-content.row { margin-left: 0; margin-right: 0; }
+  </style>
+
+  <div id="page" class="container-fluid p-0">
+    <div id="page-content" class="row g-0 probits-login">
+      {{! Left side hero (hidden on mobile) }}
+      <aside class="probits-hero">
+        <div class="probits-hero-inner">
+          {{! Replace the logo src below with your own if needed }}
+          <img class="probits-logo"
+               src="{{{ config.wwwroot }}}/theme/image.php?theme=boost&component=core&image=i%2Flogo"
+               alt="Site logo" />
+          <h1 class="probits-title">{{ sitename }}</h1>
+          <p class="probits-subtitle">Learn. Build. Grow.</p>
         </div>
+      </aside>
+
+      {{! Right side login card with the actual Moodle form }}
+      <main id="region-main"
+            class="probits-main"
+            aria-label="{{#str}}content{{/str}}">
+        <div class="probits-card">
+          {{{ output.main_content }}}
+
+          <div class="probits-meta">
+            {{#output.should_display_reg_link}}
+              <a class="probits-link" href="{{{ output.registerurl }}}">{{#str}}startsignup{{/str}}</a>
+            {{/output.should_display_reg_link}}
+          </div>
+        </div>
+      </main>
     </div>
-    {{> theme_boost/footer }}
+  </div>
+
+  {{> theme_boost/footer }}
 </div>
 
 </body>
 </html>
+
 {{#js}}
 M.util.js_pending('theme_boost/loader');
 require(['theme_boost/loader'], function() {
