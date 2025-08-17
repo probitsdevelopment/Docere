@@ -1,53 +1,4 @@
-{{!
-    This file is part of Moodle - http://moodle.org/
-
-    Moodle is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Moodle is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Moodle.  If not, see <http://www.gnu.org/licenses/>
-}}
-{{!
-    @template theme_boost/columns2
-
-    Admin time setting template.
-
-    Boost 2 column layout template.
-
-    Context variables required for this template:
-    * sitename - The name of the site
-    * output - The core renderer for the page
-    * bodyattributes - attributes for the body tag as a string of html attributes
-    * sidepreblocks - HTML for the blocks
-    * hasblocks - true if there are blocks on this page
-    * navdraweropen - true if the nav drawer should be open on page load
-    * regionmainsettingsmenu - HTML for the region main settings menu
-    * hasregionmainsettingsmenu - There is a region main settings menu on this page.
-
-    Example context (json):
-    {
-        "sitename": "Moodle",
-        "output": {
-            "doctype": "<!DOCTYPE html>",
-            "page_title": "Test page",
-            "favicon": "favicon.ico",
-            "main_content": "<h1>Headings make html validators happier</h1>"
-         },
-        "bodyattributes":"",
-        "sidepreblocks": "<h2>Blocks html goes here</h2>",
-        "hasblocks":true,
-        "navdraweropen":true,
-        "regionmainsettingsmenu": "",
-        "hasregionmainsettingsmenu": false
-    }
-}}
+{{! Boost columns2.mustache — customized: stylish front page hero + scoped styles }}
 {{> theme_boost/head }}
 
 <body {{{ bodyattributes }}}>
@@ -59,13 +10,120 @@
 
     {{> theme_boost/navbar }}
 
+    {{! ===== Inline, frontpage-scoped styles ===== }}
+    <style>
+      /* Apply only on front page via body class */
+      body.pagelayout-frontpage {
+        --brand-1:#2563eb;  /* primary */
+        --brand-2:#7c3aed;  /* accent */
+        --ink:#0f172a;      /* text dark */
+        --ink-2:#334155;    /* text muted */
+        --bg:#f1f5f9;       /* page bg */
+        --card:#ffffff;     /* card bg */
+        background: var(--bg);
+      }
+
+      /* Full-bleed hero only on front page */
+      .fp-hero-wrap { display:none; }
+      body.pagelayout-frontpage .fp-hero-wrap {
+        display:block; position:relative; overflow:hidden;
+        background:
+          radial-gradient(1200px 700px at -10% -20%, rgba(37,99,235,.35), transparent 60%),
+          radial-gradient(900px 500px at 120% 110%, rgba(124,58,237,.30), transparent 60%),
+          linear-gradient(135deg, #0b1222 0%, #121b31 60%, #0e162b 100%);
+        color:#fff;
+      }
+      body.pagelayout-frontpage .fp-hero {
+        display:grid; grid-template-columns:1fr; gap:24px;
+        min-height:420px; padding:72px 20px;
+        align-items:center; justify-items:center; text-align:center;
+      }
+      @media (min-width: 992px) {
+        body.pagelayout-frontpage .fp-hero {
+          grid-template-columns:1.1fr 0.9fr; text-align:left; padding:92px 60px;
+        }
+      }
+      .fp-hero__brand { max-width:760px; }
+      .fp-hero__logo { max-width:180px; height:auto; margin-bottom:16px; filter:drop-shadow(0 10px 24px rgba(0,0,0,.35)); }
+      .fp-hero__title { font-weight:800; font-size:clamp(28px,5vw,44px); margin:8px 0 10px; letter-spacing:.2px; }
+      .fp-hero__sub { font-size:clamp(14px,2.2vw,18px); opacity:.95; margin:0; color:rgba(255,255,255,.92); }
+      .fp-hero__card {
+        width:100%; max-width:520px; background:rgba(255,255,255,.86);
+        border:1px solid rgba(15,23,42,.08); border-radius:20px; padding:24px;
+        backdrop-filter:saturate(160%) blur(14px);
+        box-shadow:0 22px 55px rgba(2,6,23,.10), 0 2px 12px rgba(2,6,23,.06);
+        color:var(--ink);
+      }
+      .fp-chip {
+        display:inline-block; padding:.4rem .7rem; border-radius:999px;
+        background:#eef2ff; border:1px solid rgba(2,6,23,.06); color:#1e293b; font-weight:600; font-size:.85rem;
+        margin-top:12px;
+      }
+
+      /* Tighten containers only on front page for a clean look */
+      body.pagelayout-frontpage #page.container-fluid { padding-left:0; padding-right:0; }
+      body.pagelayout-frontpage #page-content.row { margin-left:0; margin-right:0; }
+      body.pagelayout-frontpage #region-main-box { padding:32px 16px; }
+      @media (min-width: 992px) { body.pagelayout-frontpage #region-main-box { padding:48px 32px; } }
+
+      /* Pretty cards in region main */
+      body.pagelayout-frontpage #region-main .box,
+      body.pagelayout-frontpage #region-main .card,
+      body.pagelayout-frontpage #region-main .coursebox {
+        border-radius:16px; border:1px solid rgba(15,23,42,.08);
+        box-shadow:0 12px 30px rgba(2,6,23,.06);
+        background:var(--card);
+      }
+
+      /* Buttons & inputs */
+      body.pagelayout-frontpage .btn-primary {
+        border-radius:12px; padding:.65rem 1.05rem; font-weight:700;
+        background:linear-gradient(90deg, var(--brand-1), var(--brand-2)); border:none;
+      }
+      body.pagelayout-frontpage .btn-primary:hover { filter:brightness(1.05); }
+      body.pagelayout-frontpage input.form-control {
+        border-radius:12px; border:1px solid rgba(2,6,23,.12); padding:.7rem .9rem;
+      }
+
+      /* Block columns subtle card look */
+      body.pagelayout-frontpage [data-region="blocks-column"] .card {
+        border-radius:16px; border:1px solid rgba(15,23,42,.08);
+        box-shadow:0 10px 26px rgba(2,6,23,.06);
+      }
+    </style>
+
     <div id="page" class="container-fluid d-print-block">
+
+        {{! ===== Front Page Hero (shows only visually on frontpage due to CSS) ===== }}
+        <div class="fp-hero-wrap">
+          <div class="fp-hero">
+            <div class="fp-hero__brand">
+              <img class="fp-hero__logo"
+                   src="{{{ config.wwwroot }}}/theme/image.php?theme=boost&component=core&image=i%2Flogo"
+                   alt="Site logo">
+              <h1 class="fp-hero__title">{{ sitename }}</h1>
+              <p class="fp-hero__sub">Your learning hub. Fast, modern, and beautifully organized.</p>
+              <span class="fp-chip">Welcome to Site home</span>
+            </div>
+
+            <div class="fp-hero__card">
+              <h3 class="mb-2">Jump back in</h3>
+              <p class="mb-3">Use the sections and blocks below to access courses, categories, and recent activity.</p>
+              <div>
+                <a href="{{{ config.wwwroot }}}/course/" class="btn btn-primary me-2 mb-2">Browse courses</a>
+                <a href="{{{ config.wwwroot }}}/my/" class="btn btn-outline-secondary mb-2" style="border-radius:12px;">My dashboard</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {{{ output.full_header }}}
             {{#secondarymoremenu}}
                 <div class="secondary-navigation">
                     {{> core/moremenu}}
                 </div>
             {{/secondarymoremenu}}
+
         <div id="page-content" class="row pb-3 d-print-block">
             <div id="region-main-box" class="col-12">
                 {{#hasregionmainsettingsmenu}}
@@ -99,6 +157,7 @@
             </div>
         </div>
     </div>
+
     {{{ output.standard_after_main_region_html }}}
     {{> theme_boost/footer }}
 </div>
