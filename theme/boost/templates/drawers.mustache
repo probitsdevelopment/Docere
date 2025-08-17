@@ -1,4 +1,11 @@
-{{! Boost drawers.mustache — with Site Home hero (scoped) }}
+{{!
+    This file is part of Moodle - http://moodle.org/
+    Moodle is free software...
+}}
+{{!
+    @template theme_boost/drawers
+    Boost drawer template (customized with Site Home hero + course list styling)
+}}
 {{> theme_boost/head }}
 
 <body {{{ bodyattributes }}}>
@@ -9,7 +16,7 @@
 
     {{> theme_boost/navbar }}
 
-    {{! ===== FRONT PAGE HERO (only on Site home) ===== }}
+    {{! ===== FRONT PAGE HERO + GLOBAL FRONT-PAGE STYLES (scoped) ===== }}
     <style>
       /* Show hero only on Site home */
       .fp-hero-wrap { display:none; }
@@ -66,18 +73,7 @@
         margin-top:12px;
       }
 
-      /* Nicer cards for lists below hero (courses/blocks) */
-      body#page-site-index #region-main .coursebox,
-      body.path-site #region-main .coursebox,
-      body.pagelayout-frontpage #region-main .coursebox,
-      body#page-site-index #region-main .card,
-      body.path-site #region-main .card,
-      body.pagelayout-frontpage #region-main .card{
-        border-radius:16px; border:1px solid rgba(15,23,42,.08);
-        box-shadow:0 12px 30px rgba(2,6,23,.06); background:#fff;
-      }
-
-      /* Buttons */
+      /* Buttons (front page only) */
       body#page-site-index .btn-primary,
       body.path-site .btn-primary,
       body.pagelayout-frontpage .btn-primary{
@@ -87,6 +83,66 @@
       body#page-site-index .btn-primary:hover,
       body.path-site .btn-primary:hover,
       body.pagelayout-frontpage .btn-primary:hover{ filter:brightness(1.05); }
+
+      /* === Front page course list styling (cards/boxes) === */
+      body#page-site-index #region-main .coursecard,
+      body.path-site #region-main .coursecard,
+      body.pagelayout-frontpage #region-main .coursecard,
+      body#page-site-index #region-main .card.coursecard,
+      body.path-site #region-main .card.coursecard,
+      body.pagelayout-frontpage #region-main .card.coursecard,
+      body#page-site-index #region-main .courses .card,
+      body.path-site #region-main .courses .card,
+      body.pagelayout-frontpage #region-main .courses .card,
+      body#page-site-index #region-main .coursebox,
+      body.path-site #region-main .coursebox,
+      body.pagelayout-frontpage #region-main .coursebox {
+        border-radius:16px;
+        border:1px solid rgba(15,23,42,.08);
+        box-shadow:0 12px 30px rgba(2,6,23,.06);
+        background:#fff;
+        overflow:hidden;
+        transition: transform .1s ease, box-shadow .2s ease;
+      }
+      body#page-site-index #region-main .coursecard:hover,
+      body.path-site #region-main .coursecard:hover,
+      body.pagelayout-frontpage #region-main .coursecard:hover,
+      body#page-site-index #region-main .courses .card:hover,
+      body.path-site #region-main .courses .card:hover,
+      body.pagelayout-frontpage #region-main .courses .card:hover,
+      body#page-site-index #region-main .coursebox:hover,
+      body.path-site #region-main .coursebox:hover,
+      body.pagelayout-frontpage #region-main .coursebox:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 48px rgba(2,6,23,.10);
+      }
+      /* Nicer buttons & thumbnails inside course cards */
+      body#page-site-index #region-main .coursecard .btn,
+      body.path-site #region-main .coursecard .btn,
+      body.pagelayout-frontpage #region-main .coursecard .btn { border-radius:10px; }
+      body#page-site-index #region-main .coursecard img,
+      body.path-site #region-main .coursecard img,
+      body.pagelayout-frontpage #region-main .coursecard img { border-radius:10px; }
+
+      /* Headings spacing/weight */
+      body#page-site-index #region-main h2,
+      body.path-site #region-main h2,
+      body.pagelayout-frontpage #region-main h2 {
+        margin-top:12px; margin-bottom:18px; font-weight:800;
+      }
+      body#page-site-index .page-header-headings h1,
+      body.path-site .page-header-headings h1,
+      body.pagelayout-frontpage .page-header-headings h1 { font-weight:800; }
+
+      /* Optional: soften region main box spacing */
+      body#page-site-index #region-main-box,
+      body.path-site #region-main-box,
+      body.pagelayout-frontpage #region-main-box { padding:32px 16px; }
+      @media (min-width: 992px){
+        body#page-site-index #region-main-box,
+        body.path-site #region-main-box,
+        body.pagelayout-frontpage #region-main-box { padding:48px 32px; }
+      }
     </style>
 
     <div class="fp-hero-wrap">
