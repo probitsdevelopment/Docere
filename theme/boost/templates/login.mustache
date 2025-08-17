@@ -1,4 +1,4 @@
-{{! theme/boost/templates/login.mustache (customized) }}
+{{! Stylish Boost login.mustache – paste entire file }}
 {{> theme_boost/head }}
 
 <body {{{ bodyattributes }}}>
@@ -8,72 +8,131 @@
   {{{ output.standard_top_of_body_html }}}
 
   <style>
-    /* --- Inline styles for login page only --- */
-    .probits-login { min-height: 100vh; display: grid; grid-template-columns: 1fr; }
-    @media (min-width: 768px) { .probits-login { grid-template-columns: 1fr 1fr; } }
-
-    .probits-hero {
-      display: none;
-      background: radial-gradient(1200px 600px at -10% -10%, rgba(64,132,255,.25), transparent 60%),
-                  radial-gradient(800px 400px at 120% 110%, rgba(255,95,109,.2), transparent 60%),
-                  linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      color: #fff;
-      padding: 56px 32px;
-    }
-    @media (min-width: 768px) { .probits-hero { display: flex; align-items: center; justify-content: center; } }
-
-    .probits-hero-inner { max-width: 520px; text-align: center; }
-    .probits-logo { max-width: 160px; height: auto; margin-bottom: 20px; filter: drop-shadow(0 6px 16px rgba(0,0,0,.25)); }
-    .probits-title { font-weight: 800; font-size: clamp(24px, 4vw, 36px); margin: 8px 0 10px; letter-spacing: .2px; }
-    .probits-subtitle { opacity: .95; font-size: clamp(14px, 2.5vw, 16px); margin: 0; }
-
-    .probits-main { display: flex; align-items: center; justify-content: center; padding: 40px 16px; }
-    .probits-card {
-      width: 100%; max-width: 420px; background: #fff; border-radius: 16px; padding: 28px;
-      border: 1px solid rgba(15,23,42,.06); box-shadow: 0 10px 30px rgba(2,6,23,.06);
+    /* === Brand palette (tweak here) === */
+    :root{
+      --brand-1:#2563eb;   /* primary */
+      --brand-2:#7c3aed;   /* accent */
+      --ink:#0f172a;       /* text dark */
+      --ink-2:#334155;     /* text muted */
+      --bg:#f1f5f9;        /* page bg */
+      --card:#ffffff;      /* card bg */
     }
 
-    /* Refine Moodle form elements inside card */
-    .probits-card .form-control { border-radius: 10px; padding: .6rem .9rem; }
-    .probits-card .btn-primary { border-radius: 10px; padding: .6rem 1rem; font-weight: 600; }
-    .probits-meta { margin-top: 12px; text-align: center; }
-    .probits-link { text-decoration: none; }
-    .probits-link:hover { text-decoration: underline; }
+    /* Reset container gutters to go full-bleed */
+    #page.container-fluid{padding-left:0;padding-right:0;}
+    #page-content.row{margin-left:0;margin-right:0;}
 
-    /* Make the whole page edge-to-edge */
-    #page.container-fluid { padding-left: 0; padding-right: 0; }
-    #page-content.row { margin-left: 0; margin-right: 0; }
+    /* === Layout === */
+    .mm-login{min-height:100vh;display:grid;grid-template-columns:1fr;}
+    @media (min-width: 992px){ .mm-login{grid-template-columns:1.1fr 0.9fr;} }
+
+    /* Left hero with animated gradient + soft noise feel (no images) */
+    .mm-hero{
+      position:relative;overflow:hidden;color:#fff;
+      background:
+        radial-gradient(1200px 700px at -10% -20%, rgba(37,99,235,.35), transparent 60%),
+        radial-gradient(900px 500px at 120% 110%, rgba(124,58,237,.30), transparent 60%),
+        linear-gradient(135deg, #0b1222 0%, #121b31 60%, #0e162b 100%);
+      display:none;align-items:center;justify-content:center;padding:56px 32px;
+    }
+    @media (min-width: 992px){ .mm-hero{display:flex;} }
+
+    .mm-hero::after{
+      content:"";position:absolute;inset:-20%;
+      background:
+        radial-gradient(50% 40% at 30% 30%, rgba(255,255,255,.06), transparent 60%),
+        radial-gradient(45% 35% at 70% 70%, rgba(255,255,255,.05), transparent 60%);
+      filter: blur(30px); animation: float 14s ease-in-out infinite alternate;
+      pointer-events:none;
+    }
+    @keyframes float{ from{transform:translateY(-10px)} to{transform:translateY(10px)} }
+
+    .mm-hero-inner{max-width:560px;text-align:left}
+    .mm-logo{max-width:170px;height:auto;margin-bottom:20px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35));}
+    .mm-title{font-weight:800;font-size:clamp(26px,4vw,40px);margin:10px 0 8px;letter-spacing:.2px;}
+    .mm-sub{opacity:.95;font-size:clamp(14px,2.2vw,17px);margin:0;color:rgba(255,255,255,.9)}
+
+    /* Right side: glass card */
+    .mm-main{display:flex;align-items:center;justify-content:center;background:var(--bg);padding:42px 18px;}
+    .mm-card{
+      width:100%;max-width:480px;border-radius:20px;padding:28px;
+      background:rgba(255,255,255,.82);backdrop-filter:saturate(160%) blur(12px);
+      box-shadow: 0 20px 50px rgba(2,6,23,.08), 0 2px 12px rgba(2,6,23,.05);
+      border:1px solid rgba(15,23,42,.08);
+    }
+    .mm-card h2, .mm-card h3, .mm-card h4{color:var(--ink);}
+
+    /* Inputs & buttons inside Moodle’s login form */
+    .mm-card .form-control{
+      border-radius:12px;border:1px solid rgba(2,6,23,.12);padding:.7rem .9rem;
+      transition: box-shadow .2s, border-color .2s, transform .04s;
+      background:#fff;
+    }
+    .mm-card .form-control:focus{
+      border-color:var(--brand-1);
+      box-shadow:0 0 0 .25rem rgba(37,99,235,.15);
+    }
+    .mm-card .btn-primary{
+      border-radius:12px;padding:.65rem 1.05rem;font-weight:700;
+      background:linear-gradient(90deg, var(--brand-1), var(--brand-2));
+      border:none;transition:transform .06s ease, filter .2s;
+    }
+    .mm-card .btn-primary:hover{filter:brightness(1.05);}
+    .mm-card .btn-primary:active{transform:translateY(1px);}
+    .mm-muted{color:var(--ink-2)}
+
+    /* Little chips (guest, cookies) */
+    .mm-card .btn-secondary, .mm-chip{
+      border-radius:12px;background:#eef2ff;border:1px solid rgba(2,6,23,.06);color:#1e293b;
+      padding:.45rem .7rem;font-weight:600;
+    }
+
+    /* Divider */
+    .mm-divider{display:flex;align-items:center;gap:.75rem;margin:10px 0 18px;}
+    .mm-divider::before,.mm-divider::after{content:"";flex:1;height:1px;background:rgba(2,6,23,.08);}
+
+    /* Help bubble */
+    .mm-help{position:fixed;right:16px;bottom:16px;z-index:2}
+    .mm-helpbtn{
+      width:40px;height:40px;border-radius:999px;border:1px solid rgba(2,6,23,.08);
+      background:#fff;box-shadow:0 10px 25px rgba(2,6,23,.12);font-weight:800;color:var(--ink);
+    }
   </style>
 
   <div id="page" class="container-fluid p-0">
-    <div id="page-content" class="row g-0 probits-login">
-      {{! Left side hero (hidden on mobile) }}
-      <aside class="probits-hero">
-        <div class="probits-hero-inner">
-          {{! Replace the logo src below with your own if needed }}
-          <img class="probits-logo"
+    <div id="page-content" class="row g-0 mm-login">
+
+      <!-- Left hero (desktop) -->
+      <aside class="mm-hero">
+        <div class="mm-hero-inner">
+          <img class="mm-logo"
                src="{{{ config.wwwroot }}}/theme/image.php?theme=boost&component=core&image=i%2Flogo"
                alt="Site logo" />
-          <h1 class="probits-title">{{ sitename }}</h1>
-          <p class="probits-subtitle">Learn. Build. Grow.</p>
+          <h1 class="mm-title">{{ sitename }}</h1>
+          <p class="mm-sub">Learn. Build. Grow.</p>
         </div>
       </aside>
 
-      {{! Right side login card with the actual Moodle form }}
-      <main id="region-main"
-            class="probits-main"
-            aria-label="{{#str}}content{{/str}}">
-        <div class="probits-card">
+      <!-- Right: login card (Moodle form stays intact) -->
+      <main id="region-main" class="mm-main" aria-label="{{#str}}content{{/str}}">
+        <div class="mm-card">
           {{{ output.main_content }}}
 
-          <div class="probits-meta">
+          <!-- Optional extras below (render only if present) -->
+          <div class="mm-divider"></div>
+          <div class="text-center">
             {{#output.should_display_reg_link}}
-              <a class="probits-link" href="{{{ output.registerurl }}}">{{#str}}startsignup{{/str}}</a>
+              <a class="mm-muted" href="{{{ output.registerurl }}}">{{#str}}startsignup{{/str}}</a>
             {{/output.should_display_reg_link}}
           </div>
         </div>
       </main>
     </div>
+  </div>
+
+  <!-- Tiny help bubble (optional, can remove) -->
+  <div class="mm-help">
+    <button type="button" class="mm-helpbtn" title="{{#str}}help{{/str}}">?</button>
   </div>
 
   {{> theme_boost/footer }}
