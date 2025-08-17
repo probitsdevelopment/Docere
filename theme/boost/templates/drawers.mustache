@@ -1,54 +1,4 @@
-{{!
-    This file is part of Moodle - http://moodle.org/
-
-    Moodle is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Moodle is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-}}
-{{!
-    @template theme_boost/drawers
-
-    Boost drawer template.
-
-    Context variables required for this template:
-    * sitename - The name of the site
-    * output - The core renderer for the page
-    * bodyattributes - attributes for the body tag as a string of html attributes
-    * sidepreblocks - HTML for the blocks
-    * hasblocks - true if there are blocks on this page
-    * courseindexopen - true if the nav drawer should be open on page load
-    * regionmainsettingsmenu - HTML for the region main settings menu
-    * hasregionmainsettingsmenu - There is a region main settings menu on this page.
-
-    Example context (json):
-    {
-        "sitename": "Moodle",
-        "output": {
-            "doctype": "<!DOCTYPE html>",
-            "page_title": "Test page",
-            "favicon": "favicon.ico",
-            "main_content": "<h1>Headings make html validators happier</h1>"
-         },
-        "bodyattributes":"",
-        "sidepreblocks": "<h2>Blocks html goes here</h2>",
-        "hasblocks":true,
-        "courseindexopen": true,
-        "navdraweropen": false,
-        "blockdraweropen": true,
-        "regionmainsettingsmenu": "",
-        "hasregionmainsettingsmenu": false,
-        "addblockbutton": ""
-    }
-}}
+{{! Boost drawers.mustache — with Site Home hero (scoped) }}
 {{> theme_boost/head }}
 
 <body {{{ bodyattributes }}}>
@@ -58,13 +8,115 @@
     {{{ output.standard_top_of_body_html }}}
 
     {{> theme_boost/navbar }}
+
+    {{! ===== FRONT PAGE HERO (only on Site home) ===== }}
+    <style>
+      /* Show hero only on Site home */
+      .fp-hero-wrap { display:none; }
+      body#page-site-index .fp-hero-wrap,
+      body.path-site .fp-hero-wrap,
+      body.pagelayout-frontpage .fp-hero-wrap { display:block; }
+
+      /* Site home palette + background */
+      body#page-site-index,
+      body.path-site,
+      body.pagelayout-frontpage {
+        --brand-1:#2563eb;  /* primary */
+        --brand-2:#7c3aed;  /* accent */
+        --ink:#0f172a;
+        --ink-2:#475569;
+        --bg:#f1f5f9;
+        --card:#ffffff;
+        background: var(--bg);
+      }
+
+      /* Make hero full-bleed */
+      body#page-site-index #page.container-fluid,
+      body.path-site #page.container-fluid,
+      body.pagelayout-frontpage #page.container-fluid { padding-left:0; padding-right:0; }
+
+      /* Hero block */
+      .fp-hero-wrap{ position:relative; overflow:hidden; color:#fff; }
+      .fp-hero{
+        display:grid; grid-template-columns:1fr; gap:24px;
+        min-height:420px; padding:72px 20px;
+        align-items:center; justify-items:center; text-align:center;
+        background:
+          radial-gradient(1200px 700px at -10% -20%, rgba(37,99,235,.35), transparent 60%),
+          radial-gradient(900px 500px at 120% 110%, rgba(124,58,237,.30), transparent 60%),
+          linear-gradient(135deg,#0b1222 0%,#121b31 60%,#0e162b 100%);
+      }
+      @media (min-width: 992px){
+        .fp-hero{ grid-template-columns:1.1fr 0.9fr; text-align:left; padding:92px 60px; }
+      }
+      .fp-hero__brand{ max-width:760px; }
+      .fp-hero__logo{ max-width:180px; height:auto; margin-bottom:16px; filter:drop-shadow(0 10px 24px rgba(0,0,0,.35)); }
+      .fp-hero__title{ font-weight:800; font-size:clamp(28px,5vw,44px); margin:8px 0 10px; letter-spacing:.2px; }
+      .fp-hero__sub{ font-size:clamp(14px,2.2vw,18px); opacity:.95; margin:0; color:rgba(255,255,255,.92); }
+      .fp-hero__card{
+        width:100%; max-width:520px; background:rgba(255,255,255,.86);
+        border:1px solid rgba(15,23,42,.08); border-radius:20px; padding:24px;
+        backdrop-filter:saturate(160%) blur(14px);
+        box-shadow:0 22px 55px rgba(2,6,23,.10), 0 2px 12px rgba(2,6,23,.06);
+        color:var(--ink);
+      }
+      .fp-chip{
+        display:inline-block; padding:.4rem .7rem; border-radius:999px;
+        background:#eef2ff; border:1px solid rgba(2,6,23,.06); color:#1e293b; font-weight:600; font-size:.85rem;
+        margin-top:12px;
+      }
+
+      /* Nicer cards for lists below hero (courses/blocks) */
+      body#page-site-index #region-main .coursebox,
+      body.path-site #region-main .coursebox,
+      body.pagelayout-frontpage #region-main .coursebox,
+      body#page-site-index #region-main .card,
+      body.path-site #region-main .card,
+      body.pagelayout-frontpage #region-main .card{
+        border-radius:16px; border:1px solid rgba(15,23,42,.08);
+        box-shadow:0 12px 30px rgba(2,6,23,.06); background:#fff;
+      }
+
+      /* Buttons */
+      body#page-site-index .btn-primary,
+      body.path-site .btn-primary,
+      body.pagelayout-frontpage .btn-primary{
+        border-radius:12px; padding:.65rem 1.05rem; font-weight:700;
+        background:linear-gradient(90deg, var(--brand-1), var(--brand-2)); border:none;
+      }
+      body#page-site-index .btn-primary:hover,
+      body.path-site .btn-primary:hover,
+      body.pagelayout-frontpage .btn-primary:hover{ filter:brightness(1.05); }
+    </style>
+
+    <div class="fp-hero-wrap">
+      <div class="fp-hero">
+        <div class="fp-hero__brand">
+          <img class="fp-hero__logo"
+               src="{{{ config.wwwroot }}}/theme/image.php?theme=boost&component=core&image=i%2Flogo"
+               alt="Site logo">
+          <h1 class="fp-hero__title">{{ sitename }}</h1>
+          <p class="fp-hero__sub">Your learning hub. Fast, modern, and beautifully organized.</p>
+          <span class="fp-chip">Welcome to Site home</span>
+        </div>
+
+        <div class="fp-hero__card">
+          <h3 class="mb-2">Jump back in</h3>
+          <p class="mb-3">Use the sections below to access courses, categories, and recent activity.</p>
+          <div>
+            <a href="{{{ config.wwwroot }}}/course/" class="btn btn-primary me-2 mb-2">Browse courses</a>
+            <a href="{{{ config.wwwroot }}}/my/" class="btn btn-outline-secondary mb-2" style="border-radius:12px;">My dashboard</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{! ===== END HERO ===== }}
+
     {{#courseindex}}
         {{< theme_boost/drawer }}
             {{$id}}theme_boost-drawers-courseindex{{/id}}
             {{$drawerclasses}}drawer drawer-left {{#courseindexopen}}show{{/courseindexopen}}{{/drawerclasses}}
-            {{$drawercontent}}
-                {{{courseindex}}}
-            {{/drawercontent}}
+            {{$drawercontent}} {{{courseindex}}} {{/drawercontent}}
             {{$drawerpreferencename}}drawer-open-index{{/drawerpreferencename}}
             {{$drawerstate}}show-drawer-left{{/drawerstate}}
             {{$tooltipplacement}}right{{/tooltipplacement}}
@@ -89,6 +141,7 @@
             {{$closebuttontext}}{{#str}}closeblockdrawer, core{{/str}}{{/closebuttontext}}
         {{/ theme_boost/drawer}}
     {{/hasblocks}}
+
     <div id="page" data-region="mainpage" data-usertour="scroller" class="drawers {{#courseindexopen}}show-drawer-left{{/courseindexopen}} {{#blockdraweropen}}show-drawer-right{{/blockdraweropen}} drag-container">
         <div id="topofscroll" class="main-inner">
             <div class="drawer-toggles d-flex">
@@ -126,12 +179,14 @@
                     </div>
                 {{/hasblocks}}
             </div>
+
             {{{ output.full_header }}}
             {{#secondarymoremenu}}
                 <div class="secondary-navigation d-print-none">
                     {{> core/moremenu}}
                 </div>
             {{/secondarymoremenu}}
+
             <div id="page-content" class="pb-3 d-print-block">
                 <div id="region-main-box">
                     {{#hasregionmainsettingsmenu}}
@@ -140,7 +195,6 @@
                     </div>
                     {{/hasregionmainsettingsmenu}}
                     <section id="region-main" aria-label="{{#str}}content{{/str}}">
-
                         {{#hasregionmainsettingsmenu}}
                             <div class="region_main_settings_menu_proxy"></div>
                         {{/hasregionmainsettingsmenu}}
@@ -158,7 +212,6 @@
                         {{{ output.main_content }}}
                         {{{ output.activity_navigation }}}
                         {{{ output.course_content_footer }}}
-
                     </section>
                 </div>
             </div>
