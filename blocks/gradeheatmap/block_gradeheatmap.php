@@ -23,6 +23,7 @@ class block_gradeheatmap extends block_base {
             return $this->content;
         }
         $this->content = new stdClass();
+         $PAGE->requires->css(new moodle_url('/blocks/gradeheatmap/styles.css'));
 
         // Detect Dashboard (My home) context.
         $isdashboard = ($PAGE->pagelayout === 'mydashboard') || ($PAGE->context->contextlevel == CONTEXT_USER);
@@ -155,12 +156,10 @@ class block_gradeheatmap extends block_base {
 
         // Render a simple canvas (no Mustache).
         $canvasid = html_writer::random_id('gradeheatmap_');
-        $canvas = html_writer::tag('canvas', '', ['id' => $canvasid]);
-        $wrapper = html_writer::tag('div', $canvas, [
-            'class' => 'heatmap-scroll',
-            'style' => 'overflow:auto; max-height:480px;'
-        ]);
-        $this->content->text = html_writer::div($wrapper, 'block_gradeheatmap');
+$canvas = html_writer::tag('canvas', '', ['id' => $canvasid]);
+$wrapper = html_writer::tag('div', $canvas, ['class' => 'heatmap-wrap']);
+$this->content->text = html_writer::div($wrapper, 'block_gradeheatmap');
+
 
         // Prepare payload for JS.
         $payload = [
@@ -171,8 +170,8 @@ class block_gradeheatmap extends block_base {
         ];
 
         // Load Chart.js + matrix plugin from CDN.
-        $PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js'));
-        $PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2.0.1/dist/chartjs-chart-matrix.umd.min.js'));
+       $PAGE->requires->js(new moodle_url('/blocks/gradeheatmap/js/chart.umd.min.js'));
+$PAGE->requires->js(new moodle_url('/blocks/gradeheatmap/js/chartjs-chart-matrix.min.js'));
 
         // Inline init JS (no AMD build needed).
         $payloadjson = json_encode($payload, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
@@ -189,8 +188,9 @@ class block_gradeheatmap extends block_base {
   var cv = document.getElementById(payload.canvasid);
   if (!cv || typeof Chart === 'undefined') return;
   // Size canvas based on data volume.
-  cv.width  = Math.max(600, payload.xlabels.length * 40);
-  cv.height = Math.max(300, payload.ylabels.length * 28);
+  cv.width  = Math.max(900, payload.xlabels.length * 60);
+cv.height = Math.max(380, payload.ylabels.length * 36);
+
   var ctx = cv.getContext('2d');
   // Convert index-based cells to labelled matrix data.
   var data = payload.cells.map(function(c){
