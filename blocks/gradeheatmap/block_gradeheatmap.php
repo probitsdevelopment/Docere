@@ -213,11 +213,24 @@ class block_gradeheatmap extends block_base {
           backgroundColor: function(ctx){ return valueToColor(ctx.raw.v); },
           borderWidth: 1,
           borderColor: 'rgba(0,0,0,0.08)',
-          width:  function(ctx){ var a=ctx.chart.chartArea; return (a.right-a.left)/p.xlabels.length - 2; },
-          height: function(ctx){ var a=ctx.chart.chartArea; return (a.bottom-a.top)/p.ylabels.length - 2; }
+         width:  ({chart}) => {
+  const a = chart.chartArea;
+  const cols = Math.max(1, p.xlabels.length);
+  // fallback before chartArea exists (first layout pass)
+  return a ? (a.right - a.left) / cols - 2 : Math.max(12, (chart.width / cols) - 2);
+},
+height: ({chart}) => {
+  const a = chart.chartArea;
+  const rows = Math.max(1, p.ylabels.length);
+  return a ? (a.bottom - a.top) / rows - 2 : Math.max(12, (chart.height / rows) - 2);
+}
+
+
         }]},
         options: {
           maintainAspectRatio:false,
+            responsive: true,
+             maintainAspectRatio: false,
           plugins:{ legend:{display:false},
             tooltip:{callbacks:{
               title:function(items){var it=items[0]; return it.raw.y+' — '+it.raw.x;},
