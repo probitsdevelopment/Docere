@@ -57,11 +57,15 @@ class block_gradeheatmap extends block_base {
                     FROM {grade_items} gi
                     JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = :userid
                    WHERE gi.courseid $inSql
-                     AND gi.itemtype = 'mod'
+                     AND gi.itemtype IN ('mod','manual')
                      AND gi.gradetype = 1
                 ORDER BY gi.courseid, gi.sortorder, gi.id";
 
             $rows = $DB->get_records_sql($sql, $params);
+            $this->content->text .= html_writer::div(
+    'Debug: userid='.$USER->id.' • rows='.count($rows),
+    'text-muted'
+);
             if (!$rows) {
                 $this->content->text = get_string('nogrades', 'block_gradeheatmap');
                 return $this->content;
