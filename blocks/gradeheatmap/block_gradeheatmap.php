@@ -161,6 +161,18 @@ $wrapper = html_writer::tag('div', $canvas, ['class' => 'heatmap-wrap']);
 $this->content->text = html_writer::div($wrapper, 'block_gradeheatmap');
 
 
+// If there is no data, show a small demo so you can verify rendering.
+if (empty($cells)) {
+    $xlabels = ['Demo: Quiz 1', 'Demo: Assignment 1', 'Demo: Final'];
+    $ylabels = [fullname($USER)];
+    $cells = [
+        ['x' => 0, 'y' => 0, 'v' => 62],
+        ['x' => 1, 'y' => 0, 'v' => 84],
+        ['x' => 2, 'y' => 0, 'v' => null],
+    ];
+}
+
+
         // Prepare payload for JS.
         $payload = [
             'canvasid' => $canvasid,
@@ -186,9 +198,13 @@ $PAGE->requires->js(new moodle_url('/blocks/gradeheatmap/js/chartjs-chart-matrix
   }
   var payload = $payloadjson;
   var cv = document.getElementById(payload.canvasid);
-  if (!cv || typeof Chart === 'undefined') return;
-  // Size canvas based on data volume.
-  cv.width  = Math.max(900, payload.xlabels.length * 60);
+
+  if (!cv) { console.warn('Heatmap: canvas not found'); return; }
+if (typeof Chart === 'undefined') {
+  cv.insertAdjacentHTML('beforebegin','<div style="color:#a00">Chart.js failed to load. Check /blocks/gradeheatmap/js/ files.</div>');
+  return;
+}
+cv.width  = Math.max(900, payload.xlabels.length * 60);
 cv.height = Math.max(380, payload.ylabels.length * 36);
 
   var ctx = cv.getContext('2d');
