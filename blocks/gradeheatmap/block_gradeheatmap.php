@@ -31,17 +31,18 @@ class block_gradeheatmap extends block_base {
             list($inSql, $inParams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'cid');
             $params = array_merge($inParams, ['userid' => $USER->id]);
 
-            $sql = "SELECT gi.courseid,
-                           COALESCE(NULLIF(gi.itemname,''), CONCAT(gi.itemmodule,' #',gi.id)) AS itemname,
-                           gi.sortorder, gi.grademax, gg.finalgrade
-                      FROM {grade_items} gi
-                      JOIN {grade_grades} gg
-                        ON gg.itemid = gi.id AND gg.userid = :userid
-                     WHERE gi.courseid $inSql
-                       AND gi.itemtype IN ('mod','manual','course')
-                       AND gi.gradetype = 1
-                  ORDER BY gi.courseid, gi.sortorder, gi.id";
-            $rows = $DB->get_records_sql($sql, $params);
+          $sql = "SELECT gi.id AS id,                     -- ← unique key FIRST
+               gi.courseid,
+               COALESCE(NULLIF(gi.itemname,''), CONCAT(gi.itemmodule,' #',gi.id)) AS itemname,
+               gi.sortorder, gi.grademax, gg.finalgrade
+  FROM {grade_items} gi
+  JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = :userid
+ WHERE gi.courseid $inSql
+   AND gi.itemtype IN ('mod','manual','course')
+   AND gi.gradetype = 1
+ ORDER BY gi.courseid, gi.sortorder, gi.id";
+$rows = $DB->get_records_sql($sql, $params);
+
 
             if ($rows) {
                 foreach ($rows as $r) {
