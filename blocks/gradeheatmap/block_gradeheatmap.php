@@ -260,4 +260,4 @@ JS;
         $this->content->footer = '';
         return $this->content;
     }
-}
+    }   
