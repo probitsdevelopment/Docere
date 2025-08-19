@@ -38,8 +38,14 @@ define([], function () {
       if (!cv || typeof Chart === 'undefined') return;
 
       // Make canvas large enough so it scrolls horizontally/vertically nicely.
-      cv.width  = Math.max(600, payload.xlabels.length * 40);
-      cv.height = Math.max(300, payload.ylabels.length * 28);
+    // Let CSS control the size; keep it responsive, with sane caps.
+cv.removeAttribute('width');
+cv.removeAttribute('height');
+
+cv.style.width  = '100%';  // fill the card width
+// Height: between 320–560px, expands a bit with more rows but capped
+cv.style.height = Math.min(560, Math.max(320, payload.ylabels.length * 22)) + 'px';
+
       var ctx = cv.getContext('2d');
 
       // Convert indices to labelled matrix data for the heatmap
