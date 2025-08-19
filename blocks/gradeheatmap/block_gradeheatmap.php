@@ -6,7 +6,7 @@ class block_gradeheatmap extends block_base {
         $this->title = 'Grade Trend';
     }
 
-    // Dashboard only
+    // Show on user Dashboard only
     public function applicable_formats() {
         return ['my' => true];
     }
@@ -14,19 +14,24 @@ class block_gradeheatmap extends block_base {
     public function get_content() {
         global $CFG, $DB, $USER, $PAGE;
 
-        if ($this->content !== null) return $this->content;
+        if ($this->content !== null) {
+            return $this->content;
+        }
         $this->content = new stdClass();
-
         require_once($CFG->dirroot . '/course/lib.php');
+
+        // Styles (dark card for teacher/admin)
         $PAGE->requires->css(new moodle_url('/blocks/gradeheatmap/styles.css'));
 
-        // Who am I? Can I see everyone’s grades?
+        // Are we teacher/admin somewhere?
         $systemcanviewall = is_siteadmin($USER) ||
             has_capability('moodle/grade:viewall', context_system::instance());
 
-        // Courses where current user has grade:viewall (teacher role)
-        $teachergradecourses = [];
+        // All courses the user is enrolled in (used for student mode and to find teacher courses)
         $enrolled = enrol_get_users_courses($USER->id, true, 'id,shortname');
+
+        // Courses where user has grade:viewall (teacher)
+        $teachergradecourses = [];
         foreach ($enrolled as $c) {
             $ctx = context_course::instance($c->id);
             if (has_capability('moodle/grade:viewall', $ctx)) {
@@ -34,68 +39,96 @@ class block_gradeheatmap extends block_base {
             }
         }
 
-        // Teacher/Admin vs Student mode
+        // Mode
         $mode = (!empty($teachergradecourses) || $systemcanviewall) ? 'teacher' : 'student';
 
-        // Build list of courses that actually have numeric grade items
+        // Courses that actually have numeric grade data (options for teacher/admin)
         $courseoptions = [];
-        if ($systemcanviewall) {
-            $recs = $DB->get_records_sql("
-                SELECT c.id, c.shortname
-                  FROM {course} c
-                  JOIN {grade_items} gi
-                    ON gi.courseid=c.id
-                   AND gi.itemtype IN ('mod','manual','course')
-                   AND gi.gradetype=1
-                  JOIN {grade_grades} gg ON gg.itemid=gi.id
-                 WHERE c.id<>1
-              GROUP BY c.id, c.shortname
-              ORDER BY c.shortname
-            ");
-            foreach ($recs as $r) $courseoptions[$r->id] = $r->shortname;
-        } elseif (!empty($teachergradecourses)) {
-            list($inSql,$inParams) = $DB->get_in_or_equal(array_keys($teachergradecourses), SQL_PARAMS_NAMED, 'cid');
-            $recs = $DB->get_records_sql("
-                SELECT c.id, c.shortname
-                  FROM {course} c
-                  JOIN {grade_items} gi
-                    ON gi.courseid=c.id
-                   AND gi.itemtype IN ('mod','manual','course')
-                   AND gi.gradetype=1
-                  JOIN {grade_grades} gg ON gg.itemid=gi.id
-                 WHERE c.id $inSql
-              GROUP BY c.id, c.shortname
-              ORDER BY c.shortname
-            ", $inParams);
-            foreach ($recs as $r) $courseoptions[$r->id] = $r->shortname;
-        }
-
-        // Which course is selected (teacher/admin)?
-        $selectedcourseid = 0;
         if ($mode === 'teacher') {
-            $selectedcourseid = optional_param('ghm_courseid', 0, PARAM_INT);
-            if (!$selectedcourseid && !empty($courseoptions)) {
-                $selectedcourseid = (int)array_key_first($courseoptions);
+            if ($systemcanviewall) {
+                $recs = $DB->get_records_sql("
+                    SELECT c.id, c.shortname
+                      FROM {course} c
+                      JOIN {grade_items} gi
+                        ON gi.courseid=c.id
+                       AND gi.itemtype IN ('mod','manual','course')
+                       AND gi.gradetype=1
+                      JOIN {grade_grades} gg ON gg.itemid=gi.id
+                     WHERE c.id<>1
+                  GROUP BY c.id, c.shortname
+                  ORDER BY c.shortname
+                ");
+                foreach ($recs as $r) $courseoptions[$r->id] = $r->shortname;
+            } else if (!empty($teachergradecourses)) {
+                list($inSql, $inParams) = $DB->get_in_or_equal(array_keys($teachergradecourses), SQL_PARAMS_NAMED, 'cid');
+                $recs = $DB->get_records_sql("
+                    SELECT c.id, c.shortname
+                      FROM {course} c
+                      JOIN {grade_items} gi
+                        ON gi.courseid=c.id
+                       AND gi.itemtype IN ('mod','manual','course')
+                       AND gi.gradetype=1
+                      JOIN {grade_grades} gg ON gg.itemid=gi.id
+                     WHERE c.id $inSql
+                  GROUP BY c.id, c.shortname
+                  ORDER BY c.shortname
+                ", $inParams);
+                foreach ($recs as $r) $courseoptions[$r->id] = $r->shortname;
             }
         }
 
-        // Canvas + top bar (always show dropdown in teacher/admin)
+        // Current selections (teacher/admin)
+        $selectedcourseid = ($mode==='teacher') ? optional_param('ghm_courseid', 0, PARAM_INT) : 0;
+        if ($mode==='teacher' && !$selectedcourseid && !empty($courseoptions)) {
+            $selectedcourseid = (int)array_key_first($courseoptions);
+        }
+        $selecteduserid = ($mode==='teacher') ? optional_param('ghm_userid', 0, PARAM_INT) : 0; // 0 = average
+
+        // Build student list for the selected course
+        $studentoptions = [];
+        if ($mode==='teacher' && $selectedcourseid) {
+            $studs = $DB->get_records_sql("
+                SELECT DISTINCT u.id, u.firstname, u.lastname
+                  FROM {grade_grades} gg
+                  JOIN {user} u         ON u.id = gg.userid
+                  JOIN {grade_items} gi ON gi.id = gg.itemid AND gi.courseid=:cid
+                 WHERE gi.gradetype = 1
+                   AND gg.finalgrade IS NOT NULL
+              ORDER BY u.lastname, u.firstname
+            ", ['cid'=>$selectedcourseid]);
+            foreach ($studs as $u) {
+                $studentoptions[$u->id] = fullname($u);
+            }
+        }
+
+        // Canvas + top bar (always show both dropdowns for teacher/admin)
         $canvasid = html_writer::random_id('ghm_');
         $canvas   = html_writer::tag('canvas', '', ['id'=>$canvasid]);
 
         $topbar = '';
         if ($mode === 'teacher') {
+            // Course select
             $opts = '';
             foreach ($courseoptions as $cid=>$short) {
                 $sel = ($cid==$selectedcourseid) ? ' selected' : '';
                 $opts .= "<option value=\"$cid\"$sel>".s($short)."</option>";
             }
-            if ($opts === '') { $opts = '<option value="" disabled>(No courses with grade data)</option>'; }
+            if ($opts === '') $opts = '<option value="" disabled>(No courses with grade data)</option>';
+
+            // Student select (0 = average)
+            $uopts = '<option value="0"'.($selecteduserid==0?' selected':'').'>All students — Average</option>';
+            foreach ($studentoptions as $uid=>$name) {
+                $sel = ($uid==$selecteduserid) ? ' selected' : '';
+                $uopts .= "<option value=\"$uid\"$sel>".s($name)."</option>";
+            }
 
             $topbar = '
               <div class="ghm-topbar dark">
                 <label class="ghm-label">Course:</label>
                 <select class="ghm-select" id="ghm-course-select-'.$canvasid.'">'.$opts.'</select>
+
+                <label class="ghm-label" style="margin-left:12px">Student:</label>
+                <select class="ghm-select" id="ghm-user-select-'.$canvasid.'">'.$uopts.'</select>
               </div>';
         }
 
@@ -104,57 +137,76 @@ class block_gradeheatmap extends block_base {
         ]);
         $this->content->text = html_writer::div($wrap, 'block_gradeheatmap');
 
-        // ----- Build data payload -----
+        // ----------------- DATA PAYLOAD -----------------
         if ($mode === 'teacher' && $selectedcourseid) {
-            // TEACHER/ADMIN: average % per item (include course total but label it safely)
-            $rows = $DB->get_records_sql("
-                SELECT
-                  gi.id,
-                  COALESCE(
-                    NULLIF(gi.itemname,''),
-                    IFNULL(CONCAT(gi.itemmodule,' #',gi.id), CONCAT('Course total #', gi.id))
-                  ) AS itemname,
-                  ROUND(AVG(gg.finalgrade/NULLIF(gi.grademax,0))*100,1) AS percent,
-                  gi.sortorder
-                FROM {grade_items} gi
-                JOIN {grade_grades} gg ON gg.itemid = gi.id
-               WHERE gi.courseid=:cid
-                 AND gi.itemtype IN ('mod','manual','course')
-                 AND gi.gradetype = 1
-                 AND gg.finalgrade IS NOT NULL
-            GROUP BY gi.id, gi.itemname, gi.sortorder
-            ORDER BY gi.sortorder, gi.id
-            ", ['cid'=>$selectedcourseid]);
+            if ($selecteduserid > 0) {
+                // Per-student
+                $rows = $DB->get_records_sql("
+                    SELECT
+                      gi.id,
+                      COALESCE(
+                        NULLIF(gi.itemname,''),
+                        IFNULL(CONCAT(gi.itemmodule,' #',gi.id), CONCAT('Course total #', gi.id))
+                      ) AS itemname,
+                      ROUND(gg.finalgrade/NULLIF(gi.grademax,0)*100,1) AS percent,
+                      gi.sortorder
+                    FROM {grade_items} gi
+                    JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = :uid
+                   WHERE gi.courseid = :cid
+                     AND gi.itemtype IN ('mod','manual','course')
+                     AND gi.gradetype = 1
+                ORDER BY gi.sortorder, gi.id
+                ", ['cid'=>$selectedcourseid, 'uid'=>$selecteduserid]);
+                $actualLabel = 'Actual — '.($studentoptions[$selecteduserid] ?? 'Student');
+            } else {
+                // Course average
+                $rows = $DB->get_records_sql("
+                    SELECT
+                      gi.id,
+                      COALESCE(
+                        NULLIF(gi.itemname,''),
+                        IFNULL(CONCAT(gi.itemmodule,' #',gi.id), CONCAT('Course total #', gi.id))
+                      ) AS itemname,
+                      ROUND(AVG(gg.finalgrade/NULLIF(gi.grademax,0))*100,1) AS percent,
+                      gi.sortorder
+                    FROM {grade_items} gi
+                    JOIN {grade_grades} gg ON gg.itemid = gi.id
+                   WHERE gi.courseid = :cid
+                     AND gi.itemtype IN ('mod','manual','course')
+                     AND gi.gradetype = 1
+                     AND gg.finalgrade IS NOT NULL
+                GROUP BY gi.id, gi.itemname, gi.sortorder
+                ORDER BY gi.sortorder, gi.id
+                ", ['cid'=>$selectedcourseid]);
+                $actualLabel = 'Actual — Course average';
+            }
 
             $labels=[]; $actual=[];
             if ($rows) {
                 foreach ($rows as $r) {
-                    $iname = trim($r->itemname ?? '');
-                    if ($iname === '') $iname = 'Item #'.$r->id;
-                    $labels[] = $iname;
-                    $actual[] = $r->percent === null ? null : (float)$r->percent;
+                    $name = trim($r->itemname ?? '');
+                    if ($name==='') $name = 'Item #'.$r->id;
+                    $labels[] = $name;
+                    $actual[] = $r->percent===null ? null : (float)$r->percent;
                 }
             }
-            // Expected line - simple constant target (60%)
+            if (empty($labels)) {
+                $labels   = ['Demo: Quiz 1','Demo: Assign 1','Demo: Final'];
+                $actual   = [48.0,73.0,66.0];
+            }
             $expected = array_fill(0, max(1,count($labels)), 60.0);
 
-            if (empty($labels)) { // safe demo fallback
-                $labels   = ['Demo: Quiz 1','Demo: Assign 1','Demo: Final'];
-                $actual   = [48.0, 73.0, 66.0];
-                $expected = [60.0, 60.0, 60.0];
-            }
-
             $payload = [
-                'mode'     => 'teacher',
-                'chart'    => 'curves',
-                'canvasid' => $canvasid,
-                'labels'   => $labels,
-                'actual'   => $actual,
-                'expected' => $expected
+                'mode'        => 'teacher',
+                'canvasid'    => $canvasid,
+                'labels'      => $labels,
+                'actual'      => $actual,
+                'expected'    => $expected,
+                'actualLabel' => $actualLabel
             ];
 
         } else {
-            // STUDENT: their own grades across all enrolled courses (smooth line)
+            // Student: their own % across all enrolled courses
             $labels=[]; $series=[];
             if (!empty($enrolled)) {
                 $courseids = array_keys($enrolled);
@@ -174,18 +226,19 @@ class block_gradeheatmap extends block_base {
                        AND gi.gradetype = 1
                   ORDER BY gi.courseid, gi.sortorder, gi.id
                 ", array_merge($inParams,['uid'=>$USER->id]));
-
                 foreach ($rows as $r) {
                     $c = $enrolled[$r->courseid]->shortname ?? ('C'.$r->courseid);
-                    $iname = trim($r->itemname ?? '');
-                    if ($iname === '') $iname = 'Item #'.$r->id;
-                    $labels[] = trim($c.': '.$iname);
+                    $name = trim($r->itemname ?? '');
+                    if ($name==='') $name = 'Item #'.$r->id;
+                    $labels[] = $c.': '.$name;
                     $series[] = ($r->grademax>0 && $r->finalgrade!==null)
                         ? (float)round(($r->finalgrade/$r->grademax)*100,1) : null;
                 }
             }
-            if (empty($labels)) { $labels=['Demo: Quiz 1','Demo: Assign 1','Demo: Final']; $series=[62.0,84.0,null]; }
-
+            if (empty($labels)) {
+                $labels=['Demo: Quiz 1','Demo: Assign 1','Demo: Final'];
+                $series=[62.0,84.0,null];
+            }
             $payload = [
                 'mode'     => 'student',
                 'canvasid' => $canvasid,
@@ -196,7 +249,7 @@ class block_gradeheatmap extends block_base {
 
         $json = json_encode($payload, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
 
-        // ----- JS (no-AMD loader + high-contrast curves) -----
+        // ----------------- JS -----------------
         $init = <<<JS
 (function(){
   var p = $json;
@@ -204,15 +257,23 @@ class block_gradeheatmap extends block_base {
   if (!cv) return;
   var ctx = cv.getContext('2d');
 
-  // Course dropdown reload
-  var sel = document.getElementById('ghm-course-select-'+p.canvasid);
-  if (sel) sel.addEventListener('change', function(){
+  // Change handlers: keep both params
+  var csel = document.getElementById('ghm-course-select-'+p.canvasid);
+  if (csel) csel.addEventListener('change', function(){
     var url = new URL(window.location.href);
     url.searchParams.set('ghm_courseid', this.value);
+    var usel = document.getElementById('ghm-user-select-'+p.canvasid);
+    if (usel) url.searchParams.set('ghm_userid', usel.value || 0);
+    window.location.href = url.toString();
+  });
+  var usel = document.getElementById('ghm-user-select-'+p.canvasid);
+  if (usel) usel.addEventListener('change', function(){
+    var url = new URL(window.location.href);
+    url.searchParams.set('ghm_userid', this.value);
+    if (csel) url.searchParams.set('ghm_courseid', csel.value || 0);
     window.location.href = url.toString();
   });
 
-  // Load Chart.js without AMD conflicts
   function noAMD(src, cb){
     var od=window.define, om=window.module, oe=window.exports;
     try{ window.define=undefined; window.module=undefined; window.exports=undefined; }catch(e){}
@@ -222,49 +283,30 @@ class block_gradeheatmap extends block_base {
     document.head.appendChild(s);
   }
 
-  // -------- Teacher/Admin (dual curves, glow, high contrast) --------
-  function drawTeacherCurves(){
+  function drawTeacher(){
     if (typeof Chart==='undefined'){
       cv.insertAdjacentHTML('beforebegin','<div style="color:#f55">Chart.js missing</div>');
       return;
     }
-
     var count = (p.labels||[]).length;
     cv.width  = Math.max(900, count*70);
     cv.height = 340;
 
-    // Detect bg for contrast choice
     function parseRGB(str){ var m=/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)/.exec(str||''); return m?{r:+m[1],g:+m[2],b:+m[3]}:{r:255,g:255,b:255}; }
     function luma(rgb){ return 0.2126*rgb.r + 0.7152*rgb.g + 0.0722*rgb.b; }
-    var bg = getComputedStyle(cv.parentElement).backgroundColor;
-    var isLight = luma(parseRGB(bg)) > 200;
+    var isLight = luma(parseRGB(getComputedStyle(cv.parentElement).backgroundColor)) > 200;
 
     var axisTick  = isLight ? '#1e293b' : '#CFE3FF';
     var gridColor = isLight ? '#e5e7eb' : 'rgba(255,255,255,0.08)';
     var actualCol = isLight ? '#0284C7' : '#399AFF';
-    var fillTop   = isLight ? 'rgba(2,132,199,0.18)' : 'rgba(57,154,255,0.18)';
     var expectedCol = isLight ? '#d97706' : '#FFD44A';
 
-    var hasActual = Array.isArray(p.actual) && p.actual.some(v => v !== null && !isNaN(v));
-    if (!hasActual && (!p.expected || !p.expected.length)) {
-      cv.insertAdjacentHTML('afterend','<div style="margin-top:6px;color:'+axisTick+'">No grade data yet for this course.</div>');
-    }
-
-    const hoverBand = {
-      id: 'hoverBand',
-      afterDatasetsDraw(chart){
-        const {ctx, tooltip, chartArea:{top,bottom}} = chart;
-        if (!tooltip || !tooltip.getActiveElements().length) return;
-        const x = tooltip.caretX;
-        ctx.save();
-        ctx.fillStyle = isLight ? 'rgba(2,132,199,0.06)' : 'rgba(180,200,255,0.07)';
-        ctx.fillRect(x-28, top, 56, bottom-top);
-        ctx.restore();
-      }
-    };
+    var g = ctx.createLinearGradient(0,0,0,cv.height);
+    g.addColorStop(0, isLight ? 'rgba(2,132,199,0.18)' : 'rgba(57,154,255,0.18)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
 
     const glow = {
-      id: 'glow',
+      id:'glow',
       beforeDatasetsDraw(chart, args){
         const m = chart.getDatasetMeta(0);
         if (!m || !m.dataset) return;
@@ -277,40 +319,33 @@ class block_gradeheatmap extends block_base {
       }
     };
 
-    var g = ctx.createLinearGradient(0,0,0,cv.height);
-    g.addColorStop(0, fillTop);
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-
     new Chart(ctx,{
       type:'line',
-      plugins:[hoverBand, glow],
+      plugins:[glow],
       data:{
-        labels: p.labels,
-        datasets:[
-          {
-            label:'Actual',
-            data:p.actual || [],
-            tension:.42,
-            cubicInterpolationMode:'monotone',
-            borderColor: actualCol,
-            backgroundColor: g,
-            borderWidth: 3,
-            pointRadius: 4,
-            pointBackgroundColor: actualCol,
-            spanGaps: true,
-            fill:true
-          },
-          {
-            label:'Expected',
-            data:p.expected || [],
-            tension:.42,
-            borderColor: expectedCol,
-            borderDash:[6,6],
-            borderWidth:2,
-            pointRadius:0,
-            fill:false
-          }
-        ]
+        labels:p.labels,
+        datasets:[{
+          label: (p.actualLabel || 'Actual'),
+          data: p.actual || [],
+          tension:.42,
+          cubicInterpolationMode:'monotone',
+          borderColor: actualCol,
+          backgroundColor: g,
+          borderWidth: 3,
+          pointRadius: 4,
+          pointBackgroundColor: actualCol,
+          spanGaps: true,
+          fill:true
+        },{
+          label:'Expected',
+          data: p.expected || [],
+          tension:.42,
+          borderColor: expectedCol,
+          borderDash:[6,6],
+          borderWidth:2,
+          pointRadius:0,
+          fill:false
+        }]
       },
       options:{
         responsive:true, maintainAspectRatio:false, animation:{duration:500},
@@ -334,13 +369,12 @@ class block_gradeheatmap extends block_base {
     });
   }
 
-  // -------- Student (single green smooth line) --------
   function drawStudent(){
     if (typeof Chart==='undefined'){
       cv.insertAdjacentHTML('beforebegin','<div style="color:#a00">Chart.js missing</div>');
       return;
     }
-    cv.width  = Math.max(900,(p.labels||[]).length*60);
+    cv.width = Math.max(900,(p.labels||[]).length*60);
     cv.height = 320;
 
     var g = ctx.createLinearGradient(0,0,0,cv.height);
@@ -375,12 +409,12 @@ class block_gradeheatmap extends block_base {
   }
 
   function start(){
-    if (typeof Chart!=='undefined') return (p.mode==='teacher' ? drawTeacherCurves() : drawStudent());
+    if (typeof Chart!=='undefined') return (p.mode==='teacher' ? drawTeacher() : drawStudent());
     noAMD('/blocks/gradeheatmap/js/chart.umd.min.js', function(err){
       if (err || typeof Chart==='undefined'){
         noAMD('https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js',
-          function(){ (p.mode==='teacher' ? drawTeacherCurves() : drawStudent()); });
-      } else { (p.mode==='teacher' ? drawTeacherCurves() : drawStudent()); }
+          function(){ (p.mode==='teacher' ? drawTeacher() : drawStudent()); });
+      } else { (p.mode==='teacher' ? drawTeacher() : drawStudent()); }
     });
   }
   start();
@@ -393,4 +427,3 @@ JS;
         return $this->content;
     }
 }
-
