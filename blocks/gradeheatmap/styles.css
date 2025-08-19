@@ -43,7 +43,6 @@
 
 
 
-/* Wrapper */
 .block_gradeheatmap { width:100%; }
 .block_gradeheatmap .heatmap-wrap{
   display:flex; flex-direction:column; gap:8px;
