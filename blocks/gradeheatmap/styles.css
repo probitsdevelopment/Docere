@@ -9,6 +9,27 @@
 .block_gradeheatmap canvas{ max-width:100%; height:auto; } */
 /* optional: hide block title so it looks like a native center widget */
 /* .block_gradeheatmap .card-title{ display:none!important; } */
+
+
+
+/* 
+
+.block_gradeheatmap { width: 100%; }
+.block_gradeheatmap .heatmap-wrap{
+  display:flex; justify-content:center; align-items:center;
+  overflow:auto; padding:16px; background:#fff;
+  border-radius:12px; box-shadow:0 1px 2px rgba(0,0,0,.06);
+  min-height:240px;
+}
+.block_gradeheatmap canvas{ max-width:100%; height:auto; } */
+
+
+
+
+
+
+
+
 .block_gradeheatmap { width: 100%; }
 .block_gradeheatmap .heatmap-wrap{
   display:flex; justify-content:center; align-items:center;
@@ -17,3 +38,4 @@
   min-height:240px;
 }
 .block_gradeheatmap canvas{ max-width:100%; height:auto; }
+
