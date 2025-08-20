@@ -121,6 +121,15 @@ class block_gradeheatmap extends block_base {
                 $sel = ($uid==$selecteduserid) ? ' selected' : '';
                 $uopts .= "<option value=\"$uid\"$sel>".s($name)."</option>";
             }
+
+            // Render dropdowns in topbar
+            $topbar = '<div class="ghm-topbar">'
+                . '<label for="ghm_courseid">Course: </label>'
+                . '<select id="ghm_courseid" name="ghm_courseid">' . $opts . '</select>'
+                . '&nbsp;&nbsp;'
+                . '<label for="ghm_userid">Student: </label>'
+                . '<select id="ghm_userid" name="ghm_userid">' . $uopts . '</select>'
+                . '</div>';
         }
 
         $init = <<<JS
