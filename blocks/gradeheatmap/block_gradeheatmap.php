@@ -142,7 +142,7 @@ class block_gradeheatmap extends block_base {
         // ----------------- DATA PAYLOAD -----------------
         $selected_user_id = ($mode === 'teacher' && $selecteduserid > 0) ? $selecteduserid : $USER->id;
 
-        // Fetch login activity for the last 30 days, grouped by day of the week
+        // Fetch login activity for the last 7 days, grouped by day of the week
         $logins = $DB->get_records_sql("
             SELECT
                 DAYOFWEEK(FROM_UNIXTIME(timecreated)) AS dayofweek,
@@ -152,7 +152,7 @@ class block_gradeheatmap extends block_base {
             WHERE
                 userid = :userid AND
                 eventname = '\\core\\event\\user_loggedin' AND
-                timecreated > UNIX_TIMESTAMP(NOW() - INTERVAL 30 DAY)
+                timecreated > UNIX_TIMESTAMP(NOW() - INTERVAL 7 DAY)
             GROUP BY
                 dayofweek
             ORDER BY
@@ -528,7 +528,7 @@ class block_gradeheatmap extends block_base {
 
     var loginOption = {
       title: {
-        text: 'Login Activity (Last 30 Days)',
+        text: 'Login Activity (Last 7 Days)',
         textStyle: {
           color: axisTick
         }
