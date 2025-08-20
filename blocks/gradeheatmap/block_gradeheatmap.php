@@ -329,8 +329,10 @@ class block_gradeheatmap extends block_base {
   function drawTeacher(){
     if (!chartDom) return;
     var isLight = getComputedStyle(chartDom.parentElement).backgroundColor.startsWith('rgb(245, 245, 245)') || getComputedStyle(chartDom.parentElement).backgroundColor.startsWith('rgb(255, 255, 255)');
-    var actualCol = isLight ? '#0284C7' : '#399AFF';
-    var expectedCol = isLight ? '#d97706' : '#FFD44A';
+    var successColor = isLight ? '#10B981' : '#4ade80';
+    var averageColor = isLight ? '#F59E0B' : '#FBBF24';
+    var failColor = isLight ? '#EF4444' : '#F87171';
+    var expectedColor = isLight ? '#d97706' : '#FFD44A';
     var axisTick = isLight ? '#1e293b' : '#CFE3FF';
 
     var option = {
@@ -392,26 +394,30 @@ class block_gradeheatmap extends block_base {
           }
         }
       },
+      // Visual Map for Area Pieces
+      visualMap: {
+        show: false,
+        type: 'piecewise',
+        seriesIndex: 0,
+        pieces: [
+          { gt: 80, color: successColor }, // Grades > 80% (Success)
+          { gt: 50, lt: 80, color: averageColor }, // Grades between 50% and 80% (Average)
+          { lt: 50, color: failColor } // Grades < 50% (Fail)
+        ],
+        outOfRange: {
+          color: failColor // Default for any data outside defined ranges
+        }
+      },
       series: [
         {
           name: p.actualLabel || 'Actual',
           type: 'line',
           smooth: true,
           lineStyle: {
-            color: actualCol,
             width: 3
           },
-          itemStyle: {
-              color: actualCol
-          },
           areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-              offset: 0,
-              color: isLight ? 'rgba(2,132,199,0.18)' : 'rgba(57,154,255,0.18)'
-            }, {
-              offset: 1,
-              color: 'rgba(0,0,0,0)'
-            }])
+            opacity: 0.2
           },
           data: p.actual
         },
@@ -420,12 +426,12 @@ class block_gradeheatmap extends block_base {
           type: 'line',
           smooth: true,
           lineStyle: {
-            color: expectedCol,
+            color: expectedColor,
             type: 'dashed',
             width: 2
           },
           itemStyle: {
-              color: expectedCol
+              color: expectedColor
           },
           data: p.expected
         }
@@ -441,6 +447,12 @@ class block_gradeheatmap extends block_base {
 
   function drawStudent(){
     if (!chartDom) return;
+    var isLight = getComputedStyle(chartDom.parentElement).backgroundColor.startsWith('rgb(245, 245, 245)') || getComputedStyle(chartDom.parentElement).backgroundColor.startsWith('rgb(255, 255, 255)');
+    var successColor = isLight ? '#10B981' : '#4ade80';
+    var averageColor = isLight ? '#F59E0B' : '#FBBF24';
+    var failColor = isLight ? '#EF4444' : '#F87171';
+    var axisTick = isLight ? '#1e293b' : '#CFE3FF';
+
     var option = {
       tooltip: {
         trigger: 'axis',
@@ -465,7 +477,13 @@ class block_gradeheatmap extends block_base {
         data: p.labels,
         axisLabel: {
           rotate: 60,
-          interval: 0
+          interval: 0,
+          color: axisTick
+        },
+        axisLine: {
+            lineStyle: {
+                color: axisTick
+            }
         }
       },
       yAxis: {
@@ -473,12 +491,27 @@ class block_gradeheatmap extends block_base {
         min: 0,
         max: 100,
         axisLabel: {
-          formatter: '{value} %'
+          formatter: '{value} %',
+          color: axisTick
         },
         splitLine: {
           lineStyle: {
-            color: 'rgba(0,0,0,.06)'
+            color: isLight ? '#e5e7eb' : 'rgba(255,255,255,0.08)'
           }
+        }
+      },
+      // Visual Map for Area Pieces
+      visualMap: {
+        show: false,
+        type: 'piecewise',
+        seriesIndex: 0,
+        pieces: [
+          { gt: 80, color: successColor }, // Grades > 80%
+          { gt: 50, lt: 80, color: averageColor }, // Grades between 50% and 80%
+          { lt: 50, color: failColor } // Grades < 50%
+        ],
+        outOfRange: {
+          color: failColor
         }
       },
       series: [
@@ -486,21 +519,8 @@ class block_gradeheatmap extends block_base {
           name: 'Grade (%)',
           type: 'line',
           smooth: true,
-          lineStyle: {
-            color: '#2ECC71',
-            width: 3
-          },
-          itemStyle: {
-              color: '#2ECC71'
-          },
           areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-              offset: 0,
-              color: 'rgba(46,204,113,0.28)'
-            }, {
-              offset: 1,
-              color: 'rgba(46,204,113,0.00)'
-            }])
+            opacity: 0.2
           },
           data: p.series
         }
