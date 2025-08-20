@@ -3,7 +3,8 @@ defined('MOODLE_INTERNAL') || die();
 
 class block_gradeheatmap extends block_base {
     public function init() {
-        $this->title = get_string('pluginname', 'block_gradeheatmap');
+        try { $this->title = get_string('pluginname', 'block_gradeheatmap'); }
+        catch (\Throwable $e) { $this->title = 'Grade Trends'; }
     }
 
     // Show on Dashboard and course pages.
@@ -31,7 +32,7 @@ class block_gradeheatmap extends block_base {
             'on' => true
         ]]);
 
-        // Container (chart renders here)
+        // Chart container.
         $chartdiv = html_writer::div('', 'gradeheatmap-echart', ['id' => 'gh-echart']);
 
         $isDash   = ($this->page->pagetype === 'my-index');
@@ -54,15 +55,16 @@ class block_gradeheatmap extends block_base {
             list($inSql, $inParams) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'cid');
             $params = array_merge($inParams, ['userid' => $userid]);
 
+            // Corrected query with named placeholders
             $sql = "SELECT gi.id, gi.courseid,
-                           COALESCE(NULLIF(gi.itemname,''), CONCAT(gi.itemmodule,' #',gi.id)) AS itemname,
-                           gi.sortorder, gi.grademax, gg.finalgrade
-                      FROM {grade_items} gi
-                      JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = :userid
-                     WHERE gi.courseid $inSql
-                       AND gi.itemtype IN ('mod','manual','course')
-                       AND gi.gradetype = 1
-                  ORDER BY gi.courseid, gi.sortorder, gi.id";
+                       COALESCE(NULLIF(gi.itemname,''), CONCAT(gi.itemmodule,' #',gi.id)) AS itemname,
+                       gi.sortorder, gi.grademax, gg.finalgrade
+                  FROM {grade_items} gi
+                  JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = :userid
+                 WHERE gi.courseid $inSql
+                   AND gi.itemtype IN ('mod','manual','course')
+                   AND gi.gradetype = 1
+              ORDER BY gi.courseid, gi.sortorder, gi.id";
             $rows = $DB->get_records_sql($sql, $params);
 
             foreach ($rows as $r) {
@@ -78,10 +80,10 @@ class block_gradeheatmap extends block_base {
         $build_avg_series = function(int $courseid) use($DB) {
             $labels = []; $series = [];
             $sql = "SELECT gi.id,
-                           COALESCE(NULLIF(gi.itemname,''), CONCAT(gi.itemmodule,' #',gi.id)) AS itemname,
-                           gi.sortorder,
-                           AVG(CASE WHEN gi.grademax>0 AND gg.finalgrade IS NOT NULL
-                                    THEN (gg.finalgrade/gi.grademax)*100 END) AS pct
+                       COALESCE(NULLIF(gi.itemname,''), CONCAT(gi.itemmodule,' #',gi.id)) AS itemname,
+                       gi.sortorder,
+                       AVG(CASE WHEN gi.grademax>0 AND gg.finalgrade IS NOT NULL
+                                THEN (gg.finalgrade/gi.grademax)*100 END) AS pct
                       FROM {grade_items} gi
                       JOIN {grade_grades} gg ON gg.itemid = gi.id
                      WHERE gi.courseid = :cid
