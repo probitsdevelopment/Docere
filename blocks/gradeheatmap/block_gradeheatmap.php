@@ -132,12 +132,51 @@ class block_gradeheatmap extends block_base {
                 . '</div>';
         }
 
-        $init = <<<JS
-require(['block_gradeheatmap/heatmap'], function(heatmap) {
-    var p = $json;
-    heatmap.init(p);
-});
-JS;
+        // Build chart data for JS
+        $chartdata = [
+            'labels' => [], // grade item names
+            'grades' => [], // grades for selected user or average
+            'students' => [], // student names (for teacher mode)
+        ];
+
+        // Get grade items for selected course
+        $gradeitems = [];
+        if ($selectedcourseid) {
+            $gradeitems = $DB->get_records_sql("SELECT id, itemname FROM {grade_items} WHERE courseid = :cid AND gradetype = 1 ORDER BY sortorder", ['cid'=>$selectedcourseid]);
+        }
+        foreach ($gradeitems as $gi) {
+            $chartdata['labels'][] = $gi->itemname ?: 'Grade Item ' . $gi->id;
+        }
+
+        // Get grades for selected user or average
+        if ($selectedcourseid && !empty($gradeitems)) {
+            $itemids = array_keys($gradeitems);
+            list($inSql, $inParams) = $DB->get_in_or_equal($itemids, SQL_PARAMS_NAMED, 'gi');
+            if ($selecteduserid) {
+                // Specific student
+                $grades = $DB->get_records_sql("SELECT gg.itemid, gg.finalgrade FROM {grade_grades} gg WHERE gg.userid = :uid AND gg.itemid $inSql", array_merge(['uid'=>$selecteduserid], $inParams));
+                foreach ($itemids as $iid) {
+                    $chartdata['grades'][] = isset($grades[$iid]) ? floatval($grades[$iid]->finalgrade) : null;
+                }
+            } else {
+                // Average for all students
+                foreach ($itemids as $iid) {
+                    $avg = $DB->get_field_sql("SELECT AVG(finalgrade) FROM {grade_grades} WHERE itemid = :iid AND finalgrade IS NOT NULL", ['iid'=>$iid]);
+                    $chartdata['grades'][] = $avg !== false ? floatval($avg) : null;
+                }
+            }
+        }
+
+        // For teacher mode, add student names
+        if ($mode === 'teacher' && !empty($studentoptions)) {
+            foreach ($studentoptions as $uid => $name) {
+                $chartdata['students'][] = $name;
+            }
+        }
+
+        $json = json_encode($chartdata, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT);
+
+        $init = "require(['block_gradeheatmap/heatmap'], function(heatmap) {\n    var p = $json;\n    heatmap.init(p);\n});";
 
         $PAGE->requires->js_init_code($init);
 
