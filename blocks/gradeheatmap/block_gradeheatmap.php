@@ -21,7 +21,9 @@ class block_gradeheatmap extends block_base {
         require_once($CFG->dirroot . '/course/lib.php');
 
         // Load the ECharts library
-        $PAGE->requires->js('https://cdnjs.cloudflare.com/ajax/libs/echarts/5.0.0/echarts.min.js');
+       $PAGE->requires->js('https://cdn.jsdelivr.net/npm/echarts@5.0.0/dist/echarts.min.js', true);
+    $PAGE->requires->js(new moodle_url('/blocks/gradeheatmap/js/echarts.min.js'), true);// Local fallback
+
 
 
         // Styles (dark card for teacher/admin)
