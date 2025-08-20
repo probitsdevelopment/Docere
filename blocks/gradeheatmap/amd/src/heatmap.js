@@ -9,52 +9,55 @@ define([], function() {
     return 'rgba(' + r + ',' + g + ',0.85)'; // red→green
   }
 
+  function loadECharts(cb){
+    if (window.echarts) return cb();
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js';
+    s.onload=function(){ cb(); };
+    document.head.appendChild(s);
+  }
+
   return {
     init: function(payload) {
-      var cv = document.getElementById(payload.canvasid);
-      if (!cv || typeof Chart === 'undefined') return;
+      var container = document.getElementById(payload.canvasid);
+      if (!container) return;
+      // Ensure it's a div for ECharts
+      if (container.tagName.toLowerCase() !== 'div') {
+        var div = document.createElement('div');
+        div.id = payload.canvasid;
+        div.style.width = '900px';
+        div.style.height = '340px';
+        container.parentNode.replaceChild(div, container);
+        container = div;
+      } else {
+        container.style.width = '900px';
+        container.style.height = '340px';
+      }
 
-      // Size canvas so it scrolls nicely.
-      cv.width  = Math.max(600, payload.xlabels.length * 40);
-      cv.height = Math.max(300, payload.ylabels.length * 28);
-      var ctx = cv.getContext('2d');
-
-      // Convert to labelled matrix data.
-      var data = payload.cells.map(function(c) {
-        return { x: payload.xlabels[c.x], y: payload.ylabels[c.y], v: c.v };
-      });
-
-      new Chart(ctx, {
-        type: 'matrix',
-        data: {
-          datasets: [{
-            label: 'Grades (%)',
-            data: data,
-            backgroundColor: function(ctx) { return valueToColor(ctx.raw.v); },
-            borderWidth: 1,
-            borderColor: 'rgba(0,0,0,0.08)',
-            tension: 0.4 , 
-            width:  function(ctx){ var a=ctx.chart.chartArea; return (a.right-a.left)/payload.xlabels.length - 2; },
-            height: function(ctx){ var a=ctx.chart.chartArea; return (a.bottom-a.top)/payload.ylabels.length - 2; }
-          }]
-        },
-        options: {
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                title: function(items){ var it=items[0]; return it.raw.y+' — '+it.raw.x; },
-                label: function(item){ var v=item.raw.v; return (v==null||isNaN(v))?'No grade':(v+'%'); }
-              }
-            }
+      function drawEChartsLine() {
+        var chart = echarts.init(container);
+        var option = {
+          xAxis: {
+            type: 'category',
+            data: payload.xlabels || payload.labels || []
           },
-          scales: {
-            x: { type:'category', labels: payload.xlabels, position:'top', ticks:{autoSkip:false,maxRotation:60,minRotation:0} },
-            y: { type:'category', labels: payload.ylabels, reverse:true, ticks:{autoSkip:false} }
-          }
-        }
-      });
+          yAxis: {
+            type: 'value',
+            min: 0,
+            max: 100
+          },
+          series: [{
+            data: (payload.series || payload.actual || []),
+            type: 'line',
+            smooth: true,
+            name: (payload.actualLabel || 'Actual'),
+            lineStyle: { width: 3 }
+          }]
+        };
+        chart.setOption(option);
+      }
+
+      loadECharts(drawEChartsLine);
     }
   };
 });
