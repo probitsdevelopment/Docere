@@ -174,6 +174,8 @@ class block_gradeheatmap extends block_base {
             }
         }
 
+        // Add canvasid to payload for JS
+        $chartdata['canvasid'] = $canvasid;
         $json = json_encode($chartdata, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT);
 
         $init = "require(['block_gradeheatmap/heatmap'], function(heatmap) {\n    var p = $json;\n    heatmap.init(p);\n});";
