@@ -1,4 +1,3 @@
-
 <?php
 defined('MOODLE_INTERNAL') || die();
 
@@ -61,7 +60,7 @@ class block_gradeheatmap extends block_base {
 
             // Corrected query with named placeholders
             $sql = "SELECT gi.id, gi.courseid,
-                       COALESCE(NULLIF(gi.itemname,''), CONCAT(gi.itemmodule,' #',gi.id)) AS itemname,
+                       COALESCE(NULLIF(gi.itemname,''), CONCAT(gi.itemmodule,' #', gi.id)) AS itemname,
                        gi.sortorder, gi.grademax, gg.finalgrade
                   FROM {grade_items} gi
                   JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = :userid
@@ -84,7 +83,7 @@ class block_gradeheatmap extends block_base {
         $build_avg_series = function(int $courseid) use($DB) {
             $labels = []; $series = [];
             $sql = "SELECT gi.id,
-                       COALESCE(NULLIF(gi.itemname,''), CONCAT(gi.itemmodule,' #',gi.id)) AS itemname,
+                       COALESCE(NULLIF(gi.itemname,''), CONCAT(gi.itemmodule,' #', gi.id)) AS itemname,
                        gi.sortorder,
                        AVG(CASE WHEN gi.grademax>0 AND gg.finalgrade IS NOT NULL
                                 THEN (gg.finalgrade/gi.grademax)*100 END) AS pct
@@ -240,4 +239,4 @@ JS);
         $this->content->footer = '';
         return $this->content;
     }
-}
+}  
