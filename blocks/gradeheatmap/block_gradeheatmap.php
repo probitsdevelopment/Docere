@@ -230,7 +230,6 @@ class block_gradeheatmap extends block_base {
                 $labels = ['Demo: Quiz 1','Demo: Assign 1','Demo: Final'];
                 $actual = [48.0,73.0,66.0];
             }
-            $expected = array_fill(0, max(1,count($labels)), 60.0);
 
             $payload = [
                 'mode'             => 'teacher',
@@ -238,7 +237,6 @@ class block_gradeheatmap extends block_base {
                 'loginchartcontainerid' => $loginchartcontainerid,
                 'labels'           => $labels,
                 'actual'           => $actual,
-                'expected'         => $expected,
                 'actualLabel'      => $actualLabel,
                 'loginlabels'      => $login_labels,
                 'loginseries'      => $login_series
@@ -332,18 +330,14 @@ class block_gradeheatmap extends block_base {
     var successColor = isLight ? '#10B981' : '#4ade80';
     var averageColor = isLight ? '#F59E0B' : '#FBBF24';
     var failColor = isLight ? '#EF4444' : '#F87171';
-    var expectedColor = isLight ? '#d97706' : '#FFD44A';
     var axisTick = isLight ? '#1e293b' : '#CFE3FF';
 
     var option = {
       tooltip: {
         trigger: 'axis',
         formatter: function (params) {
-          var res = params[0].name + '<br/>';
-          for (var i = 0; i < params.length; i++) {
-            res += params[i].marker + ' ' + params[i].seriesName + ': ' + (params[i].value == null ? '—' : params[i].value + '%') + '<br/>';
-          }
-          return res;
+          var value = params[0].value;
+          return params[0].name + '<br/>Grade (%): ' + (value == null ? '—' : value + '%');
         },
         backgroundColor: isLight ? 'rgba(15,23,42,0.92)' : 'rgba(8,12,20,0.92)',
         textStyle: {
@@ -352,12 +346,6 @@ class block_gradeheatmap extends block_base {
         borderColor: isLight ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.12)',
         borderWidth: 1,
         padding: 10
-      },
-      legend: {
-        data: [p.actualLabel || 'Actual', 'Expected'],
-        textStyle: {
-          color: axisTick
-        }
       },
       grid: {
         left: '3%',
@@ -394,18 +382,17 @@ class block_gradeheatmap extends block_base {
           }
         }
       },
-      // Visual Map for Area Pieces
       visualMap: {
         show: false,
         type: 'piecewise',
         seriesIndex: 0,
         pieces: [
-          { gt: 80, color: successColor }, // Grades > 80% (Success)
-          { gt: 50, lt: 80, color: averageColor }, // Grades between 50% and 80% (Average)
-          { lt: 50, color: failColor } // Grades < 50% (Fail)
+          { gt: 80, color: successColor },
+          { gt: 50, lt: 80, color: averageColor },
+          { lt: 50, color: failColor }
         ],
         outOfRange: {
-          color: failColor // Default for any data outside defined ranges
+          color: failColor
         }
       },
       series: [
@@ -413,27 +400,13 @@ class block_gradeheatmap extends block_base {
           name: p.actualLabel || 'Actual',
           type: 'line',
           smooth: true,
-          lineStyle: {
-            width: 3
-          },
           areaStyle: {
-            opacity: 0.2
+            opacity: 0.8
+          },
+          lineStyle: {
+              width: 0 // This will make the line invisible
           },
           data: p.actual
-        },
-        {
-          name: 'Expected',
-          type: 'line',
-          smooth: true,
-          lineStyle: {
-            color: expectedColor,
-            type: 'dashed',
-            width: 2
-          },
-          itemStyle: {
-              color: expectedColor
-          },
-          data: p.expected
         }
       ]
     };
@@ -500,15 +473,14 @@ class block_gradeheatmap extends block_base {
           }
         }
       },
-      // Visual Map for Area Pieces
       visualMap: {
         show: false,
         type: 'piecewise',
         seriesIndex: 0,
         pieces: [
-          { gt: 80, color: successColor }, // Grades > 80%
-          { gt: 50, lt: 80, color: averageColor }, // Grades between 50% and 80%
-          { lt: 50, color: failColor } // Grades < 50%
+          { gt: 80, color: successColor },
+          { gt: 50, lt: 80, color: averageColor },
+          { lt: 50, color: failColor }
         ],
         outOfRange: {
           color: failColor
@@ -520,7 +492,10 @@ class block_gradeheatmap extends block_base {
           type: 'line',
           smooth: true,
           areaStyle: {
-            opacity: 0.2
+            opacity: 0.8
+          },
+          lineStyle: {
+              width: 0 // This will make the line invisible
           },
           data: p.series
         }
