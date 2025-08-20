@@ -20,6 +20,9 @@ class block_gradeheatmap extends block_base {
         $this->content = new stdClass();
         require_once($CFG->dirroot . '/course/lib.php');
 
+        // Load the ECharts library
+        $PAGE->requires->js('https://cdn.jsdelivr.net/npm/echarts@5.0.0/dist/echarts.min.js');
+
         // Styles (dark card for teacher/admin)
         $PAGE->requires->css(new moodle_url('/blocks/gradeheatmap/styles.css'));
 
