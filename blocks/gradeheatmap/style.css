@@ -1,0 +1,18 @@
+
+.block_gradeheatmap { width:100%; }
+.block_gradeheatmap .gradeheatmap-echart{
+  background:#fff;
+  border-radius:12px;
+  padding:12px;
+  box-shadow:0 1px 2px rgba(0,0,0,.06);
+  min-height:320px;
+}
+.ghm-topbar{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.ghm-label{ font-size:14px; color:#555; }
+.ghm-select{
+  appearance:auto;
+  padding:6px 10px;
+  border-radius:8px;
+  border:1px solid #ddd;
+  background:#fafafa;
+}
