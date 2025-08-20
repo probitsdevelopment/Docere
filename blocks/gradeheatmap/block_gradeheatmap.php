@@ -3,7 +3,7 @@ defined('MOODLE_INTERNAL') || die();
 
 class block_gradeheatmap extends block_base {
     public function init() {
-        $this->title = 'Grade Trend';
+        $this->title = 'Grade Trend and Login Activity';
     }
 
     // Show on user Dashboard only
@@ -101,24 +101,26 @@ class block_gradeheatmap extends block_base {
             }
         }
 
-        // Chart container ID
+        // Chart container IDs
         $chartcontainerid = html_writer::random_id('ghm_');
-        $chartcontainer   = html_writer::tag('div', '', ['id'=>$chartcontainerid, 'style' => 'width:100%;height:350px;']);
+        $loginchartcontainerid = html_writer::random_id('ghm_login_');
+        $chartcontainer = html_writer::tag('div', '', ['id' => $chartcontainerid, 'style' => 'width:100%;height:350px;']);
+        $loginchartcontainer = html_writer::tag('div', '', ['id' => $loginchartcontainerid, 'style' => 'width:100%;height:350px; margin-top: 20px;']);
 
         $topbar = '';
         if ($mode === 'teacher') {
             // Course select
             $opts = '';
-            foreach ($courseoptions as $cid=>$short) {
-                $sel = ($cid==$selectedcourseid) ? ' selected' : '';
+            foreach ($courseoptions as $cid => $short) {
+                $sel = ($cid == $selectedcourseid) ? ' selected' : '';
                 $opts .= "<option value=\"$cid\"$sel>".s($short)."</option>";
             }
             if ($opts === '') $opts = '<option value="" disabled>(No courses with grade data)</option>';
 
             // Student select (0 = average)
-            $uopts = '<option value="0"'.($selecteduserid==0?' selected':'').'>All students — Average</option>';
-            foreach ($studentoptions as $uid=>$name) {
-                $sel = ($uid==$selecteduserid) ? ' selected' : '';
+            $uopts = '<option value="0"'.($selecteduserid == 0 ? ' selected' : '').'>All students — Average</option>';
+            foreach ($studentoptions as $uid => $name) {
+                $sel = ($uid == $selecteduserid) ? ' selected' : '';
                 $uopts .= "<option value=\"$uid\"$sel>".s($name)."</option>";
             }
 
@@ -132,12 +134,49 @@ class block_gradeheatmap extends block_base {
                </div>';
         }
 
-        $wrap = html_writer::tag('div', $topbar.$chartcontainer, [
-            'class'=> ($mode==='teacher' ? 'heatmap-wrap dark' : 'heatmap-wrap')
+        $wrap = html_writer::tag('div', $topbar . $chartcontainer . $loginchartcontainer, [
+            'class' => ($mode === 'teacher' ? 'heatmap-wrap dark' : 'heatmap-wrap')
         ]);
         $this->content->text = html_writer::div($wrap, 'block_gradeheatmap');
 
         // ----------------- DATA PAYLOAD -----------------
+        $login_data = [];
+        $selected_user_id = ($mode === 'teacher' && $selecteduserid > 0) ? $selecteduserid : $USER->id;
+
+        // Fetch login activity for the last 30 days
+        $logins = $DB->get_records_sql("
+            SELECT
+                FROM_UNIXTIME(timecreated, '%Y-%m-%d') AS login_date,
+                COUNT(id) AS login_count
+            FROM
+                {logstore_standard_log}
+            WHERE
+                userid = :userid AND
+                eventname = '\\core\\event\\user_loggedin' AND
+                timecreated > UNIX_TIMESTAMP(NOW() - INTERVAL 30 DAY)
+            GROUP BY
+                login_date
+            ORDER BY
+                login_date ASC
+        ", ['userid' => $selected_user_id]);
+
+        $login_labels = [];
+        $login_series = [];
+        if ($logins) {
+            foreach ($logins as $login) {
+                $login_labels[] = $login->login_date;
+                $login_series[] = (int)$login->login_count;
+            }
+        }
+
+        // Generate dummy data if no real data exists
+        if (empty($login_labels)) {
+            for ($i = 6; $i >= 0; $i--) {
+                $login_labels[] = date('Y-m-d', strtotime("-$i days"));
+                $login_series[] = rand(0, 5);
+            }
+        }
+
         if ($mode === 'teacher' && $selectedcourseid) {
             if ($selecteduserid > 0) {
                 // Per-student
@@ -191,18 +230,21 @@ class block_gradeheatmap extends block_base {
                 }
             }
             if (empty($labels)) {
-                $labels   = ['Demo: Quiz 1','Demo: Assign 1','Demo: Final'];
-                $actual   = [48.0,73.0,66.0];
+                $labels = ['Demo: Quiz 1','Demo: Assign 1','Demo: Final'];
+                $actual = [48.0,73.0,66.0];
             }
             $expected = array_fill(0, max(1,count($labels)), 60.0);
 
             $payload = [
                 'mode'             => 'teacher',
                 'chartcontainerid' => $chartcontainerid,
+                'loginchartcontainerid' => $loginchartcontainerid,
                 'labels'           => $labels,
                 'actual'           => $actual,
                 'expected'         => $expected,
-                'actualLabel'      => $actualLabel
+                'actualLabel'      => $actualLabel,
+                'loginlabels'      => $login_labels,
+                'loginseries'      => $login_series
             ];
 
         } else {
@@ -242,8 +284,11 @@ class block_gradeheatmap extends block_base {
             $payload = [
                 'mode'             => 'student',
                 'chartcontainerid' => $chartcontainerid,
+                'loginchartcontainerid' => $loginchartcontainerid,
                 'labels'           => $labels,
-                'series'           => $series
+                'series'           => $series,
+                'loginlabels'      => $login_labels,
+                'loginseries'      => $login_series
             ];
         }
 
@@ -254,8 +299,9 @@ class block_gradeheatmap extends block_base {
 (function(){
   var p = {$json};
   var chartDom = document.getElementById(p.chartcontainerid);
-  if (!chartDom) return;
+  var loginChartDom = document.getElementById(p.loginchartcontainerid);
   var myChart = null;
+  var myLoginChart = null;
 
   // Change handlers: keep both params
   var csel = document.getElementById('ghm-course-select-'+p.chartcontainerid);
@@ -284,6 +330,7 @@ class block_gradeheatmap extends block_base {
   }
 
   function drawTeacher(){
+    if (!chartDom) return;
     var isLight = getComputedStyle(chartDom.parentElement).backgroundColor.startsWith('rgb(245, 245, 245)') || getComputedStyle(chartDom.parentElement).backgroundColor.startsWith('rgb(255, 255, 255)');
     var actualCol = isLight ? '#0284C7' : '#399AFF';
     var expectedCol = isLight ? '#d97706' : '#FFD44A';
@@ -396,6 +443,7 @@ class block_gradeheatmap extends block_base {
   }
 
   function drawStudent(){
+    if (!chartDom) return;
     var option = {
       tooltip: {
         trigger: 'axis',
@@ -469,15 +517,110 @@ class block_gradeheatmap extends block_base {
     }
   }
 
+  function drawLoginChart(){
+    if (!loginChartDom) return;
+    var isLight = getComputedStyle(loginChartDom.parentElement).backgroundColor.startsWith('rgb(245, 245, 245)') || getComputedStyle(loginChartDom.parentElement).backgroundColor.startsWith('rgb(255, 255, 255)');
+    var barColor = isLight ? '#0284C7' : '#399AFF';
+    var axisTick = isLight ? '#1e293b' : '#CFE3FF';
+
+    var loginOption = {
+      title: {
+        text: 'Login Activity (Last 30 Days)',
+        textStyle: {
+          color: axisTick
+        }
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        },
+        formatter: function(params) {
+          var value = params[0].value;
+          return params[0].name + '<br/>Logins: ' + value;
+        },
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        textStyle: {
+          color: '#fff'
+        }
+      },
+      xAxis: {
+        type: 'category',
+        data: p.loginlabels,
+        axisLabel: {
+          color: axisTick,
+          rotate: 45,
+          interval: 0
+        },
+        axisLine: {
+          lineStyle: {
+            color: axisTick
+          }
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: 'Login Count',
+        nameTextStyle: {
+            color: axisTick
+        },
+        axisLabel: {
+            color: axisTick
+        },
+        splitLine: {
+            lineStyle: {
+                color: isLight ? '#e5e7eb' : 'rgba(255,255,255,0.08)'
+            }
+        }
+      },
+      series: [
+        {
+          name: 'Logins',
+          type: 'bar',
+          data: p.loginseries,
+          itemStyle: {
+            color: barColor
+          }
+        }
+      ]
+    };
+    if (myLoginChart) {
+        myLoginChart.setOption(loginOption, true);
+    } else {
+        myLoginChart = echarts.init(loginChartDom);
+        myLoginChart.setOption(loginOption);
+    }
+  }
+
   function start(){
     if (typeof echarts !== 'undefined') {
-      return (p.mode === 'teacher' ? drawTeacher() : drawStudent());
+      if (p.mode === 'teacher') {
+        drawTeacher();
+      } else {
+        drawStudent();
+      }
+      drawLoginChart();
+      return;
     }
     noAMD('/blocks/gradeheatmap/js/echarts.min.js', function(err){
       if (err || typeof echarts === 'undefined'){
         noAMD('https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js',
-          function(){ (p.mode === 'teacher' ? drawTeacher() : drawStudent()); });
-      } else { (p.mode === 'teacher' ? drawTeacher() : drawStudent()); }
+          function(){
+            if (p.mode === 'teacher') {
+              drawTeacher();
+            } else {
+              drawStudent();
+            }
+            drawLoginChart();
+          });
+      } else {
+        if (p.mode === 'teacher') {
+          drawTeacher();
+        } else {
+          drawStudent();
+        }
+        drawLoginChart();
+      }
     });
   }
   start();
