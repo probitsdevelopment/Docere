@@ -1,5 +1,5 @@
 
-.block_gradeheatmap { width:100%; }
+/* .block_gradeheatmap { width:100%; }
 .block_gradeheatmap .gradeheatmap-echart{
   background:#fff;
   border-radius:12px;
@@ -15,4 +15,17 @@
   border-radius:8px;
   border:1px solid #ddd;
   background:#fafafa;
+} */
+
+
+
+
+/* styles.css for gradeheatmap block */
+#container {
+    width: 100%;
+    height: 400px;
+    margin-top: 10px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
