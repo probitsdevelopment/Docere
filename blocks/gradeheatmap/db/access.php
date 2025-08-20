@@ -1,26 +1,22 @@
-
 <?php
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = [
-    // Allow managers/teachers to add the block to course pages.
-    'block/gradeheatmap:addinstance' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-        ],
-        'clonepermissionsfrom' => 'moodle/site:manageblocks'
-    ],
-
-    // Allow users to add the block to their Dashboard (My home).
-    'block/gradeheatmap:myaddinstance' => [
+$capabilities = array(
+    'block/gradeheatmap:myaddinstance' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => [
+        'archetypes' => array(
             'user' => CAP_ALLOW,
-        ],
-        'clonepermissionsfrom' => 'moodle/my:manageblocks'
-    ],
-];
+        ),
+        'clonepermissionsfrom' => 'moodle/my:manageblocks',
+    ),
+    'block/gradeheatmap:addinstance' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+        'clonepermissionsfrom' => 'moodle/course:manageactivities',
+    ),
+);
