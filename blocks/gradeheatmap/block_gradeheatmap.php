@@ -23,9 +23,6 @@ class block_gradeheatmap extends block_base {
         // Styles (dark card for teacher/admin)
         $PAGE->requires->css(new moodle_url('/blocks/gradeheatmap/styles.css'));
 
-        // Load Apache ECharts library
-        $PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js'));
-
         // Are we teacher/admin somewhere?
         $systemcanviewall = is_siteadmin($USER) ||
             has_capability('moodle/grade:viewall', context_system::instance());
@@ -93,7 +90,7 @@ class block_gradeheatmap extends block_base {
             $studs = $DB->get_records_sql("
                 SELECT DISTINCT u.id, u.firstname, u.lastname
                   FROM {grade_grades} gg
-                  JOIN {user} u         ON u.id = gg.userid
+                  JOIN {user} u        ON u.id = gg.userid
                   JOIN {grade_items} gi ON gi.id = gg.itemid AND gi.courseid=:cid
                  WHERE gi.gradetype = 1
                    AND gg.finalgrade IS NOT NULL
@@ -106,9 +103,36 @@ class block_gradeheatmap extends block_base {
 
         // Canvas + top bar (always show both dropdowns for teacher/admin)
         $canvasid = html_writer::random_id('ghm_');
-        $canvas   = html_writer::tag('div', '', ['id'=>$canvasid, 'style'=>'height: 400px;']);
+        $canvas   = html_writer::tag('div', '', ['id'=>$canvasid, 'style' => 'width:100%;height:350px;']);
 
-        $wrap = html_writer::tag('div', $canvas, [
+        $topbar = '';
+        if ($mode === 'teacher') {
+            // Course select
+            $opts = '';
+            foreach ($courseoptions as $cid=>$short) {
+                $sel = ($cid==$selectedcourseid) ? ' selected' : '';
+                $opts .= "<option value=\"$cid\"$sel>".s($short)."</option>";
+            }
+            if ($opts === '') $opts = '<option value="" disabled>(No courses with grade data)</option>';
+
+            // Student select (0 = average)
+            $uopts = '<option value="0"'.($selecteduserid==0?' selected':'').'>All students — Average</option>';
+            foreach ($studentoptions as $uid=>$name) {
+                $sel = ($uid==$selecteduserid) ? ' selected' : '';
+                $uopts .= "<option value=\"$uid\"$sel>".s($name)."</option>";
+            }
+
+            $topbar = '
+               <div class="ghm-topbar dark">
+                 <label class="ghm-label">Course:</label>
+                 <select class="ghm-select" id="ghm-course-select-'.$canvasid.'">'.$opts.'</select>
+
+                 <label class="ghm-label" style="margin-left:12px">Student:</label>
+                 <select class="ghm-select" id="ghm-user-select-'.$canvasid.'">'.$uopts.'</select>
+               </div>';
+        }
+
+        $wrap = html_writer::tag('div', $topbar.$canvas, [
             'class'=> ($mode==='teacher' ? 'heatmap-wrap dark' : 'heatmap-wrap')
         ]);
         $this->content->text = html_writer::div($wrap, 'block_gradeheatmap');
@@ -119,13 +143,13 @@ class block_gradeheatmap extends block_base {
                 // Per-student
                 $rows = $DB->get_records_sql("
                     SELECT
-                      gi.id,
-                      COALESCE(
-                        NULLIF(gi.itemname,''), 
-                        IFNULL(CONCAT(gi.itemmodule,' #',gi.id), CONCAT('Course total #', gi.id))
-                      ) AS itemname,
-                      ROUND(gg.finalgrade/NULLIF(gi.grademax,0)*100,1) AS percent,
-                      gi.sortorder
+                     gi.id,
+                     COALESCE(
+                       NULLIF(gi.itemname,''),
+                       IFNULL(CONCAT(gi.itemmodule,' #',gi.id), CONCAT('Course total #', gi.id))
+                     ) AS itemname,
+                     ROUND(gg.finalgrade/NULLIF(gi.grademax,0)*100,1) AS percent,
+                     gi.sortorder
                     FROM {grade_items} gi
                     JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = :uid
                    WHERE gi.courseid = :cid
@@ -138,13 +162,13 @@ class block_gradeheatmap extends block_base {
                 // Course average
                 $rows = $DB->get_records_sql("
                     SELECT
-                      gi.id,
-                      COALESCE(
-                        NULLIF(gi.itemname,''), 
-                        IFNULL(CONCAT(gi.itemmodule,' #',gi.id), CONCAT('Course total #', gi.id))
-                      ) AS itemname,
-                      ROUND(AVG(gg.finalgrade/NULLIF(gi.grademax,0))*100,1) AS percent,
-                      gi.sortorder
+                     gi.id,
+                     COALESCE(
+                       NULLIF(gi.itemname,''),
+                       IFNULL(CONCAT(gi.itemmodule,' #',gi.id), CONCAT('Course total #', gi.id))
+                     ) AS itemname,
+                     ROUND(AVG(gg.finalgrade/NULLIF(gi.grademax,0))*100,1) AS percent,
+                     gi.sortorder
                     FROM {grade_items} gi
                     JOIN {grade_grades} gg ON gg.itemid = gi.id
                    WHERE gi.courseid = :cid
@@ -191,7 +215,7 @@ class block_gradeheatmap extends block_base {
                     SELECT gi.id AS id,
                            gi.courseid,
                            COALESCE(
-                             NULLIF(gi.itemname,''), 
+                             NULLIF(gi.itemname,''),
                              IFNULL(CONCAT(gi.itemmodule,' #',gi.id), CONCAT('Course total #', gi.id))
                            ) AS itemname,
                            gi.sortorder, gi.grademax, gg.finalgrade
@@ -228,45 +252,235 @@ class block_gradeheatmap extends block_base {
         // ----------------- JS -----------------
         $init = <<<JS
 (function(){
-  var p = $json;
-  var cv = document.getElementById(p.canvasid);
-  if (!cv) return;
-  var myChart = echarts.init(cv);
+  var p = {$json};
+  var chartDom = document.getElementById(p.canvasid);
+  if (!chartDom) return;
+  var myChart = null;
 
-  var option = {
-      title: {
-          text: p.actualLabel || 'Grades Overview'
-      },
+  // Change handlers: keep both params
+  var csel = document.getElementById('ghm-course-select-'+p.canvasid);
+  if (csel) csel.addEventListener('change', function(){
+    var url = new URL(window.location.href);
+    url.searchParams.set('ghm_courseid', this.value);
+    var usel = document.getElementById('ghm-user-select-'+p.canvasid);
+    if (usel) url.searchParams.set('ghm_userid', usel.value || 0);
+    window.location.href = url.toString();
+  });
+  var usel = document.getElementById('ghm-user-select-'+p.canvasid);
+  if (usel) usel.addEventListener('change', function(){
+    var url = new URL(window.location.href);
+    url.searchParams.set('ghm_userid', this.value);
+    if (csel) url.searchParams.set('ghm_courseid', csel.value || 0);
+    window.location.href = url.toString();
+  });
+
+  function noAMD(src, cb){
+    var od=window.define, om=window.module, oe=window.exports;
+    try{ window.define=undefined; window.module=undefined; window.exports=undefined; }catch(e){}
+    var s=document.createElement('script'); s.src=src; s.async=true;
+    s.onload=function(){ window.define=od; window.module=om; window.exports=oe; cb(); };
+    s.onerror=function(){ window.define=od; window.module=om; window.exports=oe; cb(new Error('loadfail '+src)); };
+    document.head.appendChild(s);
+  }
+
+  function drawTeacher(){
+    var isLight = getComputedStyle(chartDom.parentElement).backgroundColor.startsWith('rgb(245, 245, 245)') || getComputedStyle(chartDom.parentElement).backgroundColor.startsWith('rgb(255, 255, 255)');
+    var actualCol = isLight ? '#0284C7' : '#399AFF';
+    var expectedCol = isLight ? '#d97706' : '#FFD44A';
+    var axisTick = isLight ? '#1e293b' : '#CFE3FF';
+
+    var option = {
       tooltip: {
-          trigger: 'axis'
+        trigger: 'axis',
+        formatter: function (params) {
+          var res = params[0].name + '<br/>';
+          for (var i = 0; i < params.length; i++) {
+            res += params[i].marker + ' ' + params[i].seriesName + ': ' + (params[i].value == null ? '—' : params[i].value + '%') + '<br/>';
+          }
+          return res;
+        },
+        backgroundColor: isLight ? 'rgba(15,23,42,0.92)' : 'rgba(8,12,20,0.92)',
+        textStyle: {
+          color: '#E6F0FF'
+        },
+        borderColor: isLight ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.12)',
+        borderWidth: 1,
+        padding: 10
+      },
+      legend: {
+        data: [p.actualLabel || 'Actual', 'Expected'],
+        textStyle: {
+          color: axisTick
+        }
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
       },
       xAxis: {
-          type: 'category',
-          data: p.labels
+        type: 'category',
+        boundaryGap: false,
+        data: p.labels,
+        axisLabel: {
+            color: axisTick,
+            rotate: 45,
+            interval: 0
+        },
+        axisLine: {
+            lineStyle: {
+                color: axisTick
+            }
+        }
       },
       yAxis: {
-          type: 'value'
+        type: 'value',
+        min: 0,
+        max: 100,
+        axisLabel: {
+            formatter: '{value} %',
+            color: axisTick
+        },
+        splitLine: {
+          lineStyle: {
+            color: isLight ? '#e5e7eb' : 'rgba(255,255,255,0.08)'
+          }
+        }
       },
-      series: [{
-          data: p.actual || [],
-          type: 'line',  // This ensures the chart is a line chart
+      series: [
+        {
+          name: p.actualLabel || 'Actual',
+          type: 'line',
           smooth: true,
-          color: '#0284C7',
-          name: 'Actual'
-      }, {
-          data: p.expected || [],
-          type: 'line',  // Expected is also a line
-          smooth: true,
-          color: '#FFD44A',
+          lineStyle: {
+            color: actualCol,
+            width: 3
+          },
+          itemStyle: {
+              color: actualCol
+          },
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: isLight ? 'rgba(2,132,199,0.18)' : 'rgba(57,154,255,0.18)'
+            }, {
+              offset: 1,
+              color: 'rgba(0,0,0,0)'
+            }])
+          },
+          data: p.actual
+        },
+        {
           name: 'Expected',
-          lineStyle: { type: 'dashed' }
-      }]
-  };
+          type: 'line',
+          smooth: true,
+          lineStyle: {
+            color: expectedCol,
+            type: 'dashed',
+            width: 2
+          },
+          itemStyle: {
+              color: expectedCol
+          },
+          data: p.expected
+        }
+      ]
+    };
+    if (myChart) {
+      myChart.setOption(option, true);
+    } else {
+      myChart = echarts.init(chartDom);
+      myChart.setOption(option);
+    }
+  }
 
-  myChart.setOption(option);
-  window.addEventListener('resize', function() {
-    myChart.resize();
-  });
+  function drawStudent(){
+    var option = {
+      tooltip: {
+        trigger: 'axis',
+        formatter: function (params) {
+          var value = params[0].value;
+          return params[0].name + '<br/>Grade (%): ' + (value == null ? 'No grade' : value + '%');
+        },
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        textStyle: {
+          color: '#fff'
+        }
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: p.labels,
+        axisLabel: {
+          rotate: 60,
+          interval: 0
+        }
+      },
+      yAxis: {
+        type: 'value',
+        min: 0,
+        max: 100,
+        axisLabel: {
+          formatter: '{value} %'
+        },
+        splitLine: {
+          lineStyle: {
+            color: 'rgba(0,0,0,.06)'
+          }
+        }
+      },
+      series: [
+        {
+          name: 'Grade (%)',
+          type: 'line',
+          smooth: true,
+          lineStyle: {
+            color: '#2ECC71',
+            width: 3
+          },
+          itemStyle: {
+              color: '#2ECC71'
+          },
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: 'rgba(46,204,113,0.28)'
+            }, {
+              offset: 1,
+              color: 'rgba(46,204,113,0.00)'
+            }])
+          },
+          data: p.series
+        }
+      ]
+    };
+    if (myChart) {
+      myChart.setOption(option, true);
+    } else {
+      myChart = echarts.init(chartDom);
+      myChart.setOption(option);
+    }
+  }
+
+  function start(){
+    if (typeof echarts !== 'undefined') {
+      return (p.mode === 'teacher' ? drawTeacher() : drawStudent());
+    }
+    noAMD('/blocks/gradeheatmap/js/echarts.min.js', function(err){
+      if (err || typeof echarts === 'undefined'){
+        noAMD('https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js',
+          function(){ (p.mode === 'teacher' ? drawTeacher() : drawStudent()); });
+      } else { (p.mode === 'teacher' ? drawTeacher() : drawStudent()); }
+    });
+  }
+  start();
 })();
 JS;
 
