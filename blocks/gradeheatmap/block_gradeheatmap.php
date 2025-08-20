@@ -140,13 +140,12 @@ class block_gradeheatmap extends block_base {
         $this->content->text = html_writer::div($wrap, 'block_gradeheatmap');
 
         // ----------------- DATA PAYLOAD -----------------
-        $login_data = [];
         $selected_user_id = ($mode === 'teacher' && $selecteduserid > 0) ? $selecteduserid : $USER->id;
 
-        // Fetch login activity for the last 30 days
+        // Fetch login activity for the last 30 days, grouped by day of the week
         $logins = $DB->get_records_sql("
             SELECT
-                FROM_UNIXTIME(timecreated, '%Y-%m-%d') AS login_date,
+                DAYOFWEEK(FROM_UNIXTIME(timecreated)) AS dayofweek,
                 COUNT(id) AS login_count
             FROM
                 {logstore_standard_log}
@@ -155,26 +154,24 @@ class block_gradeheatmap extends block_base {
                 eventname = '\\core\\event\\user_loggedin' AND
                 timecreated > UNIX_TIMESTAMP(NOW() - INTERVAL 30 DAY)
             GROUP BY
-                login_date
+                dayofweek
             ORDER BY
-                login_date ASC
+                dayofweek ASC
         ", ['userid' => $selected_user_id]);
 
         $login_labels = [];
         $login_series = [];
         if ($logins) {
             foreach ($logins as $login) {
-                $login_labels[] = $login->login_date;
+                $login_labels[] = (int)$login->dayofweek;
                 $login_series[] = (int)$login->login_count;
             }
         }
 
         // Generate dummy data if no real data exists
         if (empty($login_labels)) {
-            for ($i = 6; $i >= 0; $i--) {
-                $login_labels[] = date('Y-m-d', strtotime("-$i days"));
-                $login_series[] = rand(0, 5);
-            }
+            $login_labels = [1, 2, 3, 4, 5, 6, 7];
+            $login_series = [rand(0, 5), rand(0, 5), rand(0, 5), rand(0, 5), rand(0, 5), rand(0, 5), rand(0, 5)];
         }
 
         if ($mode === 'teacher' && $selectedcourseid) {
@@ -523,6 +520,12 @@ class block_gradeheatmap extends block_base {
     var barColor = isLight ? '#0284C7' : '#399AFF';
     var axisTick = isLight ? '#1e293b' : '#CFE3FF';
 
+    // Map day of week number to name (1=Sun, 2=Mon...)
+    var daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    var loginLabels = p.loginlabels.map(function(dayIndex) {
+      return daysOfWeek[dayIndex - 1];
+    });
+
     var loginOption = {
       title: {
         text: 'Login Activity (Last 30 Days)',
@@ -546,7 +549,7 @@ class block_gradeheatmap extends block_base {
       },
       xAxis: {
         type: 'category',
-        data: p.loginlabels,
+        data: loginLabels,
         axisLabel: {
           color: axisTick,
           rotate: 45,
