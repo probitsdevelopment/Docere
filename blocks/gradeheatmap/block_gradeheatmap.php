@@ -101,9 +101,9 @@ class block_gradeheatmap extends block_base {
             }
         }
 
-        // Canvas + top bar (always show both dropdowns for teacher/admin)
-        $canvasid = html_writer::random_id('ghm_');
-        $canvas   = html_writer::tag('div', '', ['id'=>$canvasid, 'style' => 'width:100%;height:350px;']);
+        // Chart container ID
+        $chartcontainerid = html_writer::random_id('ghm_');
+        $chartcontainer   = html_writer::tag('div', '', ['id'=>$chartcontainerid, 'style' => 'width:100%;height:350px;']);
 
         $topbar = '';
         if ($mode === 'teacher') {
@@ -125,14 +125,14 @@ class block_gradeheatmap extends block_base {
             $topbar = '
                <div class="ghm-topbar dark">
                  <label class="ghm-label">Course:</label>
-                 <select class="ghm-select" id="ghm-course-select-'.$canvasid.'">'.$opts.'</select>
+                 <select class="ghm-select" id="ghm-course-select-'.$chartcontainerid.'">'.$opts.'</select>
 
                  <label class="ghm-label" style="margin-left:12px">Student:</label>
-                 <select class="ghm-select" id="ghm-user-select-'.$canvasid.'">'.$uopts.'</select>
+                 <select class="ghm-select" id="ghm-user-select-'.$chartcontainerid.'">'.$uopts.'</select>
                </div>';
         }
 
-        $wrap = html_writer::tag('div', $topbar.$canvas, [
+        $wrap = html_writer::tag('div', $topbar.$chartcontainer, [
             'class'=> ($mode==='teacher' ? 'heatmap-wrap dark' : 'heatmap-wrap')
         ]);
         $this->content->text = html_writer::div($wrap, 'block_gradeheatmap');
@@ -197,12 +197,12 @@ class block_gradeheatmap extends block_base {
             $expected = array_fill(0, max(1,count($labels)), 60.0);
 
             $payload = [
-                'mode'        => 'teacher',
-                'canvasid'    => $canvasid,
-                'labels'      => $labels,
-                'actual'      => $actual,
-                'expected'    => $expected,
-                'actualLabel' => $actualLabel
+                'mode'             => 'teacher',
+                'chartcontainerid' => $chartcontainerid,
+                'labels'           => $labels,
+                'actual'           => $actual,
+                'expected'         => $expected,
+                'actualLabel'      => $actualLabel
             ];
 
         } else {
@@ -240,10 +240,10 @@ class block_gradeheatmap extends block_base {
                 $series=[62.0,84.0,null];
             }
             $payload = [
-                'mode'     => 'student',
-                'canvasid' => $canvasid,
-                'labels'   => $labels,
-                'series'   => $series
+                'mode'             => 'student',
+                'chartcontainerid' => $chartcontainerid,
+                'labels'           => $labels,
+                'series'           => $series
             ];
         }
 
@@ -253,20 +253,20 @@ class block_gradeheatmap extends block_base {
         $init = <<<JS
 (function(){
   var p = {$json};
-  var chartDom = document.getElementById(p.canvasid);
+  var chartDom = document.getElementById(p.chartcontainerid);
   if (!chartDom) return;
   var myChart = null;
 
   // Change handlers: keep both params
-  var csel = document.getElementById('ghm-course-select-'+p.canvasid);
+  var csel = document.getElementById('ghm-course-select-'+p.chartcontainerid);
   if (csel) csel.addEventListener('change', function(){
     var url = new URL(window.location.href);
     url.searchParams.set('ghm_courseid', this.value);
-    var usel = document.getElementById('ghm-user-select-'+p.canvasid);
+    var usel = document.getElementById('ghm-user-select-'+p.chartcontainerid);
     if (usel) url.searchParams.set('ghm_userid', usel.value || 0);
     window.location.href = url.toString();
   });
-  var usel = document.getElementById('ghm-user-select-'+p.canvasid);
+  var usel = document.getElementById('ghm-user-select-'+p.chartcontainerid);
   if (usel) usel.addEventListener('change', function(){
     var url = new URL(window.location.href);
     url.searchParams.set('ghm_userid', this.value);
