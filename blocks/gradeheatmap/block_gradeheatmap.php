@@ -132,6 +132,8 @@ JS;
 
         $PAGE->requires->js_init_code($init);
 
+        // Render topbar and canvas in block content
+        $this->content->text = $topbar . $canvas;
         $this->content->footer = '';
         return $this->content;
     }
