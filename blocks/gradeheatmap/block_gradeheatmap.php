@@ -105,7 +105,7 @@ class block_gradeheatmap extends block_base {
         $chartcontainerid = html_writer::random_id('ghm_');
         $loginchartcontainerid = html_writer::random_id('ghm_login_');
         $chartcontainer = html_writer::tag('div', '', ['id' => $chartcontainerid, 'style' => 'width:100%;height:350px;']);
-        $loginchartcontainer = html_writer::tag('div', '', ['id' => $loginchartcontainerid, 'style' => 'width:100%;height:350px; margin-top: 20px;']);
+        $loginchartcontainer = html_writer::tag('div', '', ['id' => $loginchartcontainerid, 'style' => 'width:100%;height:350px;']);
 
         $topbar = '';
         if ($mode === 'teacher') {
@@ -154,7 +154,15 @@ class block_gradeheatmap extends block_base {
                </div>';
         }
 
-        $wrap = html_writer::tag('div', $topbar . $chartcontainer . $loginchartcontainer, [
+        // Wrap charts in a container for flexbox layout
+        $chartshtml = '
+            <div class="ghm-charts-container">
+                ' . $chartcontainer . '
+                ' . $loginchartcontainer . '
+            </div>
+        ';
+
+        $wrap = html_writer::tag('div', $topbar . $chartshtml, [
             'class' => ($mode === 'teacher' ? 'heatmap-wrap dark' : 'heatmap-wrap')
         ]);
         $this->content->text = html_writer::div($wrap, 'block_gradeheatmap');
