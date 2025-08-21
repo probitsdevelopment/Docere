@@ -3,7 +3,7 @@ defined('MOODLE_INTERNAL') || die();
 
 class block_gradeheatmap extends block_base {
     public function init() {
-        $this->title = 'Grade Trend and Login Activity';
+        $this->title = 'Grade Trend ';
     }
 
     // Show on user Dashboard only
@@ -177,43 +177,49 @@ class block_gradeheatmap extends block_base {
         if ($mode === 'teacher' && $selectedcourseid) {
             if ($selecteduserid > 0) {
                 // Per-student
-                $rows = $DB->get_records_sql("
-                    SELECT
-                     gi.id,
-                     COALESCE(
-                       NULLIF(gi.itemname,''),
-                       IFNULL(CONCAT(gi.itemmodule,' #',gi.id), CONCAT('Course total #', gi.id))
-                     ) AS itemname,
-                     ROUND(gg.finalgrade/NULLIF(gi.grademax,0)*100,1) AS percent,
-                     gi.sortorder
-                    FROM {grade_items} gi
-                    JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = :uid
-                   WHERE gi.courseid = :cid
-                     AND gi.itemtype IN ('mod','manual','course')
-                     AND gi.gradetype = 1
-                ORDER BY gi.sortorder, gi.id
-                ", ['cid'=>$selectedcourseid, 'uid'=>$selecteduserid]);
+                // Per-student
+$rows = $DB->get_records_sql("
+    SELECT
+     gi.id,
+     COALESCE(
+       NULLIF(gi.itemname,''),
+       IFNULL(CONCAT(gi.itemmodule,' #',gi.id), CONCAT('Course total #', gi.id))
+     ) AS itemname,
+     ROUND(gg.finalgrade/NULLIF(gi.grademax,0)*100,1) AS percent,
+     gi.sortorder
+    FROM {grade_items} gi
+    JOIN {grade_grades} gg ON gg.itemid = gi.id AND gg.userid = :uid
+    JOIN {modules} m ON m.name = gi.itemmodule
+    JOIN {course_modules} cm ON cm.instance = gi.iteminstance AND cm.module = m.id
+   WHERE gi.courseid = :cid
+     AND gi.itemtype IN ('mod','manual','course')
+     AND gi.gradetype = 1
+ORDER BY gi.sortorder, gi.id
+", ['cid'=>$selectedcourseid, 'uid'=>$selecteduserid]);
                 $actualLabel = 'Actual — '.($studentoptions[$selecteduserid] ?? 'Student');
             } else {
                 // Course average
-                $rows = $DB->get_records_sql("
-                    SELECT
-                     gi.id,
-                     COALESCE(
-                       NULLIF(gi.itemname,''),
-                       IFNULL(CONCAT(gi.itemmodule,' #',gi.id), CONCAT('Course total #', gi.id))
-                     ) AS itemname,
-                     ROUND(AVG(gg.finalgrade/NULLIF(gi.grademax,0))*100,1) AS percent,
-                     gi.sortorder
-                    FROM {grade_items} gi
-                    JOIN {grade_grades} gg ON gg.itemid = gi.id
-                   WHERE gi.courseid = :cid
-                     AND gi.itemtype IN ('mod','manual','course')
-                     AND gi.gradetype = 1
-                     AND gg.finalgrade IS NOT NULL
-                GROUP BY gi.id, gi.itemname, gi.sortorder
-                ORDER BY gi.sortorder, gi.id
-                ", ['cid'=>$selectedcourseid]);
+                // Course average
+$rows = $DB->get_records_sql("
+    SELECT
+     gi.id,
+     COALESCE(
+       NULLIF(gi.itemname,''),
+       IFNULL(CONCAT(gi.itemmodule,' #',gi.id), CONCAT('Course total #', gi.id))
+     ) AS itemname,
+     ROUND(AVG(gg.finalgrade/NULLIF(gi.grademax,0))*100,1) AS percent,
+     gi.sortorder
+    FROM {grade_items} gi
+    JOIN {grade_grades} gg ON gg.itemid = gi.id
+    JOIN {modules} m ON m.name = gi.itemmodule
+    JOIN {course_modules} cm ON cm.instance = gi.iteminstance AND cm.module = m.id
+   WHERE gi.courseid = :cid
+     AND gi.itemtype IN ('mod','manual','course')
+     AND gi.gradetype = 1
+     AND gg.finalgrade IS NOT NULL
+GROUP BY gi.id, gi.itemname, gi.sortorder
+ORDER BY gi.sortorder, gi.id
+", ['cid'=>$selectedcourseid]);
                 $actualLabel = 'Actual — Course average';
             }
 
