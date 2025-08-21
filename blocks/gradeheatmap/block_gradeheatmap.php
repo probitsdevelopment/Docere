@@ -131,6 +131,26 @@ class block_gradeheatmap extends block_base {
 
                  <label class="ghm-label" style="margin-left:12px">Student:</label>
                  <select class="ghm-select" id="ghm-user-select-'.$chartcontainerid.'">'.$uopts.'</select>
+                 
+                 <div class="ghm-toggle-wrap">
+                     <label class="switch">
+                         <input type="checkbox" id="darkModeToggle">
+                         <span class="slider round"></span>
+                     </label>
+                     <label for="darkModeToggle" class="ghm-label">Dark Mode</label>
+                 </div>
+               </div>';
+        } else {
+            // Dark Mode Toggle for student view
+            $topbar = '
+               <div class="ghm-topbar">
+                 <div class="ghm-toggle-wrap">
+                     <label class="switch">
+                         <input type="checkbox" id="darkModeToggle">
+                         <span class="slider round"></span>
+                     </label>
+                     <label for="darkModeToggle" class="ghm-label">Dark Mode</label>
+                 </div>
                </div>';
         }
 
@@ -297,6 +317,7 @@ class block_gradeheatmap extends block_base {
   var loginChartDom = document.getElementById(p.loginchartcontainerid);
   var myChart = null;
   var myLoginChart = null;
+  var darkModeToggle = document.getElementById('darkModeToggle');
 
   // Change handlers: keep both params
   var csel = document.getElementById('ghm-course-select-'+p.chartcontainerid);
@@ -324,13 +345,45 @@ class block_gradeheatmap extends block_base {
     document.head.appendChild(s);
   }
 
-  function drawTeacher(){
+  function renderCharts() {
+    var theme = darkModeToggle.checked ? 'dark' : 'light';
+    var body = document.body;
+    if (darkModeToggle.checked) {
+        body.classList.add('dark-mode');
+    } else {
+        body.classList.remove('dark-mode');
+    }
+    
+    // Dispose and re-initialize charts with the new theme
+    if (myChart) {
+      myChart.dispose();
+      myChart = null;
+    }
+    if (myLoginChart) {
+      myLoginChart.dispose();
+      myLoginChart = null;
+    }
+    
+    if (p.mode === 'teacher') {
+      drawTeacher(theme);
+    } else {
+      drawStudent(theme);
+    }
+    drawLoginChart(theme);
+  }
+
+  if (darkModeToggle) {
+      darkModeToggle.addEventListener('change', function() {
+          renderCharts();
+      });
+  }
+
+  function drawTeacher(theme){
     if (!chartDom) return;
-    var isLight = getComputedStyle(chartDom.parentElement).backgroundColor.startsWith('rgb(245, 245, 245)') || getComputedStyle(chartDom.parentElement).backgroundColor.startsWith('rgb(255, 255, 255)');
-    var successColor = isLight ? '#10B981' : '#4ade80';
-    var averageColor = isLight ? '#F59E0B' : '#FBBF24';
-    var failColor = isLight ? '#EF4444' : '#F87171';
-    var axisTick = isLight ? '#1e293b' : '#CFE3FF';
+    var successColor = theme === 'dark' ? '#4ade80' : '#10B981';
+    var averageColor = theme === 'dark' ? '#FBBF24' : '#F59E0B';
+    var failColor = theme === 'dark' ? '#F87171' : '#EF4444';
+    var axisTick = theme === 'dark' ? '#CFE3FF' : '#1e293b';
 
     var option = {
       tooltip: {
@@ -339,11 +392,11 @@ class block_gradeheatmap extends block_base {
           var value = params[0].value;
           return params[0].name + '<br/>Grade (%): ' + (value == null ? '—' : value + '%');
         },
-        backgroundColor: isLight ? 'rgba(15,23,42,0.92)' : 'rgba(8,12,20,0.92)',
+        backgroundColor: theme === 'dark' ? 'rgba(8,12,20,0.92)' : 'rgba(15,23,42,0.92)',
         textStyle: {
-          color: '#E6F0FF'
+          color: theme === 'dark' ? '#E6F0FF' : '#E6F0FF'
         },
-        borderColor: isLight ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.12)',
+        borderColor: theme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.15)',
         borderWidth: 1,
         padding: 10
       },
@@ -378,7 +431,7 @@ class block_gradeheatmap extends block_base {
         },
         splitLine: {
           lineStyle: {
-            color: isLight ? '#e5e7eb' : 'rgba(255,255,255,0.08)'
+            color: theme === 'dark' ? 'rgba(255,255,255,0.08)' : '#e5e7eb'
           }
         }
       },
@@ -404,27 +457,22 @@ class block_gradeheatmap extends block_base {
             opacity: 0.8
           },
           lineStyle: {
-              width: 0 // This will make the line invisible
+            width: 0 
           },
           data: p.actual
         }
       ]
     };
-    if (myChart) {
-      myChart.setOption(option, true);
-    } else {
-      myChart = echarts.init(chartDom);
-      myChart.setOption(option);
-    }
+    myChart = echarts.init(chartDom, theme === 'dark' ? 'dark' : null);
+    myChart.setOption(option);
   }
 
-  function drawStudent(){
+  function drawStudent(theme){
     if (!chartDom) return;
-    var isLight = getComputedStyle(chartDom.parentElement).backgroundColor.startsWith('rgb(245, 245, 245)') || getComputedStyle(chartDom.parentElement).backgroundColor.startsWith('rgb(255, 255, 255)');
-    var successColor = isLight ? '#10B981' : '#4ade80';
-    var averageColor = isLight ? '#F59E0B' : '#FBBF24';
-    var failColor = isLight ? '#EF4444' : '#F87171';
-    var axisTick = isLight ? '#1e293b' : '#CFE3FF';
+    var successColor = theme === 'dark' ? '#4ade80' : '#10B981';
+    var averageColor = theme === 'dark' ? '#FBBF24' : '#F59E0B';
+    var failColor = theme === 'dark' ? '#F87171' : '#EF4444';
+    var axisTick = theme === 'dark' ? '#CFE3FF' : '#1e293b';
 
     var option = {
       tooltip: {
@@ -433,9 +481,9 @@ class block_gradeheatmap extends block_base {
           var value = params[0].value;
           return params[0].name + '<br/>Grade (%): ' + (value == null ? 'No grade' : value + '%');
         },
-        backgroundColor: 'rgba(0,0,0,0.7)',
+        backgroundColor: theme === 'dark' ? 'rgba(8,12,20,0.92)' : 'rgba(15,23,42,0.92)',
         textStyle: {
-          color: '#fff'
+          color: theme === 'dark' ? '#E6F0FF' : '#E6F0FF'
         }
       },
       grid: {
@@ -469,7 +517,7 @@ class block_gradeheatmap extends block_base {
         },
         splitLine: {
           lineStyle: {
-            color: isLight ? '#e5e7eb' : 'rgba(255,255,255,0.08)'
+            color: theme === 'dark' ? 'rgba(255,255,255,0.08)' : '#e5e7eb'
           }
         }
       },
@@ -495,25 +543,20 @@ class block_gradeheatmap extends block_base {
             opacity: 0.8
           },
           lineStyle: {
-              width: 0 // This will make the line invisible
+              width: 0 
           },
           data: p.series
         }
       ]
     };
-    if (myChart) {
-      myChart.setOption(option, true);
-    } else {
-      myChart = echarts.init(chartDom);
-      myChart.setOption(option);
-    }
+    myChart = echarts.init(chartDom, theme === 'dark' ? 'dark' : null);
+    myChart.setOption(option);
   }
 
-  function drawLoginChart(){
+  function drawLoginChart(theme){
     if (!loginChartDom) return;
-    var isLight = getComputedStyle(loginChartDom.parentElement).backgroundColor.startsWith('rgb(245, 245, 245)') || getComputedStyle(loginChartDom.parentElement).backgroundColor.startsWith('rgb(255, 255, 255)');
-    var barColor = isLight ? '#0284C7' : '#399AFF';
-    var axisTick = isLight ? '#1e293b' : '#CFE3FF';
+    var barColor = theme === 'dark' ? '#399AFF' : '#0284C7';
+    var axisTick = theme === 'dark' ? '#CFE3FF' : '#1e293b';
 
     // Map day of week number to name (1=Sun, 2=Mon...)
     var daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -567,7 +610,7 @@ class block_gradeheatmap extends block_base {
         },
         splitLine: {
             lineStyle: {
-                color: isLight ? '#e5e7eb' : 'rgba(255,255,255,0.08)'
+                color: theme === 'dark' ? 'rgba(255,255,255,0.08)' : '#e5e7eb'
             }
         }
       },
@@ -582,42 +625,42 @@ class block_gradeheatmap extends block_base {
         }
       ]
     };
-    if (myLoginChart) {
-        myLoginChart.setOption(loginOption, true);
-    } else {
-        myLoginChart = echarts.init(loginChartDom);
-        myLoginChart.setOption(loginOption);
-    }
+    myLoginChart = echarts.init(loginChartDom, theme === 'dark' ? 'dark' : null);
+    myLoginChart.setOption(loginOption);
   }
 
   function start(){
     if (typeof echarts !== 'undefined') {
-      if (p.mode === 'teacher') {
-        drawTeacher();
-      } else {
-        drawStudent();
+      var isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (darkModeToggle) {
+          darkModeToggle.checked = isDarkMode;
       }
-      drawLoginChart();
+      renderCharts();
       return;
     }
     noAMD('/blocks/gradeheatmap/js/echarts.min.js', function(err){
       if (err || typeof echarts === 'undefined'){
         noAMD('https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js',
           function(){
-            if (p.mode === 'teacher') {
-              drawTeacher();
-            } else {
-              drawStudent();
-            }
-            drawLoginChart();
+            // Load ECharts dark theme
+            noAMD('https://cdn.jsdelivr.net/npm/echarts@5.5.0/theme/dark.js',
+              function(){
+                var isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (darkModeToggle) {
+                    darkModeToggle.checked = isDarkMode;
+                }
+                renderCharts();
+              });
           });
       } else {
-        if (p.mode === 'teacher') {
-          drawTeacher();
-        } else {
-          drawStudent();
-        }
-        drawLoginChart();
+        noAMD('https://cdn.jsdelivr.net/npm/echarts@5.5.0/theme/dark.js',
+          function(){
+            var isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (darkModeToggle) {
+                darkModeToggle.checked = isDarkMode;
+            }
+            renderCharts();
+          });
       }
     });
   }
