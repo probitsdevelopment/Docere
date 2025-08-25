@@ -1,0 +1,24 @@
+/* Size to taste */
+$acme-logo-w: 160px;
+$acme-logo-h: 32px;
+
+/* Hide the default site logo for Acme users */
+body.org-acme .navbar .navbar-brand .logo { visibility: hidden !important; }
+
+body.org-acme .navbar .navbar-brand {
+  position: relative;
+  min-height: $acme-logo-h;
+}
+
+/* Draw our org logo (file in theme/acme/pix/logo_acme.svg) */
+body.org-acme .navbar .navbar-brand::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: $acme-logo-w;
+  height: $acme-logo-h;
+  background: url([[pix:theme_acme|logo_acme]]) no-repeat left center;
+  background-size: contain;
+  pointer-events: none;
+}
