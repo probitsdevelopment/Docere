@@ -1,11 +1,24 @@
 {{!
     This file is part of Moodle - http://moodle.org/
-    Moodle is free software...
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
     @template theme_boost/drawers
-    Boost drawer template (customized with Site Home hero + course list styling)
+    Boost drawer template.
 }}
+
 {{> theme_boost/head }}
 
 <body {{{ bodyattributes }}}>
@@ -15,158 +28,6 @@
     {{{ output.standard_top_of_body_html }}}
 
     {{> theme_boost/navbar }}
-
-    {{! ===== FRONT PAGE HERO + GLOBAL FRONT-PAGE STYLES (scoped) ===== }}
-    <style>
-      /* Show hero only on Site home */
-      .fp-hero-wrap { display:none; }
-      body#page-site-index .fp-hero-wrap,
-      body.path-site .fp-hero-wrap,
-      body.pagelayout-frontpage .fp-hero-wrap { display:block; }
-
-      /* Site home palette + background */
-      body#page-site-index,
-      body.path-site,
-      body.pagelayout-frontpage {
-        --brand-1:#2563eb;  /* primary */
-        --brand-2:#7c3aed;  /* accent */
-        --ink:#0f172a;
-        --ink-2:#475569;
-        --bg:#f1f5f9;
-        --card:#ffffff;
-        background: var(--bg);
-      }
-
-      /* Make hero full-bleed */
-      body#page-site-index #page.container-fluid,
-      body.path-site #page.container-fluid,
-      body.pagelayout-frontpage #page.container-fluid { padding-left:0; padding-right:0; }
-
-      /* Hero block */
-      .fp-hero-wrap{ position:relative; overflow:hidden; color:#fff; }
-      .fp-hero{
-        display:grid; grid-template-columns:1fr; gap:24px;
-        min-height:420px; padding:72px 20px;
-        align-items:center; justify-items:center; text-align:center;
-        background:
-          radial-gradient(1200px 700px at -10% -20%, rgba(37,99,235,.35), transparent 60%),
-          radial-gradient(900px 500px at 120% 110%, rgba(124,58,237,.30), transparent 60%),
-          linear-gradient(135deg,#0b1222 0%,#121b31 60%,#0e162b 100%);
-      }
-      @media (min-width: 992px){
-        .fp-hero{ grid-template-columns:1.1fr 0.9fr; text-align:left; padding:92px 60px; }
-      }
-      .fp-hero__brand{ max-width:760px; }
-      .fp-hero__logo{ max-width:180px; height:auto; margin-bottom:16px; filter:drop-shadow(0 10px 24px rgba(0,0,0,.35)); }
-      .fp-hero__title{ font-weight:800; font-size:clamp(28px,5vw,44px); margin:8px 0 10px; letter-spacing:.2px; }
-      .fp-hero__sub{ font-size:clamp(14px,2.2vw,18px); opacity:.95; margin:0; color:rgba(255,255,255,.92); }
-      .fp-hero__card{
-        width:100%; max-width:520px; background:rgba(255,255,255,.86);
-        border:1px solid rgba(15,23,42,.08); border-radius:20px; padding:24px;
-        backdrop-filter:saturate(160%) blur(14px);
-        box-shadow:0 22px 55px rgba(2,6,23,.10), 0 2px 12px rgba(2,6,23,.06);
-        color:var(--ink);
-      }
-      .fp-chip{
-        display:inline-block; padding:.4rem .7rem; border-radius:999px;
-        background:#eef2ff; border:1px solid rgba(2,6,23,.06); color:#1e293b; font-weight:600; font-size:.85rem;
-        margin-top:12px;
-      }
-
-      /* Buttons (front page only) */
-      body#page-site-index .btn-primary,
-      body.path-site .btn-primary,
-      body.pagelayout-frontpage .btn-primary{
-        border-radius:12px; padding:.65rem 1.05rem; font-weight:700;
-        background:linear-gradient(90deg, var(--brand-1), var(--brand-2)); border:none;
-      }
-      body#page-site-index .btn-primary:hover,
-      body.path-site .btn-primary:hover,
-      body.pagelayout-frontpage .btn-primary:hover{ filter:brightness(1.05); }
-
-      /* === Front page course list styling (cards/boxes) === */
-      body#page-site-index #region-main .coursecard,
-      body.path-site #region-main .coursecard,
-      body.pagelayout-frontpage #region-main .coursecard,
-      body#page-site-index #region-main .card.coursecard,
-      body.path-site #region-main .card.coursecard,
-      body.pagelayout-frontpage #region-main .card.coursecard,
-      body#page-site-index #region-main .courses .card,
-      body.path-site #region-main .courses .card,
-      body.pagelayout-frontpage #region-main .courses .card,
-      body#page-site-index #region-main .coursebox,
-      body.path-site #region-main .coursebox,
-      body.pagelayout-frontpage #region-main .coursebox {
-        border-radius:16px;
-        border:1px solid rgba(15,23,42,.08);
-        box-shadow:0 12px 30px rgba(2,6,23,.06);
-        background:#fff;
-        overflow:hidden;
-        transition: transform .1s ease, box-shadow .2s ease;
-      }
-      body#page-site-index #region-main .coursecard:hover,
-      body.path-site #region-main .coursecard:hover,
-      body.pagelayout-frontpage #region-main .coursecard:hover,
-      body#page-site-index #region-main .courses .card:hover,
-      body.path-site #region-main .courses .card:hover,
-      body.pagelayout-frontpage #region-main .courses .card:hover,
-      body#page-site-index #region-main .coursebox:hover,
-      body.path-site #region-main .coursebox:hover,
-      body.pagelayout-frontpage #region-main .coursebox:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 18px 48px rgba(2,6,23,.10);
-      }
-      /* Nicer buttons & thumbnails inside course cards */
-      body#page-site-index #region-main .coursecard .btn,
-      body.path-site #region-main .coursecard .btn,
-      body.pagelayout-frontpage #region-main .coursecard .btn { border-radius:10px; }
-      body#page-site-index #region-main .coursecard img,
-      body.path-site #region-main .coursecard img,
-      body.pagelayout-frontpage #region-main .coursecard img { border-radius:10px; }
-
-      /* Headings spacing/weight */
-      body#page-site-index #region-main h2,
-      body.path-site #region-main h2,
-      body.pagelayout-frontpage #region-main h2 {
-        margin-top:12px; margin-bottom:18px; font-weight:800;
-      }
-      body#page-site-index .page-header-headings h1,
-      body.path-site .page-header-headings h1,
-      body.pagelayout-frontpage .page-header-headings h1 { font-weight:800; }
-
-      /* Optional: soften region main box spacing */
-      body#page-site-index #region-main-box,
-      body.path-site #region-main-box,
-      body.pagelayout-frontpage #region-main-box { padding:32px 16px; }
-      @media (min-width: 992px){
-        body#page-site-index #region-main-box,
-        body.path-site #region-main-box,
-        body.pagelayout-frontpage #region-main-box { padding:48px 32px; }
-      }
-    </style>
-
-    <div class="fp-hero-wrap">
-      <div class="fp-hero">
-        <div class="fp-hero__brand">
-          <img class="fp-hero__logo"
-               src="{{{ config.wwwroot }}}/theme/image.php?theme=boost&component=core&image=i%2Flogo"
-               alt="Site logo">
-          <h1 class="fp-hero__title">{{ sitename }}</h1>
-          <p class="fp-hero__sub">Your learning hub. Fast, modern, and beautifully organized.</p>
-          <span class="fp-chip">Welcome to Site home</span>
-        </div>
-
-        <div class="fp-hero__card">
-          <h3 class="mb-2">Jump back in</h3>
-          <p class="mb-3">Use the sections below to access courses, categories, and recent activity.</p>
-          <div>
-            <a href="{{{ config.wwwroot }}}/course/" class="btn btn-primary me-2 mb-2">Browse courses</a>
-            <a href="{{{ config.wwwroot }}}/my/" class="btn btn-outline-secondary mb-2" style="border-radius:12px;">My dashboard</a>
-          </div>
-        </div>
-      </div>
-    </div>
-    {{! ===== END HERO ===== }}
 
     {{#courseindex}}
         {{< theme_boost/drawer }}
@@ -228,7 +89,7 @@
                             data-placement="right"
                             title="{{#str}}opendrawerblocks, core{{/str}}"
                         >
-                            <span class="sr-only">{{#str}}opendrawerblocks, core{{/str}}</span>
+                            <span class="sr-only">{{#str}}opendrawerblocks, core{{/str}}}</span>
                             <span class="dir-rtl-hide">{{#pix}}t/blocks_drawer, core{{/pix}}</span>
                             <span class="dir-ltr-hide">{{#pix}}t/blocks_drawer_rtl, core{{/pix}}</span>
                         </button>
