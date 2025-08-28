@@ -65,6 +65,20 @@ class core_renderer extends \core_renderer {
     }
 
     /**
+     * Use Org (category) logo in the navbar when inside that org or one of its courses.
+     * Falls back to the site logo elsewhere.
+     */
+    public function get_logo_url($maxwidth = 200, $maxheight = 200) {
+        // This helper must be in /theme/boost/lib.php (you already added it).
+        $orglogo = theme_boost_get_category_logo_url($this->page); // string URL or null
+
+        if ($orglogo) {
+            return new moodle_url($orglogo);
+        }
+        return parent::get_logo_url($maxwidth, $maxheight);
+    }
+
+    /**
      * Renders the context header for the page.
      *
      * @param array $headerinfo Heading information.

@@ -5318,5 +5318,14 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $offlin
 
         send_file_not_found();
     }
+// Serve category orglogo file.
+if ($context->contextlevel == CONTEXT_COURSECAT && $component === 'core' && $filearea === 'orglogo') {
+    require_login();
+    $fs = get_file_storage();
+    $file = $fs->get_file($context->id, $component, $filearea, $itemid, $filepath, $filename);
+    if ($file && !$file->is_directory()) {
+        send_stored_file($file, 0, 0, true);
+    }
+}
 
 }

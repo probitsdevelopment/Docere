@@ -96,6 +96,20 @@ $mform = new core_course_editcategory_form(null, array(
     'context' => $context,
     'itemid' => $itemid
 ));
+
+
+// Prepare draft area for org logo.
+$draftitemid = file_get_submitted_draft_itemid('orglogo_draft');
+file_prepare_draft_area(
+    $draftitemid,
+    $context->id,
+    'core',        // component
+    'orglogo',     // filearea
+    0,
+    ['subdirs' => 0, 'maxfiles' => 1]
+);
+$category->orglogo_draft = $draftitemid;
+
 $mform->set_data(file_prepare_standard_editor(
     $category,
     'description',
@@ -123,6 +137,19 @@ if ($mform->is_cancelled()) {
     } else {
         $category = core_course_category::create($data, $mform->get_description_editor_options());
     }
+    // Save the org logo file.
+if (!empty($data->orglogo_draft)) {
+    $catcontext = context_coursecat::instance($id ? $id : $category->id);
+    file_save_draft_area_files(
+        $data->orglogo_draft,
+        $catcontext->id,
+        'core',
+        'orglogo',
+        0,
+        ['subdirs' => 0, 'maxfiles' => 1]
+    );
+}
+
     $manageurl->param('categoryid', $category->id);
     redirect($manageurl);
 }

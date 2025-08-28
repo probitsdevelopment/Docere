@@ -164,3 +164,36 @@ function theme_boost_get_pre_scss($theme) {
 
     return $scss;
 }
+function theme_boost_get_category_logo_url(moodle_page $page) {
+    $categoryid = null;
+
+    // If we are inside a course, get its parent category.
+    if ($page->course && $page->course->id > 1) {
+        $coursecat = core_course_category::get($page->course->category, IGNORE_MISSING);
+        $categoryid = $coursecat ? $coursecat->id : null;
+    } else if ($catid = optional_param('categoryid', 0, PARAM_INT)) {
+        $categoryid = $catid;
+    }
+
+    if (!$categoryid) {
+        return null;
+    }
+
+    $catcontext = context_coursecat::instance($categoryid);
+    $fs = get_file_storage();
+    $files = $fs->get_area_files($catcontext->id, 'core', 'orglogo', 0, 'itemid, filepath, filename', false);
+
+    if ($files) {
+        $file = reset($files);
+        return moodle_url::make_pluginfile_url(
+            $file->get_contextid(),
+            $file->get_component(),
+            $file->get_filearea(),
+            $file->get_itemid(),
+            $file->get_filepath(),
+            $file->get_filename()
+        )->out(false);
+    }
+
+    return null;
+}
