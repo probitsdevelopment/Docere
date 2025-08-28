@@ -78,6 +78,18 @@ class core_renderer extends \core_renderer {
         return parent::get_logo_url($maxwidth, $maxheight);
     }
 
+
+
+ // Show a logo if get_logo_url() returns one (org or site).
+public function should_display_logo(): bool {
+    return (bool) $this->get_logo_url();
+}
+
+// Some templates use has_logo(); keep it consistent.
+public function has_logo(): bool {
+    return $this->should_display_logo();
+}
+
     /**
      * Renders the context header for the page.
      *

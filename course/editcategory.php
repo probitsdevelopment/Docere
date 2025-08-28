@@ -140,14 +140,8 @@ if ($mform->is_cancelled()) {
     // Save the org logo file.
 if (!empty($data->orglogo_draft)) {
     $catcontext = context_coursecat::instance($id ? $id : $category->id);
-    file_save_draft_area_files(
-        $data->orglogo_draft,
-        $catcontext->id,
-        'core',
-        'orglogo',
-        0,
-        ['subdirs' => 0, 'maxfiles' => 1]
-    );
+   file_save_draft_area_files($data->orglogo_draft, $catcontext->id, 'core', 'orglogo', 0, ['subdirs' => 0, 'maxfiles' => 1]);
+
 }
 
     $manageurl->param('categoryid', $category->id);

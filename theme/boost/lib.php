@@ -167,12 +167,13 @@ function theme_boost_get_pre_scss($theme) {
 function theme_boost_get_category_logo_url(moodle_page $page) {
     $categoryid = null;
 
-    // If we are inside a course, get its parent category.
-    if ($page->course && $page->course->id > 1) {
-        $coursecat = core_course_category::get($page->course->category, IGNORE_MISSING);
-        $categoryid = $coursecat ? $coursecat->id : null;
-    } else if ($catid = optional_param('categoryid', 0, PARAM_INT)) {
-        $categoryid = $catid;
+    if (!empty($page->course) && !empty($page->course->id) && $page->course->id > 1) {
+        $categoryid = (int)$page->course->category;
+    } else {
+        $catid = optional_param('categoryid', 0, PARAM_INT);
+        if ($catid) {
+            $categoryid = $catid;
+        }
     }
 
     if (!$categoryid) {
@@ -181,19 +182,22 @@ function theme_boost_get_category_logo_url(moodle_page $page) {
 
     $catcontext = context_coursecat::instance($categoryid);
     $fs = get_file_storage();
-    $files = $fs->get_area_files($catcontext->id, 'core', 'orglogo', 0, 'itemid, filepath, filename', false);
 
-    if ($files) {
-        $file = reset($files);
-        return moodle_url::make_pluginfile_url(
-            $file->get_contextid(),
-            $file->get_component(),
-            $file->get_filearea(),
-            $file->get_itemid(),
-            $file->get_filepath(),
-            $file->get_filename()
-        )->out(false);
+    $files = $fs->get_area_files($catcontext->id, 'core', 'orglogo', 0, 'itemid, filepath, filename', false);
+    if (!$files) {
+        return null;
     }
 
-    return null;
+    $file = reset($files);
+
+    $url = moodle_url::make_pluginfile_url(
+        $file->get_contextid(),
+        $file->get_component(),
+        $file->get_filearea(),
+        $file->get_itemid(),
+        $file->get_filepath(),
+        $file->get_filename()
+    );
+
+    return $url->out(false);
 }

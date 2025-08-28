@@ -5296,6 +5296,25 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $offlin
         }
 
         send_file_not_found();
+        if ($context->contextlevel == CONTEXT_COURSECAT && $filearea === 'orglogo') {
+    require_login();
+
+    // Args are like: /{itemid}/{filepath...}/{filename}
+    $itemid   = (int) array_shift($args);           // you saved with itemid = 0
+    $filename = array_pop($args);                   // last segment
+    $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
+
+    $fs = get_file_storage();
+    // Component is 'core' (must match your save code).
+    $file = $fs->get_file($context->id, 'core', 'orglogo', $itemid, $filepath, $filename);
+    if ($file && !$file->is_directory()) {
+        // In 4.1 this param is $sendfileoptions (NOT $options).
+        send_stored_file($file, 0, 0, $forcedownload, $sendfileoptions);
+    }
+
+    // If not found, stop here so it doesn't fall through.
+    send_file_not_found();
+}
 
     // ========================================================================================================================
     } else if (strpos($component, '_') === false) {
