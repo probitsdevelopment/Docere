@@ -164,51 +164,30 @@ function theme_boost_get_pre_scss($theme) {
 
     return $scss;
 }
-function theme_boost_get_category_logo_url(moodle_page $page) {
-    // Resolve the current category id from the most reliable sources.
+function theme_boost_get_category_logo_url(\moodle_page $page) {
     $categoryid = null;
 
-    // A) On category pages the page context is a course category.
+    // A) Category pages.
     if (!empty($page->context) && $page->context->contextlevel == CONTEXT_COURSECAT) {
         $categoryid = (int)$page->context->instanceid;
-
-    // B) On course pages use the course's parent category.
-    } else if (!empty($page->course) && !empty($page->course->id) && $page->course->id > 1) {
+    // B) Course pages.
+    } else if (!empty($page->course) && $page->course->id > 1) {
         $categoryid = (int)$page->course->category;
-
-    // C) Fallback for pages that pass `?categoryid=` in the URL (e.g. management).
+    // C) Fallback from URL.
     } else {
         $catid = optional_param('categoryid', 0, PARAM_INT);
-        if ($catid) {
-            $categoryid = (int)$catid;
-        }
+        if ($catid) { $categoryid = (int)$catid; }
     }
+    if (!$categoryid) { return null; }
 
-    if (!$categoryid) {
-        return null;
-    }
-
-    $catcontext = context_coursecat::instance($categoryid);
+    $catcontext = \context_coursecat::instance($categoryid);
     $fs = get_file_storage();
-
-    // We saved into component='core', filearea='orglogo', itemid=0.
-    $files = $fs->get_area_files($catcontext->id, 'core', 'orglogo', 0,
-        'itemid, filepath, filename', false);
-
-    if (!$files) {
-        return null;
-    }
+    $files = $fs->get_area_files($catcontext->id, 'core', 'orglogo', 0, 'itemid, filepath, filename', false);
+    if (!$files) { return null; }
 
     $file = reset($files);
-
-    $url = moodle_url::make_pluginfile_url(
-        $file->get_contextid(),  //  The category context id
-        $file->get_component(),  // 'core'
-        $file->get_filearea(),   // 'orglogo'
-        $file->get_itemid(),     // 0
-        $file->get_filepath(),   // usually '/'
-        $file->get_filename()
-    );
-
-    return $url->out(false);
+    return \moodle_url::make_pluginfile_url(
+        $file->get_contextid(), $file->get_component(), $file->get_filearea(),
+        $file->get_itemid(), $file->get_filepath(), $file->get_filename()
+    )->out(false);
 }
