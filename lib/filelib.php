@@ -5289,32 +5289,31 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $offlin
             $birecord = null;
         }
 
-        $filefunction = $component.'_pluginfile';
+                $filefunction = $component . '_pluginfile';
         if (function_exists($filefunction)) {
             // if the function exists, it must send the file and terminate. Whatever it returns leads to "not found"
             $filefunction($course, $birecord, $context, $filearea, $args, $forcedownload, $sendfileoptions);
         }
 
         send_file_not_found();
-        if ($context->contextlevel == CONTEXT_COURSECAT && $filearea === 'orglogo') {
-    require_login();
 
-    // Args are like: /{itemid}/{filepath...}/{filename}
-    $itemid   = (int) array_shift($args);           // you saved with itemid = 0
-    $filename = array_pop($args);                   // last segment
-    $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
+    // ========================================================================================================================
+    // Serve Organisation logo stored in the Course Category (Org) context.
+    } else if ($context->contextlevel == CONTEXT_COURSECAT && $filearea === 'orglogo') {
+        require_login();
 
-    $fs = get_file_storage();
-    // Component is 'core' (must match your save code).
-    $file = $fs->get_file($context->id, 'core', 'orglogo', $itemid, $filepath, $filename);
-    if ($file && !$file->is_directory()) {
-        // In 4.1 this param is $sendfileoptions (NOT $options).
-        send_stored_file($file, 0, 0, $forcedownload, $sendfileoptions);
-    }
+        // URL parts after $filearea are: /{itemid}/{filepath...}/{filename}
+        $itemid   = (int) array_shift($args);                 // saved as 0
+        $filename = array_pop($args);                         // last segment
+        $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
 
-    // If not found, stop here so it doesn't fall through.
-    send_file_not_found();
-}
+        $fs = get_file_storage();
+        $file = $fs->get_file($context->id, 'core', 'orglogo', $itemid, $filepath, $filename);
+        if ($file && !$file->is_directory()) {
+            // IMPORTANT in 4.1: use $sendfileoptions (not $options).
+            send_stored_file($file, 0, 0, $forcedownload, $sendfileoptions);
+        }
+        send_file_not_found();
 
     // ========================================================================================================================
     } else if (strpos($component, '_') === false) {
@@ -5329,7 +5328,7 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $offlin
         }
         include_once("$dir/lib.php");
 
-        $filefunction = $component.'_pluginfile';
+        $filefunction = $component . '_pluginfile';
         if (function_exists($filefunction)) {
             // if the function exists, it must send the file and terminate. Whatever it returns leads to "not found"
             $filefunction($course, $cm, $context, $filearea, $args, $forcedownload, $sendfileoptions);
@@ -5337,14 +5336,4 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $offlin
 
         send_file_not_found();
     }
-// Serve category orglogo file.
-if ($context->contextlevel == CONTEXT_COURSECAT && $component === 'core' && $filearea === 'orglogo') {
-    require_login();
-    $fs = get_file_storage();
-    $file = $fs->get_file($context->id, $component, $filearea, $itemid, $filepath, $filename);
-    if ($file && !$file->is_directory()) {
-        send_stored_file($file, 0, 0, true);
-    }
-}
-
 }
