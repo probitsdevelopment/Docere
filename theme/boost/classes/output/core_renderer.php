@@ -32,23 +32,27 @@ defined('MOODLE_INTERNAL') || die;
 class core_renderer extends \core_renderer {
 
 
-    public function get_logo_url($maxwidth = 200, $maxheight = 200) {
-        if (function_exists('theme_boost_get_category_logo_url')) {
-            $orglogo = theme_boost_get_category_logo_url($this->page);
-            if ($orglogo) {
-                return new \moodle_url($orglogo);
-            }
-        }
-        return parent::get_logo_url($maxwidth, $maxheight);
+      public function get_logo_url($maxwidth = 200, $maxheight = 200) {
+        return new \moodle_url('https://test.docere.pro/pluginfile.php/78/core/orglogo/0//Black%20Logo.png');
     }
 
-    public function should_display_logo(): bool {
-        return (bool)$this->get_logo_url();
-    }
+    // public function get_logo_url($maxwidth = 200, $maxheight = 200) {
+    //     if (function_exists('theme_boost_get_category_logo_url')) {
+    //         $orglogo = theme_boost_get_category_logo_url($this->page);
+    //         if ($orglogo) {
+    //             return new \moodle_url($orglogo);
+    //         }
+    //     }
+    //     return parent::get_logo_url($maxwidth, $maxheight);
+    // }
 
-    public function has_logo(): bool {
-        return $this->should_display_logo();
-    }
+    // public function should_display_logo(): bool {
+    //     return (bool)$this->get_logo_url();
+    // }
+
+    // public function has_logo(): bool {
+    //     return $this->should_display_logo();
+    // }
 
     /**
      * Returns HTML to display a "Turn editing on/off" button in a form.
