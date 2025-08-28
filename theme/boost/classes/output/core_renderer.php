@@ -31,6 +31,25 @@ defined('MOODLE_INTERNAL') || die;
  */
 class core_renderer extends \core_renderer {
 
+
+    public function get_logo_url($maxwidth = 200, $maxheight = 200) {
+        if (function_exists('theme_boost_get_category_logo_url')) {
+            $orglogo = theme_boost_get_category_logo_url($this->page);
+            if ($orglogo) {
+                return new \moodle_url($orglogo);
+            }
+        }
+        return parent::get_logo_url($maxwidth, $maxheight);
+    }
+
+    public function should_display_logo(): bool {
+        return (bool)$this->get_logo_url();
+    }
+
+    public function has_logo(): bool {
+        return $this->should_display_logo();
+    }
+
     /**
      * Returns HTML to display a "Turn editing on/off" button in a form.
      *
@@ -68,27 +87,7 @@ class core_renderer extends \core_renderer {
      * Use Org (category) logo in the navbar when inside that org or one of its courses.
      * Falls back to the site logo elsewhere.
      */
-    public function get_logo_url($maxwidth = 200, $maxheight = 200) {
-        // This helper must be in /theme/boost/lib.php (you already added it).
-        $orglogo = theme_boost_get_category_logo_url($this->page); // string URL or null
-
-        if ($orglogo) {
-            return new moodle_url($orglogo);
-        }
-        return parent::get_logo_url($maxwidth, $maxheight);
-    }
-
-
-
- // Show a logo if get_logo_url() returns one (org or site).
-public function should_display_logo(): bool {
-    return (bool) $this->get_logo_url();
-}
-
-// Some templates use has_logo(); keep it consistent.
-public function has_logo(): bool {
-    return $this->should_display_logo();
-}
+   
 
     /**
      * Renders the context header for the page.
