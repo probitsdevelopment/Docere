@@ -165,9 +165,80 @@ function theme_boost_get_pre_scss($theme) {
     return $scss;
 }
 function theme_boost_get_category_logo_url(\moodle_page $page): ?string {
-    $catid = \local_orgbranding\helper::current_page_categoryid($page);
-    if (!$catid) return null;
+    global $USER, $DB;
 
-    $url = \local_orgbranding\helper::category_logo_url_from_catid($catid);
-    return $url ? $url->out(false) : null;
+    $catid = 0;
+
+    // 1) Course/activity pages.
+    if (!empty($page->course) && !empty($page->course->id) && $page->course->id != SITEID) {
+        if (!empty($page->course->category)) {
+            $catid = (int)$page->course->category;
+        }
+    }
+
+    // 2) Category pages.
+    if (!$catid && $page->context->contextlevel === CONTEXT_COURSECAT) {
+        $catid = (int)$page->context->instanceid;
+    }
+
+    // 3) URL param on some tools (system context).
+    if (!$catid) {
+        $maybe = optional_param('categoryid', 0, PARAM_INT);
+        if ($maybe > 0) {
+            $catid = (int)$maybe;
+        }
+    }
+
+    // 4) Infer from user when still unknown (dashboard/admin/front page).
+    if (!$catid && isloggedin() && !isguestuser()) {
+        // If the plugin helper exists, use it.
+        if (class_exists('\\local_orgbranding\\helper') &&
+            method_exists('\\local_orgbranding\\helper', 'infer_user_primary_categoryid')) {
+            $catid = (int)\local_orgbranding\helper::infer_user_primary_categoryid($USER->id);
+        } else {
+            // Minimal inference: category with most visible enrolments.
+            $sql = "SELECT c.category AS catid, COUNT(*) AS cnt
+                      FROM {user_enrolments} ue
+                      JOIN {enrol} e ON e.id = ue.enrolid
+                      JOIN {course} c ON c.id = e.courseid
+                     WHERE ue.userid = :uid AND c.visible = 1
+                  GROUP BY c.category
+                  ORDER BY cnt DESC";
+            if ($rec = $DB->get_record_sql($sql, ['uid' => $USER->id])) {
+                $catid = (int)$rec->catid;
+            }
+            // Fallback: any category where user has a role.
+            if (!$catid) {
+                $sql2 = "SELECT ctx.instanceid AS catid
+                           FROM {role_assignments} ra
+                           JOIN {context} ctx ON ctx.id = ra.contextid
+                          WHERE ra.userid = :uid AND ctx.contextlevel = :lvl
+                       ORDER BY ra.id ASC";
+                if ($rec2 = $DB->get_record_sql($sql2, ['uid' => $USER->id, 'lvl' => CONTEXT_COURSECAT])) {
+                    $catid = (int)$rec2->catid;
+                }
+            }
+        }
+    }
+
+    if (!$catid) {
+        return null; // no org resolved -> use site logo
+    }
+
+    // Build URL from local_orgbranding/orglogo/<categoryid>.
+    $ctx = \context_coursecat::instance($catid, IGNORE_MISSING);
+    if (!$ctx) {
+        return null;
+    }
+
+    $fs = get_file_storage();
+    $files = $fs->get_area_files($ctx->id, 'local_orgbranding', 'orglogo', $catid, 'itemid, filename', false);
+    if (!$files) {
+        return null;
+    }
+
+    $f = reset($files);
+    return \moodle_url::make_pluginfile_url(
+        $ctx->id, 'local_orgbranding', 'orglogo', $catid, $f->get_filepath(), $f->get_filename()
+    )->out(false);
 }
