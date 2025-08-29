@@ -64,23 +64,6 @@ class core_renderer extends \core_renderer {
         return $this->should_display_logo();
     }
 
-    public function get_logo_url($maxwidth = 200, $maxheight = 200) {
-        if (function_exists('theme_boost_get_category_logo_url')) {
-            $orglogo = theme_boost_get_category_logo_url($this->page);
-            if ($orglogo) {
-                return new \moodle_url($orglogo);
-            }
-        }
-        return parent::get_logo_url($maxwidth, $maxheight);
-    }
-
-    public function should_display_logo(): bool {
-        return (bool)$this->get_logo_url();
-    }
-
-    public function has_logo(): bool {
-        return $this->should_display_logo();
-    }
 
     /**
      * Returns HTML to display a "Turn editing on/off" button in a form.
