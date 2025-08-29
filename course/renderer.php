@@ -1579,25 +1579,25 @@ class core_course_renderer extends plugin_renderer_base {
         $content .= html_writer::end_tag('div'); // .info
 
 
-         $catcontext = context_coursecat::instance($coursecat->id);
-    $fs = get_file_storage();
-    $files = $fs->get_area_files($catcontext->id, 'core', 'orglogo', 0, 'itemid, filepath, filename', false);
-    if ($files) {
-        $file = reset($files);
-        $logourl = moodle_url::make_pluginfile_url(
-            $file->get_contextid(),
-            $file->get_component(),
-            $file->get_filearea(),
-            $file->get_itemid(),
-            $file->get_filepath(),
-            $file->get_filename()
-        );
-        $content .= html_writer::empty_tag('img', array(
-            'src' => $logourl,
-            'alt' => format_string($coursecat->get_formatted_name()),
-            'style' => 'max-height:50px; max-width:220px; object-fit:contain; display:block; margin:6px 0;'
-        ));
-    }
+    //      $catcontext = context_coursecat::instance($coursecat->id);
+    // $fs = get_file_storage();
+    // $files = $fs->get_area_files($catcontext->id, 'core', 'orglogo', 0, 'itemid, filepath, filename', false);
+    // if ($files) {
+    //     $file = reset($files);
+    //     $logourl = moodle_url::make_pluginfile_url(
+    //         $file->get_contextid(),
+    //         $file->get_component(),
+    //         $file->get_filearea(),
+    //         $file->get_itemid(),
+    //         $file->get_filepath(),
+    //         $file->get_filename()
+    //     );
+    //     $content .= html_writer::empty_tag('img', array(
+    //         'src' => $logourl,
+    //         'alt' => format_string($coursecat->get_formatted_name()),
+    //         'style' => 'max-height:50px; max-width:220px; object-fit:contain; display:block; margin:6px 0;'
+    //     ));
+    // }
 
         // add category content to the output
         $content .= html_writer::tag('div', $categorycontent, array('class' => 'content'));

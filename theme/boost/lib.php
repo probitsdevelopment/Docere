@@ -164,36 +164,36 @@ function theme_boost_get_pre_scss($theme) {
 
     return $scss;
 }
-function theme_boost_get_category_logo_url(\moodle_page $page): ?string {
-    // Resolve category id from page context.
-    $catid = 0;
-    if ($page->context->contextlevel === CONTEXT_COURSECAT) {
-        $catid = (int)$page->context->instanceid;
-    } else if ($page->context->contextlevel === CONTEXT_COURSE && !empty($page->course->category)) {
-        $catid = (int)$page->course->category;
-    }
-    if (!$catid) {
-        return null;
-    }
+// function theme_boost_get_category_logo_url(\moodle_page $page): ?string {
+//     // Resolve category id from page context.
+//     $catid = 0;
+//     if ($page->context->contextlevel === CONTEXT_COURSECAT) {
+//         $catid = (int)$page->context->instanceid;
+//     } else if ($page->context->contextlevel === CONTEXT_COURSE && !empty($page->course->category)) {
+//         $catid = (int)$page->course->category;
+//     }
+//     if (!$catid) {
+//         return null;
+//     }
 
-    $ctx = \context_coursecat::instance($catid, IGNORE_MISSING);
-    if (!$ctx) {
-        return null;
-    }
+//     $ctx = \context_coursecat::instance($catid, IGNORE_MISSING);
+//     if (!$ctx) {
+//         return null;
+//     }
 
-    $fs = get_file_storage();
-    $files = $fs->get_area_files($ctx->id, 'local_orgbranding', 'orglogo', $catid, 'itemid, filename', false);
-    if (!$files) {
-        return null;
-    }
+//     $fs = get_file_storage();
+//     $files = $fs->get_area_files($ctx->id, 'local_orgbranding', 'orglogo', $catid, 'itemid, filename', false);
+//     if (!$files) {
+//         return null;
+//     }
 
-    $f = reset($files);
-    return \moodle_url::make_pluginfile_url(
-        $ctx->id,
-        'local_orgbranding',
-        'orglogo',
-        $catid,
-        $f->get_filepath(),
-        $f->get_filename()
-    )->out(false); // return string
-}
+//     $f = reset($files);
+//     return \moodle_url::make_pluginfile_url(
+//         $ctx->id,
+//         'local_orgbranding',
+//         'orglogo',
+//         $catid,
+//         $f->get_filepath(),
+//         $f->get_filename()
+//     )->out(false); // return string
+// }
