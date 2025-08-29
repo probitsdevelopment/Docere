@@ -99,17 +99,22 @@ $mform = new core_course_editcategory_form(null, array(
 
 
 // Prepare draft area for org logo.
+$context = context_coursecat::instance($category->id); // ensure this exists here
+
 $draftitemid = file_get_submitted_draft_itemid('orglogo_draft');
 file_prepare_draft_area(
     $draftitemid,
     $context->id,
-    'core',        // component
-    'orglogo',     // filearea
-    0,
-    ['subdirs' => 0, 'maxfiles' => 1]
+    'local_orgbranding',   // ✅ component (NOT 'core')
+    'orglogo',             // ✅ filearea
+    $category->id,         // ✅ itemid = category id (NOT 0)
+    ['subdirs' => 0, 'maxfiles' => 1, 'accepted_types' => ['image']]
 );
+
+// Expose draft id to the form.
 $category->orglogo_draft = $draftitemid;
 
+// Your existing description editor code can stay as-is:
 $mform->set_data(file_prepare_standard_editor(
     $category,
     'description',
@@ -139,9 +144,15 @@ if ($mform->is_cancelled()) {
     }
     // Save the org logo file.
 if (!empty($data->orglogo_draft)) {
-    $catcontext = context_coursecat::instance($id ? $id : $category->id);
-   file_save_draft_area_files($data->orglogo_draft, $catcontext->id, 'core', 'orglogo', 0, ['subdirs' => 0, 'maxfiles' => 1]);
-
+    $catcontext = context_coursecat::instance($category->id); // use the saved category id
+    file_save_draft_area_files(
+        $data->orglogo_draft,
+        $catcontext->id,
+        'local_orgbranding',   // ✅ component (NOT 'core')
+        'orglogo',             // ✅ filearea
+        $category->id,         // ✅ itemid = category id (NOT 0)
+        ['subdirs' => 0, 'maxfiles' => 1, 'accepted_types' => ['image']]
+    );
 }
 
     $manageurl->param('categoryid', $category->id);

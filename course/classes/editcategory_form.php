@@ -79,11 +79,11 @@ class core_course_editcategory_form extends moodleform {
         $mform->setType('description_editor', PARAM_RAW);
 
         // Org logo upload field.
-$mform->addElement('filemanager', 'orglogo_draft', get_string('organisationlogo', 'moodle'), null, [
-    'subdirs' => 0,
-    'maxfiles' => 1,
-    'accepted_types' => ['image']
-]);
+$mform->addElement('filemanager', 'orglogo_draft',
+    get_string('organisationlogo', 'local_orgbranding'), null,
+    ['subdirs' => 0, 'maxfiles' => 1, 'accepted_types' => ['image']]
+);
+
 
 
         if (!empty($CFG->allowcategorythemes)) {

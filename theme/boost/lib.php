@@ -164,30 +164,36 @@ function theme_boost_get_pre_scss($theme) {
 
     return $scss;
 }
-function theme_boost_get_category_logo_url(\moodle_page $page) {
-    $categoryid = null;
-
-    // A) Category pages.
-    if (!empty($page->context) && $page->context->contextlevel == CONTEXT_COURSECAT) {
-        $categoryid = (int)$page->context->instanceid;
-    // B) Course pages.
-    } else if (!empty($page->course) && $page->course->id > 1) {
-        $categoryid = (int)$page->course->category;
-    // C) Fallback from URL.
-    } else {
-        $catid = optional_param('categoryid', 0, PARAM_INT);
-        if ($catid) { $categoryid = (int)$catid; }
+function theme_boost_get_category_logo_url(\moodle_page $page): ?string {
+    // Resolve category id from page context.
+    $catid = 0;
+    if ($page->context->contextlevel === CONTEXT_COURSECAT) {
+        $catid = (int)$page->context->instanceid;
+    } else if ($page->context->contextlevel === CONTEXT_COURSE && !empty($page->course->category)) {
+        $catid = (int)$page->course->category;
     }
-    if (!$categoryid) { return null; }
+    if (!$catid) {
+        return null;
+    }
 
-    $catcontext = \context_coursecat::instance($categoryid);
+    $ctx = \context_coursecat::instance($catid, IGNORE_MISSING);
+    if (!$ctx) {
+        return null;
+    }
+
     $fs = get_file_storage();
-    $files = $fs->get_area_files($catcontext->id, 'core', 'orglogo', 0, 'itemid, filepath, filename', false);
-    if (!$files) { return null; }
+    $files = $fs->get_area_files($ctx->id, 'local_orgbranding', 'orglogo', $catid, 'itemid, filename', false);
+    if (!$files) {
+        return null;
+    }
 
-    $file = reset($files);
+    $f = reset($files);
     return \moodle_url::make_pluginfile_url(
-        $file->get_contextid(), $file->get_component(), $file->get_filearea(),
-        $file->get_itemid(), $file->get_filepath(), $file->get_filename()
-    )->out(false);
+        $ctx->id,
+        'local_orgbranding',
+        'orglogo',
+        $catid,
+        $f->get_filepath(),
+        $f->get_filename()
+    )->out(false); // return string
 }
