@@ -5299,21 +5299,35 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $offlin
 
     // ========================================================================================================================
     // Serve Organisation logo stored in the Course Category (Org) context.
-    // } else if ($context->contextlevel == CONTEXT_COURSECAT && $filearea === 'orglogo') {
-    //     require_login();
+    } else if ($context->contextlevel === CONTEXT_COURSECAT && $filearea === 'orglogo') {
+    require_login();
 
-    //     // URL parts after $filearea are: /{itemid}/{filepath...}/{filename}
-    //     $itemid   = (int) array_shift($args);                 // saved as 0
-    //     $filename = array_pop($args);                         // last segment
-    //     $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
+    // Expect /{itemid}/{filepath...}/{filename}
+    if (empty($args)) {
+        send_file_not_found();
+    }
 
-    //     $fs = get_file_storage();
-    //     $file = $fs->get_file($context->id, 'core', 'orglogo', $itemid, $filepath, $filename);
-    //     if ($file && !$file->is_directory()) {
-    //         // IMPORTANT in 4.1: use $sendfileoptions (not $options).
-    //         send_stored_file($file, 0, 0, $forcedownload, $sendfileoptions);
-    //     }
-    //     send_file_not_found();
+    $itemid = (int) array_shift($args);          // <-- category ID you saved to
+    if ($itemid <= 0) {
+        send_file_not_found();
+    }
+
+    $filename = array_pop($args);                // last segment
+    $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
+
+    $fs = get_file_storage();
+    $file = $fs->get_file(
+        $context->id,
+        'local_orgbranding',                      // <-- component
+        'orglogo',                                // <-- filearea
+        $itemid,                                  // <-- category ID
+        $filepath,
+        $filename
+    );
+
+    if (!$file || $file->is_directory()) {
+        send_file_not_found();
+    }
 
     // ========================================================================================================================
     } else if (strpos($component, '_') === false) {

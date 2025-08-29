@@ -32,55 +32,55 @@ defined('MOODLE_INTERNAL') || die;
 class core_renderer extends \core_renderer {
 
 
-//    public function get_logo_url($maxwidth = null, $maxheight = 200) {
-//         if (function_exists('theme_boost_get_category_logo_url')) {
-//             $orglogo = theme_boost_get_category_logo_url($this->page); // string|null
-//             if (!empty($orglogo)) {
-//                 return new \moodle_url($orglogo); // moodle_url
-//             }
-//         }
-//         return parent::get_logo_url($maxwidth, $maxheight); // moodle_url|false
-//     }
+   public function get_logo_url($maxwidth = null, $maxheight = 200) {
+        if (function_exists('theme_boost_get_category_logo_url')) {
+            $orglogo = theme_boost_get_category_logo_url($this->page); // string|null
+            if (!empty($orglogo)) {
+                return new \moodle_url($orglogo); // moodle_url
+            }
+        }
+        return parent::get_logo_url($maxwidth, $maxheight); // moodle_url|false
+    }
 
-//     /**
-//      * Prefer org logo for compact too.
-//      * Signature must match parent: returns moodle_url|false.
-//      */
-//     public function get_compact_logo_url($maxwidth = 300, $maxheight = 300) {
-//         if (function_exists('theme_boost_get_category_logo_url')) {
-//             $orglogo = theme_boost_get_category_logo_url($this->page);
-//             if (!empty($orglogo)) {
-//                 return new \moodle_url($orglogo);
-//             }
-//         }
-//         return parent::get_compact_logo_url($maxwidth, $maxheight);
-//     }
+    /**
+     * Prefer org logo for compact too.
+     * Signature must match parent: returns moodle_url|false.
+     */
+    public function get_compact_logo_url($maxwidth = 300, $maxheight = 300) {
+        if (function_exists('theme_boost_get_category_logo_url')) {
+            $orglogo = theme_boost_get_category_logo_url($this->page);
+            if (!empty($orglogo)) {
+                return new \moodle_url($orglogo);
+            }
+        }
+        return parent::get_compact_logo_url($maxwidth, $maxheight);
+    }
 
-//     // (Optional) keep Boost-style helpers.
-//     public function should_display_logo() {
-//         return (bool)$this->get_logo_url();
-//     }
-//     public function has_logo() {
-//         return $this->should_display_logo();
-//     }
+    // (Optional) keep Boost-style helpers.
+    public function should_display_logo() {
+        return (bool)$this->get_logo_url();
+    }
+    public function has_logo() {
+        return $this->should_display_logo();
+    }
 
-    // public function get_logo_url($maxwidth = 200, $maxheight = 200) {
-    //     if (function_exists('theme_boost_get_category_logo_url')) {
-    //         $orglogo = theme_boost_get_category_logo_url($this->page);
-    //         if ($orglogo) {
-    //             return new \moodle_url($orglogo);
-    //         }
-    //     }
-    //     return parent::get_logo_url($maxwidth, $maxheight);
-    // }
+    public function get_logo_url($maxwidth = 200, $maxheight = 200) {
+        if (function_exists('theme_boost_get_category_logo_url')) {
+            $orglogo = theme_boost_get_category_logo_url($this->page);
+            if ($orglogo) {
+                return new \moodle_url($orglogo);
+            }
+        }
+        return parent::get_logo_url($maxwidth, $maxheight);
+    }
 
-    // public function should_display_logo(): bool {
-    //     return (bool)$this->get_logo_url();
-    // }
+    public function should_display_logo(): bool {
+        return (bool)$this->get_logo_url();
+    }
 
-    // public function has_logo(): bool {
-    //     return $this->should_display_logo();
-    // }
+    public function has_logo(): bool {
+        return $this->should_display_logo();
+    }
 
     /**
      * Returns HTML to display a "Turn editing on/off" button in a form.
