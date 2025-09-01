@@ -28,7 +28,7 @@
 
 require_once('../config.php');
 require_once($CFG->dirroot . '/course/lib.php');
-require_once($CFG->dirroot . '/course/editcategory_form.php');
+
 
 require_login();
 
