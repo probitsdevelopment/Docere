@@ -143,7 +143,7 @@ $category = file_prepare_standard_editor(
     $category,
     'description',
     $mform->get_description_editor_options(),
-    (!empty($category->id) ? context_coursecat::instance($category->id) : context_system::instance()),
+    $context,  // ✅ use the SAME context you used to build the form/options
     'coursecat',
     'description',
     $itemid
