@@ -27,17 +27,21 @@
  */
 
 require_once('../config.php');
-require_once($CFG->dirroot.'/course/lib.php');
+require_once($CFG->dirroot . '/course/lib.php');
+require_once($CFG->dirroot . '/course/editcategory_form.php');
 
 require_login();
 
 $id = optional_param('id', 0, PARAM_INT);
 
 $url = new moodle_url('/course/editcategory.php');
+
 if ($id) {
+    // ===== Edit existing category =====
     $coursecat = core_course_category::get($id, MUST_EXIST, true);
     $category = $coursecat->get_db_record();
     $context = context_coursecat::instance($id);
+
     navigation_node::override_active_url(new moodle_url('/course/index.php', ['categoryid' => $category->id]));
     $PAGE->navbar->add(get_string('settings'));
     $PAGE->set_primary_active_tab('home');
@@ -45,31 +49,33 @@ if ($id) {
 
     $url->param('id', $id);
     $strtitle = new lang_string('editcategorysettings');
-    $itemid = 0; // Initialise itemid, as all files in category description has item id 0.
+    $itemid = 0; // Files in category description use itemid 0.
     $title = $strtitle;
     $fullname = $coursecat->get_formatted_name();
 
 } else {
+    // ===== Create new category =====
     $parent = required_param('parent', PARAM_INT);
     $url->param('parent', $parent);
     $strtitle = get_string('addnewcategory');
+
     if ($parent) {
-        $parentcategory = $DB->get_record('course_categories', array('id' => $parent), '*', MUST_EXIST);
+        $parentcategory = $DB->get_record('course_categories', ['id' => $parent], '*', MUST_EXIST);
         $context = context_coursecat::instance($parent);
         navigation_node::override_active_url(new moodle_url('/course/index.php', ['categoryid' => $parent]));
-        $fullname = format_string($parentcategory->name, true, ['context' => $context->id]);
+        $fullname = format_string($parentcategory->name, true, ['context' => $context]);
         $title = "$fullname: $strtitle";
+
         $managementurl = new moodle_url('/course/management.php');
-        // These are the caps required in order to see the management interface.
-        $managementcaps = array('moodle/category:manage', 'moodle/course:create');
+        $managementcaps = ['moodle/category:manage', 'moodle/course:create'];
         if (!has_any_capability($managementcaps, context_system::instance())) {
-            // If the user doesn't have either manage caps then they can only manage within the given category.
             $managementurl->param('categoryid', $parent);
         }
         $PAGE->set_primary_active_tab('home');
         $PAGE->navbar->add(get_string('coursemgmt', 'admin'), $managementurl);
         $PAGE->navbar->add(get_string('addcategory', 'admin'));
     } else {
+        // Top-level new category.
         $context = context_system::instance();
         $fullname = $SITE->fullname;
         $title = $strtitle;
@@ -79,7 +85,7 @@ if ($id) {
     $category = new stdClass();
     $category->id = 0;
     $category->parent = $parent;
-    $itemid = null; // Set this explicitly, so files for parent category should not get loaded in draft area.
+    $itemid = null; // Prevent loading files from parent into draft.
 }
 
 require_capability('moodle/category:manage', $context);
@@ -90,75 +96,105 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title($title);
 $PAGE->set_heading($fullname);
 
-$mform = new core_course_editcategory_form(null, array(
+// Build the form.
+$mform = new core_course_editcategory_form(null, [
     'categoryid' => $id,
-    'parent' => $category->parent,
-    'context' => $context,
-    'itemid' => $itemid
-));
+    'parent'     => $category->parent,
+    'context'    => $context,
+    'itemid'     => $itemid
+]);
 
-
-// Prepare draft area for org logo.
-$context = context_coursecat::instance($category->id); // ensure this exists here
-
+/**
+ * ---- PREPARE DRAFT AREA FOR ORG LOGO (local_orgbranding/orglogo) ----
+ * IMPORTANT:
+ *  - When editing (id > 0): use the category context + final filearea.
+ *  - When creating (id = 0): use system context + TEMP filearea; move on save.
+ */
 $draftitemid = file_get_submitted_draft_itemid('orglogo_draft');
-file_prepare_draft_area(
-    $draftitemid,
-    $context->id,
-    'local_orgbranding',   // ✅ component (NOT 'core')
-    'orglogo',             // ✅ filearea
-    $category->id,         // ✅ itemid = category id (NOT 0)
-    ['subdirs' => 0, 'maxfiles' => 1, 'accepted_types' => ['image']]
-);
 
-// Expose draft id to the form.
-$category->orglogo_draft = $draftitemid;
-
-// Your existing description editor code can stay as-is:
-$mform->set_data(file_prepare_standard_editor(
-    $category,
-    'description',
-    $mform->get_description_editor_options(),
-    $context,
-    'coursecat',
-    'description',
-    $itemid
-));
-
-$manageurl = new moodle_url('/course/management.php');
-if ($mform->is_cancelled()) {
-    if ($id) {
-        $manageurl->param('categoryid', $id);
-    } else if ($parent) {
-        $manageurl->param('categoryid', $parent);
-    }
-    redirect($manageurl);
-} else if ($data = $mform->get_data()) {
-    if (isset($coursecat)) {
-        if ((int)$data->parent !== (int)$coursecat->parent && !$coursecat->can_change_parent($data->parent)) {
-            throw new \moodle_exception('cannotmovecategory');
-        }
-        $coursecat->update($data, $mform->get_description_editor_options());
-    } else {
-        $category = core_course_category::create($data, $mform->get_description_editor_options());
-    }
-    // Save the org logo file.
-if (!empty($data->orglogo_draft)) {
-    $catcontext = context_coursecat::instance($category->id); // use the saved category id
-    file_save_draft_area_files(
-        $data->orglogo_draft,
-        $catcontext->id,
-        'local_orgbranding',   // ✅ component (NOT 'core')
-        'orglogo',             // ✅ filearea
-        $category->id,         // ✅ itemid = category id (NOT 0)
+if (!empty($category->id)) {
+    // Editing an existing category.
+    $draftctx = context_coursecat::instance($category->id);
+    file_prepare_draft_area(
+        $draftitemid,
+        $draftctx->id,
+        'local_orgbranding',
+        'orglogo',           // final area
+        $category->id,       // itemid = category id
+        ['subdirs' => 0, 'maxfiles' => 1, 'accepted_types' => ['image']]
+    );
+} else {
+    // Creating a new category (no category id yet).
+    $draftctx = context_system::instance();
+    file_prepare_draft_area(
+        $draftitemid,
+        $draftctx->id,
+        'local_orgbranding',
+        'orglogo_tmp',       // temporary area while id does not exist
+        $USER->id,           // stable temporary itemid
         ['subdirs' => 0, 'maxfiles' => 1, 'accepted_types' => ['image']]
     );
 }
 
-    $manageurl->param('categoryid', $category->id);
+$category->orglogo_draft = $draftitemid;
+
+// Prepare description editor data (core behavior stays unchanged).
+$category = file_prepare_standard_editor(
+    $category,
+    'description',
+    $mform->get_description_editor_options(),
+    (!empty($category->id) ? context_coursecat::instance($category->id) : context_system::instance()),
+    'coursecat',
+    'description',
+    $itemid
+);
+
+$mform->set_data($category);
+
+// Management URL base.
+$manageurl = new moodle_url('/course/management.php');
+
+// Handle form events.
+if ($mform->is_cancelled()) {
+    if (!empty($id)) {
+        $manageurl->param('categoryid', $id);
+    } else if (!empty($parent)) {
+        $manageurl->param('categoryid', $parent);
+    }
+    redirect($manageurl);
+
+} else if ($data = $mform->get_data()) {
+
+    // 1) Persist category first (so we have a real id).
+    if (!empty($coursecat)) {
+        if ((int)$data->parent !== (int)$coursecat->parent && !$coursecat->can_change_parent($data->parent)) {
+            throw new moodle_exception('cannotmovecategory');
+        }
+        $coursecat->update($data, $mform->get_description_editor_options());
+        $catid = $coursecat->id;
+    } else {
+        $newcat = core_course_category::create($data, $mform->get_description_editor_options());
+        $catid = $newcat->id;
+    }
+
+    // 2) Save/move the org logo from draft to the FINAL area under the category context.
+    if (!empty($data->orglogo_draft)) {
+        $catctx = context_coursecat::instance($catid);
+        file_save_draft_area_files(
+            $data->orglogo_draft,
+            $catctx->id,
+            'local_orgbranding',   // component
+            'orglogo',             // final filearea
+            $catid,                // itemid = category id
+            ['subdirs' => 0, 'maxfiles' => 1, 'accepted_types' => ['image']]
+        );
+    }
+
+    $manageurl->param('categoryid', $catid);
     redirect($manageurl);
 }
 
+// Output.
 echo $OUTPUT->header();
 echo $OUTPUT->heading($strtitle);
 $mform->display();
