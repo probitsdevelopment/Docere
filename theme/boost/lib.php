@@ -167,6 +167,15 @@ function theme_boost_get_pre_scss($theme) {
 function theme_boost_get_category_logo_url(\moodle_page $page): ?string {
     global $USER, $DB;
 
+    // 0) If we're on Add Category (id=0), NEVER try to resolve a category context.
+    //    This avoids calling context_coursecat::instance(0) while the form renders.
+    $script = $_SERVER['SCRIPT_NAME'] ?? '';
+    $onaddcategory = (strpos($script, '/course/editcategory.php') !== false)
+                     && (optional_param('id', 0, PARAM_INT) == 0);
+    if ($onaddcategory) {
+        return null;
+    }
+
     $catid = 0;
 
     // 1) Course/activity pages.
@@ -176,12 +185,12 @@ function theme_boost_get_category_logo_url(\moodle_page $page): ?string {
         }
     }
 
-    // 2) Category pages.
+    // 2) Category pages (including Edit Category when editing an existing category).
     if (!$catid && $page->context->contextlevel === CONTEXT_COURSECAT) {
         $catid = (int)$page->context->instanceid;
     }
 
-    // 3) URL param on some tools (system context).
+    // 3) URL param used by some tools/pages.
     if (!$catid) {
         $maybe = optional_param('categoryid', 0, PARAM_INT);
         if ($maybe > 0) {
@@ -189,14 +198,12 @@ function theme_boost_get_category_logo_url(\moodle_page $page): ?string {
         }
     }
 
-    // 4) Infer from user when still unknown (dashboard/admin/front page).
+    // 4) Infer from user (dashboard/admin/front page).
     if (!$catid && isloggedin() && !isguestuser()) {
-        // If the plugin helper exists, use it.
         if (class_exists('\\local_orgbranding\\helper') &&
             method_exists('\\local_orgbranding\\helper', 'infer_user_primary_categoryid')) {
             $catid = (int)\local_orgbranding\helper::infer_user_primary_categoryid($USER->id);
         } else {
-            // Minimal inference: category with most visible enrolments.
             $sql = "SELECT c.category AS catid, COUNT(*) AS cnt
                       FROM {user_enrolments} ue
                       JOIN {enrol} e ON e.id = ue.enrolid
@@ -207,7 +214,6 @@ function theme_boost_get_category_logo_url(\moodle_page $page): ?string {
             if ($rec = $DB->get_record_sql($sql, ['uid' => $USER->id])) {
                 $catid = (int)$rec->catid;
             }
-            // Fallback: any category where user has a role.
             if (!$catid) {
                 $sql2 = "SELECT ctx.instanceid AS catid
                            FROM {role_assignments} ra
@@ -221,18 +227,19 @@ function theme_boost_get_category_logo_url(\moodle_page $page): ?string {
         }
     }
 
-    if (!$catid) {
-        return null; // no org resolved -> use site logo
+    if ($catid <= 0) {
+        return null; // No org resolved -> use site logo.
     }
 
-    // Build URL from local_orgbranding/orglogo/<categoryid>.
+    // Use IGNORE_MISSING to avoid exceptions if something’s off.
     $ctx = \context_coursecat::instance($catid, IGNORE_MISSING);
     if (!$ctx) {
         return null;
     }
 
     $fs = get_file_storage();
-    $files = $fs->get_area_files($ctx->id, 'local_orgbranding', 'orglogo', $catid, 'itemid, filename', false);
+    // Your scheme: itemid == category id
+    $files = $fs->get_area_files($ctx->id, 'local_orgbranding', 'orglogo', $catid, 'filename', false);
     if (!$files) {
         return null;
     }
