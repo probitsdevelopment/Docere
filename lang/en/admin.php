@@ -24,7 +24,7 @@
 
 $string['accessdenied'] = 'Access denied';
 $string['accounts'] = 'Accounts';
-$string['addcategory'] = 'Add a category';
+$string['addcategory'] = 'Add a organization';
 $string['additionalhtml'] = 'Additional HTML';
 $string['additionalhtml_heading'] = 'Additional HTML to be added to every page.';
 $string['additionalhtml_desc'] = 'These settings allow you to specify HTML that you want added to every page. You can set HTML that will be added within the HEAD tag for the page, immediately after the BODY tag has been opened, or immediately before the body tag is closed.<br />Doing this allows you to add custom headers or footers on every page, or add support for services like Google Analytics very easily, independent of your chosen theme.';
@@ -428,7 +428,7 @@ $string['coursegraceperiodafter'] = 'Grace period for past courses';
 $string['coursegraceperiodbefore'] = 'Grace period for future courses';
 $string['courselistshortnames'] = 'Display extended course names';
 $string['courselistshortnames_desc'] = 'If enabled, course short names will be displayed in addition to full names in course lists. If required, extended course names may be customised by editing the \'courseextendednamedisplay\' language string using the language customisation feature.';
-$string['coursemgmt'] = 'Manage courses and categories';
+$string['coursemgmt'] = 'Manage courses and organizations';
 $string['courseoverview'] = 'Course overview';
 $string['courserequestnotify'] = 'Course request notification';
 $string['courserequestnotifyemail'] = '{$a->user} requested a new course <a href="{$a->link}">{$a->link}</a>';
