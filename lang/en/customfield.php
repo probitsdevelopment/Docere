@@ -24,9 +24,9 @@
 
 $string['action'] = 'Action';
 $string['addingnewcustomfield'] = 'Adding a new {$a}';
-$string['addnewcategory'] = 'Add a new category';
+$string['addnewcategory'] = 'Add a new organization';
 $string['afterfield'] = 'After field {$a}';
-$string['categorynotfound'] = 'Category not found';
+$string['categorynotfound'] = 'organization not found';
 $string['checked'] = 'Checked';
 $string['commonsettings'] = 'General';
 $string['componentsettings'] = 'Component settings';
@@ -40,7 +40,7 @@ $string['defaultvalue'] = 'Default value';
 $string['description'] = 'Description';
 $string['description_help'] = 'The description is displayed in the form below the field.';
 $string['edit'] = 'Edit';
-$string['editcategoryname'] = 'Edit category name';
+$string['editcategoryname'] = 'Edit organization name';
 $string['editingfield'] = 'Updating {$a}';
 $string['errorfieldtypenotfound'] = 'Field type {$a} not found';
 $string['erroruniquevalues'] = 'This value is already used.';
