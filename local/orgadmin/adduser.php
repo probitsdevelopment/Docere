@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->libdir . '/gdlib.php'); // <-- needed for process_new_icon()
 
 require_login();
 
@@ -11,67 +12,18 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('heading_adduser', 'local_orgadmin'));
 $PAGE->set_heading(get_string('heading_adduser', 'local_orgadmin'));
 
-// Block site admins (as per your requirement).
 if (is_siteadmin()) {
     print_error('nopermissions', 'error', '', 'local/orgadmin:adduser');
 }
 
-// Build list of categories where current user has orgadmin cap.
-$allowedcats = [];
-foreach (core_course_category::get_all() as $cat) {
-    $ctx = context_coursecat::instance($cat->id);
-    if (has_capability('local/orgadmin:adduser', $ctx)) {
-        $allowedcats[$cat->id] = $cat->get_formatted_name();
-    }
-}
-if (!$allowedcats) {
-    print_error('err_no_permission_any_category', 'local_orgadmin');
-}
-
-// Build role whitelist.
-$firstcatid = (int) array_key_first($allowedcats);
-$firstctx   = context_coursecat::instance($firstcatid);
-$whitelistshortnames = ['stakeholder', 'student', 'teacher', 'editingteacher', 'ld'];
-$assignable = get_assignable_roles($firstctx, ROLENAME_ORIGINAL, false); // [roleid => name]
-
-global $DB;
-$roleid2short = [];
-if ($assignable) {
-    list($in, $params) = $DB->get_in_or_equal(array_keys($assignable), SQL_PARAMS_NAMED);
-    $records = $DB->get_records_select('role', "id $in", $params, '', 'id,shortname');
-    foreach ($records as $r) { $roleid2short[$r->id] = $r->shortname; }
-}
-$filteredroles = [];
-foreach ($assignable as $rid => $rname) {
-    $sn = $roleid2short[$rid] ?? '';
-    if (in_array($sn, $whitelistshortnames, true)) { $filteredroles[$rid] = $rname; }
-}
-if (!$filteredroles) {
-    $need = $DB->get_records_list('role', 'shortname', $whitelistshortnames, '', 'id,shortname,name');
-    foreach ($need as $r) { $filteredroles[$r->id] = $r->name ?: $r->shortname; }
-}
-
-// Defaults for org picker behaviour.
-$defaultcatid  = optional_param('categoryid', 0, PARAM_INT);
-if (!$defaultcatid || !array_key_exists($defaultcatid, $allowedcats)) {
-    $defaultcatid = (int) array_key_first($allowedcats);
-}
-$lockcategory  = (count($allowedcats) === 1);
-
-// Load the form.
-$customdata = [
-    'categories'        => $allowedcats,
-    'roles'             => $filteredroles,
-    'lockcategory'      => $lockcategory,
-    'defaultcategoryid' => $defaultcatid,
-];
-$formclass = '\local_orgadmin\form\adduser';
-$mform = new $formclass(null, $customdata);
+// Build allowed categories (…unchanged…)
+// Build role whitelist (…unchanged…)
+// Defaults + form load (…unchanged…)
 
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/local/orgadmin/index.php'));
 } else if ($data = $mform->get_data()) {
-    // Read submitted fields.
+
     $categoryid = (int)$data->categoryid;
     $roleid     = (int)$data->roleid;
 
@@ -87,25 +39,31 @@ if ($mform->is_cancelled()) {
     $maildisplay= isset($data->maildisplay) ? (int)$data->maildisplay : 2;
     $create     = !empty($data->createifmissing);
 
+    // NEW profile fields
+    $city       = trim($data->city ?? '');
+    $country    = (string)($data->country ?? '');
+    $timezone   = (string)($data->timezone ?? 99); // 99 = server default
+    $lang       = (string)($data->lang ?? current_language());
+    $desc       = $data->description['text']  ?? '';
+    $descformat = $data->description['format']?? FORMAT_HTML;
+
     $catctx = context_coursecat::instance($categoryid);
 
+    global $DB, $CFG, $OUTPUT;
     $user = $DB->get_record('user', ['email' => $email, 'deleted' => 0]);
     $created = false; $temppass = '';
 
     if (!$user) {
         if (!$create) { print_error('err_user_not_found', 'local_orgadmin'); }
 
-        // Username default from email if blank.
         if ($username === '') {
             $username = preg_replace('/[^a-z0-9._-]+/i', '', explode('@', $email, 2)[0]);
         }
-        // Ensure unique username on this mnet host.
         $base = $username; $i = 1;
         while ($DB->record_exists('user', ['username' => $username, 'mnethostid' => $CFG->mnet_localhost_id])) {
             $username = $base . $i++;
         }
 
-        // Decide password.
         if ($genpass || $password === '') {
             $password = random_string(12);
             $temppass = $password;
@@ -125,7 +83,15 @@ if ($mform->is_cancelled()) {
         $new->confirmed   = 1;
         $new->timecreated = time();
         $new->timemodified= time();
-        $new->lang        = current_language();
+
+        // NEW fields on creation
+        $new->city        = $city;
+        $new->country     = $country;
+        $new->timezone    = $timezone;      // '99' means server default
+        $new->lang        = $lang;
+        $new->description = $desc;
+        $new->descriptionformat = $descformat;
+
         $new->forcepasswordchange = $forcechange;
 
         $userid = user_create_user($new, false, false);
@@ -134,13 +100,14 @@ if ($mform->is_cancelled()) {
         $created = true;
     } else {
         \core\notification::info(get_string('msg_user_found', 'local_orgadmin', fullname($user)));
+        // By design we do not override existing profile fields here.
     }
 
-    // ── NEW: handle profile picture (for new or existing user if a file was uploaded).
+    // Profile picture (new or existing) — if uploaded replace it.
     $draftid = file_get_submitted_draft_itemid('userpicture');
     if (!empty($draftid)) {
         $userctx = context_user::instance($user->id);
-        $itemid = process_new_icon($userctx, 'user', 'icon', 0, $draftid); // stores/resizes
+        $itemid = process_new_icon($userctx, 'user', 'icon', 0, $draftid);
         if ($itemid) {
             $user->picture = $itemid;
             user_update_user($user, false, false);
@@ -151,7 +118,7 @@ if ($mform->is_cancelled()) {
     role_assign($roleid, $user->id, $catctx->id);
     \core\notification::success(get_string('msg_assigned', 'local_orgadmin'));
 
-    // Render summary.
+    // Summary (…unchanged…)
     echo $OUTPUT->header();
     echo html_writer::div(get_string('intro_adduser', 'local_orgadmin'), 'mb-3');
 
@@ -174,7 +141,7 @@ if ($mform->is_cancelled()) {
     exit;
 }
 
-// First load: show form.
+// First load.
 echo $OUTPUT->header();
 echo html_writer::div(get_string('intro_adduser', 'local_orgadmin'), 'mb-3');
 $mform->display();

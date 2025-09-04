@@ -40,6 +40,7 @@ class adduser extends \moodleform {
         $mform->addElement('text', 'username', get_string('f_username', 'local_orgadmin'), ['size' => 32]);
         $mform->setType('username', PARAM_USERNAME);
 
+        // Auth method (enabled auth plugins). Default manual.
         $authopts = [];
         foreach (\get_enabled_auth_plugins(true) as $auth) {
             $authopts[$auth] = \get_string('pluginname', "auth_{$auth}");
@@ -78,12 +79,33 @@ class adduser extends \moodleform {
         $mform->addElement('select', 'maildisplay', get_string('f_maildisplay', 'local_orgadmin'), $visopts);
         $mform->setDefault('maildisplay', 2);
 
-        // ── Profile picture (NEW)
+        // ── Extra profile fields
+        $mform->addElement('text', 'city', get_string('f_city', 'local_orgadmin'), ['size' => 32]);
+        $mform->setType('city', PARAM_NOTAGS);
+
+        $countries = \get_string_manager()->get_list_of_countries(true);
+        $countries = ['' => get_string('selectacountry')] + $countries;
+        $mform->addElement('select', 'country', get_string('f_country', 'local_orgadmin'), $countries);
+
+        $timezones = \core_date::get_list_of_timezones(); // includes "Server timezone (...)"
+        $mform->addElement('select', 'timezone', get_string('f_timezone', 'local_orgadmin'), $timezones);
+        $mform->setDefault('timezone', 99); // 99 = server default
+
+        $langs = \get_string_manager()->get_list_of_translations(true);
+        $mform->addElement('select', 'lang', get_string('f_lang', 'local_orgadmin'), $langs);
+        $mform->setDefault('lang', current_language());
+
+        // Description (rich text). No files needed.
+        $mform->addElement('editor', 'description', get_string('f_description', 'local_orgadmin'),
+            null, ['maxfiles' => 0, 'trusttext' => false]);
+        $mform->setType('description', PARAM_RAW);
+
+        // ── Profile picture
         global $CFG;
         $mform->addElement(
             'filepicker',
             'userpicture',
-            get_string('userpicture'), // core string
+            get_string('userpicture'),
             null,
             ['maxbytes' => $CFG->maxbytes, 'accepted_types' => ['image']]
         );

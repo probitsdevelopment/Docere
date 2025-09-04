@@ -32,3 +32,19 @@ $string['summary_username'] = 'Username';
 $string['summary_temp_password'] = 'Temporary password';
 $string['summary_role'] = 'Assigned role';
 $string['summary_category'] = 'Organisation (category)';
+
+
+// Extra profile fields.
+$string['f_city'] = 'City/town';
+$string['f_country'] = 'Select a country';
+$string['f_timezone'] = 'Timezone';
+$string['f_lang'] = 'Preferred language';
+$string['f_description'] = 'Description';
+
+// Existing keys used in the form (ensure these exist too):
+$string['f_auth'] = 'Choose an authentication method';
+$string['f_suspended'] = 'Suspended account';
+$string['f_genpassword'] = 'Generate password';
+$string['f_password'] = 'New password';
+$string['f_forcepasswordchange'] = 'Force password change';
+$string['f_maildisplay'] = 'Email visibility';
