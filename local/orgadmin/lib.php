@@ -1,71 +1,73 @@
 <?php
-// File: local/orgadmin/lib.php
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Add our node only for Org Admins (NOT for site admins).
- * Robust against errors: wrapped in try/catch and uses FQCNs.
+ * Add our assets + (optionally) a drawer node for Org Admins.
+ * No HEAD snippet needed — assets are enqueued via $PAGE->requires.
  */
 
-function local_orgadmin_extend_primary_navigation($nav): void {
+function local_orgadmin_extend_primary_navigation(\global_navigation $nav) {
+    local_orgadmin_require_flag_assets();
     local_orgadmin_maybe_add_node($nav);
 }
 
-function local_orgadmin_extend_navigation($nav): void {
+function local_orgadmin_extend_navigation(\global_navigation $nav) {
+    local_orgadmin_require_flag_assets();
     local_orgadmin_maybe_add_node($nav);
 }
 
+/**
+ * Enqueue our JS + CSS once per request.
+ * JS runs in <head> so the 'orgadmin' class is available for CSS.
+ */
+function local_orgadmin_require_flag_assets(): void {
+    static $done = false;
+    if ($done) { return; }
+    global $PAGE;
+
+    // Tiny JS that adds 'orgadmin' class only for Org Admins (no redirects).
+    $PAGE->requires->js(new \moodle_url('/local/orgadmin/navflag.php'), /*inhead*/ true);
+
+    // CSS that hides/shows the navbar item.
+    $PAGE->requires->css(new \moodle_url('/local/orgadmin/navflag.css'));
+
+    $done = true;
+}
+
+/**
+ * Optionally add a node to the left drawer for Org Admins.
+ * (Safe: will not run for users without the capability.)
+ */
 function local_orgadmin_maybe_add_node($nav): void {
-    // Don’t show to site admins.
-    if (function_exists('is_siteadmin') && is_siteadmin()) {
+    // Capability must exist (plugin installed).
+    if (!function_exists('get_capability_info') || !get_capability_info('local_orgadmin:adduser')) {
         return;
     }
 
-    // Capability must exist.
-    if (!function_exists('get_capability_info') || !get_capability_info('local/orgadmin:adduser')) {
-        return;
-    }
-
-    try {
-        // Show if user has the cap at system or any category.
-        $has = has_capability('local/orgadmin:adduser', \context_system::instance());
-        if (!$has) {
-            foreach (\core_course_category::get_all() as $cat) {
-                $ctx = \context_coursecat::instance($cat->id);
-                if (has_capability('local/orgadmin:adduser', $ctx)) {
-                    $has = true;
-                    break;
-                }
+    // Show if user has the cap at system OR any course category.
+    $has = has_capability('local_orgadmin:adduser', \context_system::instance());
+    if (!$has) {
+        foreach (\core_course_category::get_all() as $cat) {
+            if (has_capability('local_orgadmin:adduser', \context_coursecat::instance($cat->id))) {
+                $has = true;
+                break;
             }
         }
-        if ($has) {
-            local_orgadmin_add_nav_node($nav);
-        }
-    } catch (\Throwable $e) {
-        // Never break the page for non-admins. Log in dev mode only.
-        if (function_exists('debugging')) {
-            debugging('local_orgadmin nav error: '.$e->getMessage(), DEBUG_DEVELOPER);
-        }
+    }
+    if (!$has) { return; }
+
+    // Add once.
+    $key = 'local_orgadmin';
+    if ($nav->find($key, \navigation_node::TYPE_CUSTOM)) {
         return;
     }
-}
 
-function local_orgadmin_add_nav_node($nav): void {
-    $key  = 'local_orgadmin_nav';
-    if ($nav->find($key, \navigation_node::TYPE_CUSTOM)) {
-        return; // already exists
-    }
-
-    $name = get_string('pluginname', 'local_orgadmin');
-    $url  = new \moodle_url('/local/orgadmin/index.php');
-
-    $node = \navigation_node::create(
-        $name,
-        $url,
+    $nav->add_node(\navigation_node::create(
+        get_string('pluginname', 'local_orgadmin'),
+        new \moodle_url('/local/orgadmin/index.php'),
         \navigation_node::TYPE_CUSTOM,
         null,
         $key,
-        new \pix_icon('i/users', $name)
-    );
-    $nav->add_node($node);
+        new \pix_icon('i/users', '')
+    ));
 }

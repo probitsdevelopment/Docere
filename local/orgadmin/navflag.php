@@ -1,7 +1,5 @@
 <?php
-// File: local/orgadmin/navflag.php
-// Safe JS gate: never redirects; prints JS only for Org Admins.
-
+// Safe JS gate: prints one line of JS ONLY for Org Admins; blank for others.
 require_once(__DIR__ . '/../../config.php');
 header('Content-Type: application/javascript');
 
