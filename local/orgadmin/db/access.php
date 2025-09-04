@@ -2,8 +2,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Capability to expose Org Admin tools and allow adding/assigning users.
- * We use CONTEXT_COURSECAT so org admins can be scoped to their category (“Org”).
+ * Capability used to expose Org Admin tools and allow adding/assigning users.
+ * Scoped to CONTEXT_COURSECAT so org admins are limited to their Org category.
  */
 $capabilities = [
     'local/orgadmin:adduser' => [

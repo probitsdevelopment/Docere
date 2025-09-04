@@ -8,28 +8,25 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_orgadmin'));
 $PAGE->set_heading(get_string('pluginname', 'local_orgadmin'));
 
-// Always allow site admins in.
-if (!is_siteadmin()) {
-    // Allow if user has the cap at SYSTEM or in ANY category.
-    $allowed = has_capability('local/orgadmin:adduser', context_system::instance());
-    if (!$allowed) {
-        foreach (core_course_category::get_all() as $cat) {
-            if (has_capability('local/orgadmin:adduser', context_coursecat::instance($cat->id))) {
-                $allowed = true; break;
-            }
-        }
+// Hide this page from Site Admins entirely.
+if (is_siteadmin()) {
+    print_error('nopermissions', 'error', '', 'local/orgadmin:adduser');
+}
+
+// Require the user to be an Org Admin in at least one category.
+$allowed = false;
+foreach (core_course_category::get_all() as $cat) {
+    if (has_capability('local/orgadmin:adduser', context_coursecat::instance($cat->id))) {
+        $allowed = true;
+        break;
     }
-    if (!$allowed) {
-        // Fall back to a clear message for now.
-        print_error('nopermissions', 'error', '', 'local/orgadmin:adduser');
-    }
+}
+if (!$allowed) {
+    print_error('err_no_permission_any_category', 'local_orgadmin');
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('pluginname', 'local_orgadmin'));
-
-// Simple content so we KNOW the page loaded.
-echo html_writer::div('Org Admin landing page OK', 'alert alert-success');
+// No extra heading here (avoid duplicates).
+echo $OUTPUT->notification('Org Admin landing page OK', \core\output\notification::NOTIFY_SUCCESS);
 echo $OUTPUT->single_button(new moodle_url('/local/orgadmin/adduser.php'), get_string('nav_adduser', 'local_orgadmin'));
-
 echo $OUTPUT->footer();

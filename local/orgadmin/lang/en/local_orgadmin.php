@@ -18,11 +18,13 @@ $string['btn_submit'] = 'Save & Assign';
 $string['msg_user_created'] = 'Created new user: {$a}';
 $string['msg_user_found']   = 'Found existing user: {$a}';
 $string['msg_assigned']     = 'Assigned role to user in the selected Organisation.';
+
 $string['err_email_required'] = 'Email is required.';
 $string['err_category_required'] = 'Please choose an Organisation (category).';
 $string['err_role_required'] = 'Please choose a role to assign.';
 $string['err_no_permission_any_category'] = 'You do not have Org Admin rights in any category.';
 $string['err_user_not_found'] = 'User not found and “Create if missing” was not selected.';
+
 $string['summary_title'] = 'Action summary';
 $string['summary_created'] = 'New account created';
 $string['summary_existing'] = 'Existing account used';

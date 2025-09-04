@@ -3,10 +3,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Add our entry into the navigation for users who have the capability
- * either at system level or in ANY course category they can manage.
- *
- * We implement BOTH callbacks for wider compatibility across Moodle versions.
+ * Add our entry into the navigation (drawer/secondary) only for Org Admins
+ * (never for Site Admins). We implement BOTH callbacks for wider compatibility.
  */
 
 function local_orgadmin_extend_primary_navigation($nav): void {
@@ -18,20 +16,17 @@ function local_orgadmin_extend_navigation($nav): void {
 }
 
 function local_orgadmin_maybe_add_node($nav): void {
-    global $CFG;
+    // Never show to Site Admins.
+    if (is_siteadmin()) {
+        return;
+    }
 
     // Capability must exist (plugin installed/upgraded).
     if (!function_exists('get_capability_info') || !get_capability_info('local/orgadmin:adduser')) {
         return;
     }
 
-    // If the user has cap at system, show immediately.
-    if (has_capability('local/orgadmin:adduser', context_system::instance())) {
-        local_orgadmin_add_nav_node($nav);
-        return;
-    }
-
-    // Else: show if user has cap in ANY category.
+    // Show if user has the cap in ANY category.
     foreach (core_course_category::get_all() as $cat) {
         $ctx = context_coursecat::instance($cat->id);
         if (has_capability('local/orgadmin:adduser', $ctx)) {
