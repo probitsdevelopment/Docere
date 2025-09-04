@@ -19,5 +19,21 @@ if (!$has) {
 }
 
 if ($has) {
-    echo 'document.documentElement.classList.add("orgadmin");';
+    echo <<<'JS'
+document.documentElement.classList.add('orgadmin');
+
+document.addEventListener('DOMContentLoaded', function () {
+  // If we are on any /local/orgadmin/* page, highlight the navbar item.
+  var path = (location.pathname || '').replace(/\/+$/, '');
+  if (path.indexOf('/local/orgadmin') === 0) {
+    var link = document.querySelector('li.orgadmin-only > a[href*="/local/orgadmin/"]');
+    if (link) {
+      link.classList.add('active');
+      link.setAttribute('aria-current', 'page');
+      var li = link.closest('.nav-item');
+      if (li) li.classList.add('active');
+    }
+  }
+});
+JS;
 }
