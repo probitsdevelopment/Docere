@@ -10,8 +10,10 @@ $string['f_role'] = 'Role to assign';
 $string['f_email'] = 'Email';
 $string['f_firstname'] = 'First name';
 $string['f_lastname'] = 'Last name';
-$string['f_username'] = 'Username (optional; default from email)';
-$string['f_password'] = 'Password (optional; leave blank to auto-generate)';
+$string['f_username'] = 'Username';
+$string['f_password'] = 'New password';
+$string['f_auth'] = 'Choose an authentication method';
+
 $string['f_createifmissing'] = 'Create the user if email not found';
 
 $string['btn_submit'] = 'Save & Assign';
@@ -42,7 +44,7 @@ $string['f_lang'] = 'Preferred language';
 $string['f_description'] = 'Description';
 
 // Existing keys used in the form (ensure these exist too):
-$string['f_auth'] = 'Choose an authentication method';
+
 $string['f_suspended'] = 'Suspended account';
 $string['f_genpassword'] = 'Generate password';
 $string['f_password'] = 'New password';

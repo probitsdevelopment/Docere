@@ -2,7 +2,6 @@
 namespace local_orgadmin\form;
 
 defined('MOODLE_INTERNAL') || die();
-
 require_once($GLOBALS['CFG']->libdir . '/formslib.php');
 
 class adduser extends \moodleform {
@@ -25,19 +24,33 @@ class adduser extends \moodleform {
         $mform->setType('email', PARAM_EMAIL);
         $mform->addRule('email', get_string('err_email_required', 'local_orgadmin'), 'required', null, 'client');
 
-        // Optional fields (for creating new user)
+        // First/Last
         $mform->addElement('text', 'firstname', get_string('f_firstname', 'local_orgadmin'), ['size' => 24]);
         $mform->setType('firstname', PARAM_NOTAGS);
 
         $mform->addElement('text', 'lastname', get_string('f_lastname', 'local_orgadmin'), ['size' => 24]);
         $mform->setType('lastname', PARAM_NOTAGS);
 
+        // Username (REQUIRED)
         $mform->addElement('text', 'username', get_string('f_username', 'local_orgadmin'), ['size' => 32]);
         $mform->setType('username', PARAM_USERNAME);
+        $mform->addRule('username', get_string('required'), 'required', null, 'client');
 
+        // Authentication method (default Manual accounts)
+        $authopts = [];
+        foreach (\get_enabled_auth_plugins(true) as $auth) {
+            $authopts[$auth] = \get_string('pluginname', "auth_{$auth}");
+        }
+        if (!$authopts) { $authopts = ['manual' => \get_string('pluginname', 'auth_manual')]; }
+        $mform->addElement('select', 'auth', get_string('f_auth', 'local_orgadmin'), $authopts);
+        $mform->setDefault('auth', 'manual');
+
+        // Password (REQUIRED)
         $mform->addElement('passwordunmask', 'password', get_string('f_password', 'local_orgadmin'), ['size' => 20]);
         $mform->setType('password', PARAM_RAW_TRIMMED);
+        $mform->addRule('password', get_string('required'), 'required', null, 'client');
 
+        // Create if missing
         $mform->addElement('advcheckbox', 'createifmissing', get_string('f_createifmissing', 'local_orgadmin'));
         $mform->setDefault('createifmissing', 1);
 
