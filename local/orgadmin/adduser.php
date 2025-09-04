@@ -1,7 +1,8 @@
 <?php
+// local/orgadmin/adduser.php
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/user/lib.php');
-require_once($CFG->libdir . '/gdlib.php');
+require_once($CFG->libdir . '/gdlib.php'); // for process_new_icon() if you add avatar later
 
 require_login();
 
@@ -11,6 +12,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('heading_adduser', 'local_orgadmin'));
 $PAGE->set_heading(get_string('heading_adduser', 'local_orgadmin'));
 
+// Per your requirement: hide from site admins.
 if (is_siteadmin()) {
     print_error('nopermissions', 'error', '', 'local/orgadmin:adduser');
 }
@@ -28,7 +30,7 @@ if (!$allowedcats) {
 }
 
 /* ---------- Whitelisted roles ---------- */
-global $DB;
+global $DB, $CFG, $OUTPUT;
 $whitelistshortnames = ['stakeholder', 'student', 'teacher', 'editingteacher', 'ld'];
 
 $firstcatid = (int) array_key_first($allowedcats);
@@ -53,14 +55,86 @@ if (!$filteredroles) {
     foreach ($need as $r) { $filteredroles[$r->id] = $r->name ?: $r->shortname; }
 }
 
-/* ---------- Build and show the form ---------- */
+/* ---------- Build the form ---------- */
 $customdata = [
     'categories' => $allowedcats,
     'roles'      => $filteredroles,
 ];
 $mform = new \local_orgadmin\form\adduser(null, $customdata);
 
-echo $OUTPUT->header();
-echo html_writer::div(get_string('intro_adduser', 'local_orgadmin'), 'mb-3');
-$mform->display();
-echo $OUTPUT->footer();
+/* ---------- Workflow ---------- */
+if ($mform->is_cancelled()) {
+    redirect(new moodle_url('/local/orgadmin/index.php'));
+
+} else if ($data = $mform->get_data()) {
+
+    // Validate category and role.
+    $categoryid = (int)$data->categoryid;
+    if (!isset($allowedcats[$categoryid])) {
+        print_error('nopermissions', 'error', '', 'category');
+    }
+    $catctx = context_coursecat::instance($categoryid);
+
+    $roleid = (int)$data->roleid;
+    $assignable = get_assignable_roles($catctx, ROLENAME_ORIGINAL, false);
+    if (!isset($assignable[$roleid])) {
+        print_error('nopermissions', 'error', '', 'roleassign');
+    }
+
+    // Find/create user.
+    $email     = trim(core_text::strtolower($data->email));
+    $username  = trim($data->username);
+    $firstname = trim($data->firstname);
+    $lastname  = trim($data->lastname);
+    $auth      = $data->auth ?? 'manual';
+    $password  = (string)$data->password;
+
+    if ($email === '' || $username === '' || $password === '') {
+        print_error('missingfield', 'error'); // form should have blocked this already
+    }
+
+    $user = $DB->get_record('user', ['email' => $email, 'deleted' => 0]);
+
+    if (!$user) {
+        if (empty($data->createifmissing)) {
+            print_error('err_user_not_found', 'local_orgadmin');
+        }
+
+        // Ensure unique username on this host.
+        $base = $username; $i = 1;
+        while ($DB->record_exists('user', ['username' => $username, 'mnethostid' => $CFG->mnet_localhost_id])) {
+            $username = $base . $i++;
+        }
+
+        $new              = new stdClass();
+        $new->auth        = $auth ?: 'manual';
+        $new->username    = $username;
+        $new->password    = $password;
+        $new->firstname   = $firstname ?: 'User';
+        $new->lastname    = $lastname  ?: 'Org';
+        $new->email       = $email;
+        $new->mnethostid  = $CFG->mnet_localhost_id;
+        $new->confirmed   = 1;
+        $new->timecreated = time();
+        $new->timemodified= time();
+
+        $userid = user_create_user($new, false, false);
+        $user   = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
+        \core\notification::success(get_string('msg_user_created', 'local_orgadmin', fullname($user)));
+    } else {
+        \core\notification::info(get_string('msg_user_found', 'local_orgadmin', fullname($user)));
+    }
+
+    // Assign role at the category.
+    role_assign($roleid, $user->id, $catctx->id);
+    \core\notification::success(get_string('msg_assigned', 'local_orgadmin'));
+
+    // Redirect back to the dashboard (or stay on the form—your choice).
+    redirect(new moodle_url('/local/orgadmin/index.php'));
+
+} else {
+    echo $OUTPUT->header();
+    echo html_writer::div(get_string('intro_adduser', 'local_orgadmin'), 'mb-3');
+    $mform->display();
+    echo $OUTPUT->footer();
+}
