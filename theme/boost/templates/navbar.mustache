@@ -77,16 +77,14 @@
         </div>
     {{/primarymoremenu}}
 
-    <ul class="navbar-nav d-none d-md-flex my-1 px-1">
-    <!-- page_heading_menu -->
-    {{{ output.page_heading_menu }}}
+   <ul class="navbar-nav d-none d-md-flex my-1 px-1">
+  {{{ output.page_heading_menu }}}
 
-    {{! ===== Org Admin link (role-gated via body class) ===== }}
-    <li class="nav-item orgadmin-only">
-      <a class="nav-link" href="{{{ config.wwwroot }}}/local/orgadmin/index.php">
-        {{#str}} pluginname, local_orgadmin {{/str}}
-      </a>
-    </li>
+  <li class="nav-item orgadmin-only">
+    <a class="nav-link" href="{{{ config.wwwroot }}}/local/orgadmin/index.php">
+      {{#str}} pluginname, local_orgadmin {{/str}}
+    </a>
+  </li>
 </ul>
 
     <div id="usernavigation" class="navbar-nav ml-auto">

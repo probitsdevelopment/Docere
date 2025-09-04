@@ -1,39 +1,35 @@
-
 <?php
 require_once(__DIR__ . '/../../config.php');
-
 require_login();
 
-$systemctx = context_system::instance();
 $PAGE->set_url(new moodle_url('/local/orgadmin/index.php'));
-$PAGE->set_context($systemctx);
+$PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_orgadmin'));
 $PAGE->set_heading(get_string('pluginname', 'local_orgadmin'));
 
-// Ensure the current user has orgadmin rights in at least one category (or system).
-$hasany = has_capability('local/orgadmin:adduser', $systemctx);
-if (!$hasany) {
-    foreach (core_course_category::get_all() as $cat) {
-        $ctx = context_coursecat::instance($cat->id);
-        if (has_capability('local/orgadmin:adduser', $ctx)) { $hasany = true; break; }
+// Always allow site admins in.
+if (!is_siteadmin()) {
+    // Allow if user has the cap at SYSTEM or in ANY category.
+    $allowed = has_capability('local/orgadmin:adduser', context_system::instance());
+    if (!$allowed) {
+        foreach (core_course_category::get_all() as $cat) {
+            if (has_capability('local/orgadmin:adduser', context_coursecat::instance($cat->id))) {
+                $allowed = true; break;
+            }
+        }
     }
-}
-if (!$hasany) {
-    print_error('err_no_permission_any_category', 'local_orgadmin');
+    if (!$allowed) {
+        // Fall back to a clear message for now.
+        print_error('nopermissions', 'error', '', 'local/orgadmin:adduser');
+    }
 }
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'local_orgadmin'));
 
-// Simple menu: link to Add User tool.
-$menu = html_writer::start_div('list-group my-4');
-$menu .= html_writer::link(
-    new moodle_url('/local/orgadmin/adduser.php'),
-    get_string('nav_adduser', 'local_orgadmin'),
-    ['class' => 'list-group-item list-group-item-action']
-);
-$menu .= html_writer::end_div();
+// Simple content so we KNOW the page loaded.
+echo html_writer::div('Org Admin landing page OK', 'alert alert-success');
+echo $OUTPUT->single_button(new moodle_url('/local/orgadmin/adduser.php'), get_string('nav_adduser', 'local_orgadmin'));
 
-echo $menu;
 echo $OUTPUT->footer();
