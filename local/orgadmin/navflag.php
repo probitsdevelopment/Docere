@@ -22,18 +22,38 @@ if ($has) {
     echo <<<'JS'
 document.documentElement.classList.add('orgadmin');
 
-document.addEventListener('DOMContentLoaded', function () {
-  // If we are on any /local/orgadmin/* page, highlight the navbar item.
-  var path = (location.pathname || '').replace(/\/+$/, '');
-  if (path.indexOf('/local/orgadmin') === 0) {
-    var link = document.querySelector('li.orgadmin-only > a[href*="/local/orgadmin/"]');
-    if (link) {
-      link.classList.add('active');
-      link.setAttribute('aria-current', 'page');
-      var li = link.closest('.nav-item');
-      if (li) li.classList.add('active');
+(function () {
+  function activateOrgAdminLink() {
+    var path = (location.pathname || '').replace(/\/+$/, '');
+    if (!path.startsWith('/local/orgadmin')) { return; }
+
+    // 1) Remove active state from the primary nav (Home/Dashboard/My courses).
+    document.querySelectorAll('.primary-navigation a.nav-link.active, .primary-navigation .nav-item.active a.nav-link')
+      .forEach(function (el) {
+        el.classList.remove('active');
+        el.removeAttribute('aria-current');
+      });
+
+    // 2) Find our Org Admin link and mark it active.
+    var orgLink =
+      document.querySelector('a.nav-link[href="/local/orgadmin/index.php"]') ||
+      document.querySelector('a.nav-link[href^="/local/orgadmin/"]') ||
+      document.querySelector('.orgadmin-only a.nav-link');
+
+    if (orgLink) {
+      orgLink.classList.add('active');
+      orgLink.setAttribute('aria-current', 'page');
+      var li = orgLink.closest('.nav-item');
+      if (li) { li.classList.add('active'); }
     }
   }
-});
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', activateOrgAdminLink);
+  } else {
+    activateOrgAdminLink();
+  }
+})();
 JS;
 }
+

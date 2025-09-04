@@ -1,3 +1,7 @@
 .orgadmin-only { display: none; }
 .orgadmin .orgadmin-only { display: list-item; }
 
+/* ensure our nav item shows the same underline when active */
+.navbar .nav-item.orgadmin-only .nav-link.active {
+  border-bottom: .25rem solid var(--primary);
+}
