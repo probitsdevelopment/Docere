@@ -2,16 +2,20 @@
 // local/orgadmin/adduser.php
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/user/lib.php');
-require_once($CFG->libdir . '/passwordlib.php'); // check_password_policy()
-require_once($CFG->libdir . '/gdlib.php');
+require_once($CFG->libdir . '/gdlib.php'); // for process_new_icon() if you add avatar later
 
 require_login();
 
 $PAGE->set_url(new moodle_url('/local/orgadmin/adduser.php'));
 $PAGE->set_context(context_system::instance());
-$PAGE->set_pagelayout('admin');
+$PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('heading_adduser', 'local_orgadmin'));
 $PAGE->set_heading(get_string('heading_adduser', 'local_orgadmin'));
+
+// Per your requirement: hide from site admins.
+if (is_siteadmin()) {
+    print_error('nopermissions', 'error', '', 'local/orgadmin:adduser');
+}
 
 /* ---------- Allowed orgs (categories) ---------- */
 $allowedcats = [];
@@ -64,28 +68,55 @@ if ($mform->is_cancelled()) {
 
 } else if ($data = $mform->get_data()) {
 
-    require_sesskey();
-
-    // Validate category.
+    // Validate category and role.
     $categoryid = (int)$data->categoryid;
     if (!isset($allowedcats[$categoryid])) {
-        redirect($PAGE->url, get_string('nopermissions', 'error'));
+        print_error('nopermissions', 'error', '', 'category');
     }
     $catctx = context_coursecat::instance($categoryid);
 
-    // Capability & matrix checks in the selected category.
-    if (!has_capability('local/orgadmin:adduser', $catctx) || !has_capability('moodle/role:assign', $catctx)) {
-        redirect($PAGE->url, get_string('nopermissions', 'error'));
-    }
-
     $roleid = (int)$data->roleid;
-    $assignable = get_assignable_roles($catctx, ROLENAME_ORIGINAL, false);
-    if (!isset($assignable[$roleid])) {
-        // Role not assignable here (matrix or role lacks Category context).
-        redirect($PAGE->url, get_string('nopermissions', 'error'));
-    }
+   // 0) Make absolutely sure we are testing the selected category context.
+$catctx = context_coursecat::instance($categoryid);
 
-    // Collect fields.
+// 1) You must hold BOTH capabilities in this category:
+$missing = [];
+if (!has_capability('local/orgadmin:adduser', $catctx)) {
+    $missing[] = 'local/orgadmin:adduser';
+}
+if (!has_capability('moodle/role:assign', $catctx)) {
+    $missing[] = 'moodle/role:assign';
+}
+
+// 2) If anything is missing, show it clearly and stop.
+if ($missing) {
+    \core\notification::error('Missing capability in this category: '.implode(', ', $missing));
+    echo $OUTPUT->footer();
+    exit;
+}
+
+// 3) Check the allow-assign matrix result in THIS category.
+$assignable = get_assignable_roles($catctx, ROLENAME_ORIGINAL, false); // [roleid => name]
+
+// Optional: show what Moodle thinks you can assign here.
+\core\notification::info('Assignable roles in this category: '.implode(', ', array_values($assignable)));
+
+$roleid = (int)$data->roleid;
+if (!isset($assignable[$roleid])) {
+    $rshort = $DB->get_field('role', 'shortname', ['id' => $roleid]);
+    $rolename = isset($assignable[$roleid]) ? $assignable[$roleid] : $rshort;
+
+    $msg  = "This role is NOT assignable here: {$rolename}.";
+    $msg .= " Reasons: (a) matrix doesn’t allow Acme Org Admin → {$rshort},";
+    $msg .= " or (b) that role is not allowed in Category context.";
+
+    \core\notification::error($msg);
+    echo $OUTPUT->footer();
+    exit;
+}
+
+
+    // Find/create user.
     $email     = trim(core_text::strtolower($data->email));
     $username  = trim($data->username);
     $firstname = trim($data->firstname);
@@ -94,28 +125,14 @@ if ($mform->is_cancelled()) {
     $password  = (string)$data->password;
 
     if ($email === '' || $username === '' || $password === '') {
-        redirect($PAGE->url, get_string('missingfield', 'error'));
+        print_error('missingfield', 'error'); // form should have blocked this already
     }
 
-    // Ensure chosen auth is enabled; fallback to manual (older Moodle compatibility).
-    $enabledauths = get_enabled_auth_plugins(); // returns enabled list
-    if (!in_array($auth, $enabledauths, true)) { $auth = 'manual'; }
-
-    // Pre-validate password against site policy.
-    $errmsg = '';
-    if (!check_password_policy($password, $errmsg)) {
-        redirect($PAGE->url, $errmsg);
-    }
-
-    $transaction = $DB->start_delegated_transaction();
-
-    // Find existing by email.
     $user = $DB->get_record('user', ['email' => $email, 'deleted' => 0]);
 
     if (!$user) {
         if (empty($data->createifmissing)) {
-            $transaction->allow_commit(); // nothing changed
-            redirect($PAGE->url, get_string('err_user_not_found', 'local_orgadmin'));
+            print_error('err_user_not_found', 'local_orgadmin');
         }
 
         // Ensure unique username on this host.
@@ -124,11 +141,10 @@ if ($mform->is_cancelled()) {
             $username = $base . $i++;
         }
 
-        // New user (password will be hashed by user_create_user).
         $new              = new stdClass();
         $new->auth        = $auth ?: 'manual';
         $new->username    = $username;
-        $new->password    = $password; // plain here; Moodle hashes it
+        $new->password    = $password;
         $new->firstname   = $firstname ?: 'User';
         $new->lastname    = $lastname  ?: 'Org';
         $new->email       = $email;
@@ -137,38 +153,18 @@ if ($mform->is_cancelled()) {
         $new->timecreated = time();
         $new->timemodified= time();
 
-        // IMPORTANT: set password on create (second arg = true).
-        try {
-            $userid = user_create_user($new, true, false);
-        } catch (Throwable $e) {
-            $transaction->rollback($e);
-            redirect($PAGE->url, 'Create failed: '.$e->getMessage());
-        }
+        $userid = user_create_user($new, false, false);
         $user   = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
-
-        \core\notification::success(
-            get_string('msg_user_created', 'local_orgadmin', fullname($user)) .
-            " (username: {$user->username}, auth: {$user->auth})"
-        );
+        \core\notification::success(get_string('msg_user_created', 'local_orgadmin', fullname($user)));
     } else {
-        \core\notification::info(
-            get_string('msg_user_found', 'local_orgadmin', fullname($user)) .
-            " (username: {$user->username}, auth: {$user->auth})"
-        );
+        \core\notification::info(get_string('msg_user_found', 'local_orgadmin', fullname($user)));
     }
 
-    // Assign role at the category (avoid duplicate).
-    if (!$DB->record_exists('role_assignments', [
-        'roleid'    => $roleid,
-        'userid'    => $user->id,
-        'contextid' => $catctx->id,
-    ])) {
-        role_assign($roleid, $user->id, $catctx->id);
-    }
+    // Assign role at the category.
+    role_assign($roleid, $user->id, $catctx->id);
     \core\notification::success(get_string('msg_assigned', 'local_orgadmin'));
 
-    $transaction->allow_commit();
-
+    // Redirect back to the dashboard (or stay on the form—your choice).
     redirect(new moodle_url('/local/orgadmin/index.php'));
 
 } else {
