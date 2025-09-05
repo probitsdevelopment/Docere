@@ -76,10 +76,45 @@ if ($mform->is_cancelled()) {
     $catctx = context_coursecat::instance($categoryid);
 
     $roleid = (int)$data->roleid;
-    $assignable = get_assignable_roles($catctx, ROLENAME_ORIGINAL, false);
-    if (!isset($assignable[$roleid])) {
-        print_error('nopermissions', 'error', '', 'roleassign');
-    }
+   // 0) Make absolutely sure we are testing the selected category context.
+$catctx = context_coursecat::instance($categoryid);
+
+// 1) You must hold BOTH capabilities in this category:
+$missing = [];
+if (!has_capability('local/orgadmin:adduser', $catctx)) {
+    $missing[] = 'local/orgadmin:adduser';
+}
+if (!has_capability('moodle/role:assign', $catctx)) {
+    $missing[] = 'moodle/role:assign';
+}
+
+// 2) If anything is missing, show it clearly and stop.
+if ($missing) {
+    \core\notification::error('Missing capability in this category: '.implode(', ', $missing));
+    echo $OUTPUT->footer();
+    exit;
+}
+
+// 3) Check the allow-assign matrix result in THIS category.
+$assignable = get_assignable_roles($catctx, ROLENAME_ORIGINAL, false); // [roleid => name]
+
+// Optional: show what Moodle thinks you can assign here.
+\core\notification::info('Assignable roles in this category: '.implode(', ', array_values($assignable)));
+
+$roleid = (int)$data->roleid;
+if (!isset($assignable[$roleid])) {
+    $rshort = $DB->get_field('role', 'shortname', ['id' => $roleid]);
+    $rolename = isset($assignable[$roleid]) ? $assignable[$roleid] : $rshort;
+
+    $msg  = "This role is NOT assignable here: {$rolename}.";
+    $msg .= " Reasons: (a) matrix doesn’t allow Acme Org Admin → {$rshort},";
+    $msg .= " or (b) that role is not allowed in Category context.";
+
+    \core\notification::error($msg);
+    echo $OUTPUT->footer();
+    exit;
+}
+
 
     // Find/create user.
     $email     = trim(core_text::strtolower($data->email));
