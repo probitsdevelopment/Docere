@@ -153,7 +153,7 @@ if (!isset($assignable[$roleid])) {
         $new->timecreated = time();
         $new->timemodified= time();
 
-        $userid = user_create_user($new, false, false);
+        $userid = user_create_user($new, true, false);
         $user   = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
         \core\notification::success(get_string('msg_user_created', 'local_orgadmin', fullname($user)));
     } else {
