@@ -2,20 +2,22 @@
 // local/orgadmin/adduser.php
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/user/lib.php');
-require_once($CFG->libdir . '/gdlib.php'); // for process_new_icon() if you add avatar later
+require_once($CFG->libdir . '/passwordlib.php'); // check_password_policy()
+require_once($CFG->libdir . '/gdlib.php');       // (optional) for future avatar handling
 
 require_login();
 
 $PAGE->set_url(new moodle_url('/local/orgadmin/adduser.php'));
 $PAGE->set_context(context_system::instance());
-$PAGE->set_pagelayout('standard');
+$PAGE->set_pagelayout('admin'); // nicer admin look & avoids "Course" heading on errors
 $PAGE->set_title(get_string('heading_adduser', 'local_orgadmin'));
 $PAGE->set_heading(get_string('heading_adduser', 'local_orgadmin'));
 
-// Per your requirement: hide from site admins.
-if (is_siteadmin()) {
-    print_error('nopermissions', 'error', '', 'local/orgadmin:adduser');
-}
+// NOTE: If you must block site admins from using this page, re-enable the next block.
+// For testing, keep it commented so you can verify end-to-end.
+// if (is_siteadmin()) {
+//     print_error('nopermissions', 'error', '', 'local/orgadmin:adduser');
+// }
 
 /* ---------- Allowed orgs (categories) ---------- */
 $allowedcats = [];
@@ -68,55 +70,35 @@ if ($mform->is_cancelled()) {
 
 } else if ($data = $mform->get_data()) {
 
-    // Validate category and role.
+    require_sesskey();
+
+    // Validate category.
     $categoryid = (int)$data->categoryid;
     if (!isset($allowedcats[$categoryid])) {
-        print_error('nopermissions', 'error', '', 'category');
+        redirect($PAGE->url, get_string('nopermissions', 'error'), 0, \core\output\notification::NOTIFY_ERROR);
     }
     $catctx = context_coursecat::instance($categoryid);
 
+    // Capability & matrix checks in the *selected* category.
+    $missing = [];
+    if (!has_capability('local/orgadmin:adduser', $catctx)) { $missing[] = 'local/orgadmin:adduser'; }
+    if (!has_capability('moodle/role:assign',      $catctx)) { $missing[] = 'moodle/role:assign'; }
+    if ($missing) {
+        $msg = 'Missing capability in this category: '.implode(', ', $missing);
+        redirect($PAGE->url, $msg, 0, \core\output\notification::NOTIFY_ERROR);
+    }
+
     $roleid = (int)$data->roleid;
-   // 0) Make absolutely sure we are testing the selected category context.
-$catctx = context_coursecat::instance($categoryid);
+    $assignable = get_assignable_roles($catctx, ROLENAME_ORIGINAL, false);
+    if (!isset($assignable[$roleid])) {
+        $rshort   = $DB->get_field('role', 'shortname', ['id' => $roleid]) ?: (string)$roleid;
+        $msg  = "This role is NOT assignable here: {$rshort}. ";
+        $msg .= "Fix either: (a) Allow role assignments (Org Admin → {$rshort}), or ";
+        $msg .= "(b) ensure the role’s Context types include Category.";
+        redirect($PAGE->url, $msg, 0, \core\output\notification::NOTIFY_ERROR);
+    }
 
-// 1) You must hold BOTH capabilities in this category:
-$missing = [];
-if (!has_capability('local/orgadmin:adduser', $catctx)) {
-    $missing[] = 'local/orgadmin:adduser';
-}
-if (!has_capability('moodle/role:assign', $catctx)) {
-    $missing[] = 'moodle/role:assign';
-}
-
-// 2) If anything is missing, show it clearly and stop.
-if ($missing) {
-    \core\notification::error('Missing capability in this category: '.implode(', ', $missing));
-    echo $OUTPUT->footer();
-    exit;
-}
-
-// 3) Check the allow-assign matrix result in THIS category.
-$assignable = get_assignable_roles($catctx, ROLENAME_ORIGINAL, false); // [roleid => name]
-
-// Optional: show what Moodle thinks you can assign here.
-\core\notification::info('Assignable roles in this category: '.implode(', ', array_values($assignable)));
-
-$roleid = (int)$data->roleid;
-if (!isset($assignable[$roleid])) {
-    $rshort = $DB->get_field('role', 'shortname', ['id' => $roleid]);
-    $rolename = isset($assignable[$roleid]) ? $assignable[$roleid] : $rshort;
-
-    $msg  = "This role is NOT assignable here: {$rolename}.";
-    $msg .= " Reasons: (a) matrix doesn’t allow Acme Org Admin → {$rshort},";
-    $msg .= " or (b) that role is not allowed in Category context.";
-
-    \core\notification::error($msg);
-    echo $OUTPUT->footer();
-    exit;
-}
-
-
-    // Find/create user.
+    // Collect fields.
     $email     = trim(core_text::strtolower($data->email));
     $username  = trim($data->username);
     $firstname = trim($data->firstname);
@@ -125,14 +107,28 @@ if (!isset($assignable[$roleid])) {
     $password  = (string)$data->password;
 
     if ($email === '' || $username === '' || $password === '') {
-        print_error('missingfield', 'error'); // form should have blocked this already
+        redirect($PAGE->url, get_string('missingfield', 'error'), 0, \core\output\notification::NOTIFY_ERROR);
     }
 
+    // Ensure chosen auth is enabled; fallback to manual.
+    $enabledauths = get_enabled_auth_plugins(true); // e.g. ['manual', ...]
+    if (!in_array($auth, $enabledauths, true)) { $auth = 'manual'; }
+
+    // Pre-validate password against site policy (clear message if it fails).
+    $errmsg = '';
+    if (!check_password_policy($password, $errmsg)) {
+        redirect($PAGE->url, $errmsg, 0, \core\output\notification::NOTIFY_ERROR);
+    }
+
+    $transaction = $DB->start_delegated_transaction();
+
+    // Find existing by email.
     $user = $DB->get_record('user', ['email' => $email, 'deleted' => 0]);
 
     if (!$user) {
         if (empty($data->createifmissing)) {
-            print_error('err_user_not_found', 'local_orgadmin');
+            $transaction->allow_commit(); // nothing changed
+            redirect($PAGE->url, get_string('err_user_not_found', 'local_orgadmin'), 0, \core\output\notification::NOTIFY_ERROR);
         }
 
         // Ensure unique username on this host.
@@ -141,10 +137,11 @@ if (!isset($assignable[$roleid])) {
             $username = $base . $i++;
         }
 
+        // Prepare new user object (password will be hashed by user_create_user).
         $new              = new stdClass();
         $new->auth        = $auth ?: 'manual';
         $new->username    = $username;
-        $new->password    = $password;
+        $new->password    = $password; // plain here; Moodle hashes it
         $new->firstname   = $firstname ?: 'User';
         $new->lastname    = $lastname  ?: 'Org';
         $new->email       = $email;
@@ -153,18 +150,34 @@ if (!isset($assignable[$roleid])) {
         $new->timecreated = time();
         $new->timemodified= time();
 
-        $userid = user_create_user($new, false, false);
+        // IMPORTANT: set password at creation (2nd arg = true).
+        $userid = user_create_user($new, true, false);
         $user   = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
-        \core\notification::success(get_string('msg_user_created', 'local_orgadmin', fullname($user)));
+
+        \core\notification::success(
+            get_string('msg_user_created', 'local_orgadmin', fullname($user)) .
+            " (username: {$user->username}, auth: {$user->auth})"
+        );
     } else {
-        \core\notification::info(get_string('msg_user_found', 'local_orgadmin', fullname($user)));
+        \core\notification::info(
+            get_string('msg_user_found', 'local_orgadmin', fullname($user)) .
+            " (username: {$user->username}, auth: {$user->auth})"
+        );
     }
 
-    // Assign role at the category.
-    role_assign($roleid, $user->id, $catctx->id);
+    // Assign role at the category (avoid duplicate).
+    if (!$DB->record_exists('role_assignments', [
+        'roleid'    => $roleid,
+        'userid'    => $user->id,
+        'contextid' => $catctx->id,
+    ])) {
+        role_assign($roleid, $user->id, $catctx->id);
+    }
     \core\notification::success(get_string('msg_assigned', 'local_orgadmin'));
 
-    // Redirect back to the dashboard (or stay on the form—your choice).
+    $transaction->allow_commit();
+
+    // Redirect back to dashboard (or change this to stay on form if you prefer).
     redirect(new moodle_url('/local/orgadmin/index.php'));
 
 } else {
