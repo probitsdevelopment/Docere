@@ -180,14 +180,14 @@ class block_base {
      *
      * @return boolean
      */
-    // function is_empty() {
-    //     if ( !has_capability('moodle/block:view', $this->context) ) {
-    //         return true;
-    //     }
+    function is_empty() {
+        if ( !has_capability('moodle/block:view', $this->context) ) {
+            return true;
+        }
 
-    //     $this->get_content();
-    //     return(empty($this->content->text) && empty($this->content->footer));
-    // }
+        $this->get_content();
+        return(empty($this->content->text) && empty($this->content->footer));
+    }
 
     /**
      * First sets the current value of $this->content to NULL
@@ -249,10 +249,10 @@ class block_base {
             $bc->controls = $this->page->blocks->edit_controls($this);
         } else {
             // we must not use is_empty on hidden blocks
-        //     if ($this->is_empty() && !$bc->controls) {
-        //         return null;
-        //     }
-        // }
+            if ($this->is_empty() && !$bc->controls) {
+                return null;
+            }
+        }
 
         if (empty($CFG->allowuserblockhiding)
                 || (empty($bc->content) && empty($bc->footer))
