@@ -23,7 +23,7 @@
     {}
 }}
 
-<div id="block-timeline-{{uniqid}}-{{timelineinstanceid}}" class="block-timeline" data-region="timeline">
+{% comment %} <div id="block-timeline-{{uniqid}}-{{timelineinstanceid}}" class="block-timeline" data-region="timeline">
     <div class="p-0 px-2">
         <div class="row no-gutters">
             <div class="mr-2 mb-1">
@@ -40,7 +40,7 @@
     </div>
     <div class="p-0">
         {{> block_timeline/view }}
-    </div>
+    </div> {% endcomment %}
 </div>
 {{#js}}
 require(
