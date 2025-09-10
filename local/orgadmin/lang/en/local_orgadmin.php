@@ -57,3 +57,6 @@ $string['f_suspended'] = 'Suspended account';
 $string['f_genpassword'] = 'Generate password';
 $string['f_forcepasswordchange'] = 'Force password change';
 $string['f_maildisplay'] = 'Email visibility';
+
+
+

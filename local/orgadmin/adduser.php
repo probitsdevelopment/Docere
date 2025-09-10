@@ -31,7 +31,7 @@ if (!$allowedcats) {
 
 /* ---------- Whitelisted roles ---------- */
 global $DB, $CFG, $OUTPUT;
-$whitelistshortnames = ['stakeholder', 'student', 'teacher', 'editingteacher', 'ld'];
+$whitelistshortnames = ['stakeholder', 'student', 'teacher', 'editingteacher', 'ld', 'orgops', 'coursecreator'];
 
 $firstcatid = (int) array_key_first($allowedcats);
 $firstctx   = context_coursecat::instance($firstcatid);
@@ -159,7 +159,6 @@ if (!isset($assignable[$roleid])) {
     } else {
         \core\notification::info(get_string('msg_user_found', 'local_orgadmin', fullname($user)));
     }
-
     // Assign role at the category.
     role_assign($roleid, $user->id, $catctx->id);
     \core\notification::success(get_string('msg_assigned', 'local_orgadmin'));
