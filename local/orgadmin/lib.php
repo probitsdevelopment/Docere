@@ -49,17 +49,41 @@ function local_orgadmin_require_flag_assets(): void {
     if ($done) { return; }
     global $PAGE;
 
-    // Redirect users to their appropriate dashboard when they visit the home page
-    if ($PAGE->pagetype === 'site-index') {
-        // Check for students first (preserve existing functionality)
-        if (orgadmin_role_detector::should_show_student_dashboard()) {
-            $redirecturl = new \moodle_url('/local/orgadmin/student_dashboard.php');
+    // Redirect users to their appropriate dashboard when they visit the home page or my dashboard
+    if ($PAGE->pagetype === 'site-index' || $PAGE->pagetype === 'my-index') {
+        // Check for admin first (highest priority)
+        if (orgadmin_role_detector::should_show_admin_dashboard()) {
+            $redirecturl = new \moodle_url('/local/orgadmin/admin_dashboard.php');
             redirect($redirecturl);
         }
         
-        // Then check for L&D users (only if not a student)
+        // Check for organization admin
+        if (orgadmin_role_detector::should_show_org_admin_dashboard()) {
+            $redirecturl = new \moodle_url('/local/orgadmin/org_admin_dashboard.php');
+            redirect($redirecturl);
+        }
+        
+        // Check for teacher/trainer users
+        if (orgadmin_role_detector::should_show_teacher_dashboard()) {
+            $redirecturl = new \moodle_url('/local/orgadmin/teacher_dashboard.php');
+            redirect($redirecturl);
+        }
+
+        // Check for stakeholder users (non-editing teachers)
+        if (orgadmin_role_detector::should_show_stakeholder_dashboard()) {
+            $redirecturl = new \moodle_url('/local/orgadmin/stakeholder_dashboard.php');
+            redirect($redirecturl);
+        }
+
+        // Check for L&D users
         if (orgadmin_role_detector::should_show_lnd_dashboard()) {
             $redirecturl = new \moodle_url('/local/orgadmin/lnd_dashboard.php');
+            redirect($redirecturl);
+        }
+        
+        // Check for students last (preserve existing functionality)
+        if (orgadmin_role_detector::should_show_student_dashboard()) {
+            $redirecturl = new \moodle_url('/local/orgadmin/student_dashboard.php');
             redirect($redirecturl);
         }
     }

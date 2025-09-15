@@ -93,8 +93,8 @@ html, body {
     width: 100%;
     max-width: none;
     margin: 0;
-    padding: 8px 40px 0px;
-    background-color: #f5f7fa;
+    padding: 20px 40px 0px;
+    background-color: #ffffff;
     height: calc(100vh - 70px);
     overflow-x: hidden;
     overflow-y: hidden;

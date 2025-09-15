@@ -20,6 +20,12 @@ if (!orgadmin_role_detector::should_show_lnd_dashboard()) {
 
 echo $OUTPUT->header();
 
+// Include Google Material Icons
+echo html_writer::empty_tag('link', [
+    'rel' => 'stylesheet',
+    'href' => 'https://fonts.googleapis.com/icon?family=Material+Icons'
+]);
+
 // Get current user's name for welcome message
 $username = $USER->firstname ?: 'User';
 
@@ -28,7 +34,7 @@ echo html_writer::start_tag('style');
 echo '
 /* Reset and base styles for full width */
 html, body {
-    background-color: #f5f7fa !important;
+    background-color: #ffffff !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0 !important;
     padding: 0 !important;
@@ -94,22 +100,25 @@ html, body {
     max-width: none;
     margin: 0;
     padding: 15px 30px;
-    background: #f5f7fa;
+    background: #ffffff;
     height: calc(100vh - 70px);
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /* Welcome Banner - Compact */
 .lnd-welcome-banner {
-    background: linear-gradient(135deg, #81c7f5 0%, #9fd8ff 50%, #b5e2ff 100%);
+    background: #CDEBFA;
     border-radius: 15px;
     padding: 20px 25px;
-    margin-bottom: 40px;
+    margin-bottom: 25px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(129, 199, 245, 0.3);
+    box-shadow: 0 4px 15px rgba(205, 235, 250, 0.3);
+    border-top: 1px solid #149EDF;
+    border-left: 1px solid #149EDF;
+    border-right: 1px solid #149EDF;
+    border-bottom: 4px solid #149EDF;
 }
 
 .lnd-welcome-content {
@@ -174,57 +183,46 @@ html, body {
     border-bottom: 8px solid transparent;
 }
 
-/* Metrics Cards - Compact */
+/* Metrics Cards - Borderless Design */
 .lnd-metrics-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 40px;
+    gap: 20px;
+    margin-bottom: 25px;
 }
 
 .lnd-metric-card {
     background: white;
-    border-radius: 8px;
-    padding: 15px 12px;
+    border-radius: 12px;
+    padding: 20px 16px;
     text-align: left;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid #e9ecef;
     position: relative;
-    border-top: 2px solid transparent;
     display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 10px;
-    min-height: 75px;
-    max-width: 280px;
-    flex-direction: row-reverse;
+    gap: 12px;
+    min-height: 85px;
+    max-width: 300px;
 }
 
-.lnd-metric-card.pending {
-    border-top-color: #f39c12;
-}
-
-.lnd-metric-card.active {
-    border-top-color: #2ecc71;
-}
-
-.lnd-metric-card.students {
-    border-top-color: #3498db;
-}
-
-.lnd-metric-card.completion {
-    border-top-color: #9b59b6;
-}
 
 .lnd-metric-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
     margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
-    color: white;
     flex-shrink: 0;
+    margin-left: auto;
+}
+
+.lnd-metric-icon .material-icons {
+    font-size: 16px;
+    color: white;
 }
 
 .lnd-metric-card.pending .lnd-metric-icon {
@@ -251,16 +249,17 @@ html, body {
 }
 
 .lnd-metric-title {
-    font-size: 0.7em;
+    font-size: 0.75em;
     color: #7f8c8d;
-    margin: 0 0 2px 0;
+    margin: 0 0 8px 0;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
-    line-height: 1.2;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+    font-weight: 500;
 }
 
 .lnd-metric-value {
-    font-size: 1.4em;
+    font-size: 1.8em;
     font-weight: 700;
     margin: 0;
     line-height: 1;
@@ -312,9 +311,9 @@ html, body {
 }
 
 .lnd-tab-btn.active {
-    background: #3498db;
+    background: #5FC6F8;
     color: white;
-    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+    box-shadow: 0 2px 8px rgba(95, 198, 248, 0.3);
 }
 
 .lnd-tab-btn:hover:not(.active) {
@@ -323,7 +322,7 @@ html, body {
 }
 
 .lnd-view-analysis-btn {
-    background: #2ecc71;
+    background: #89DA4D;
     color: white;
     padding: 12px 24px;
     border: none;
@@ -334,34 +333,40 @@ html, body {
     align-items: center;
     gap: 8px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+    box-shadow: 0 4px 15px rgba(137, 218, 77, 0.3);
 }
 
 .lnd-view-analysis-btn:hover {
-    background: #27ae60;
+    background: #7BC73F;
     transform: translateY(-1px);
 }
 
-/* Assessment Cards - Compact */
+/* Assessment Cards - Compact with Scroll */
 .lnd-assessment-list {
     background: white;
     border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    overflow: hidden;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 250px;
+    overflow-y: auto;
 }
 
 .lnd-assessment-card {
-    padding: 18px 25px;
-    border-bottom: 1px solid #ecf0f1;
+    background: #f8f9fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
     transition: all 0.3s ease;
 }
 
 .lnd-assessment-card:hover {
-    background: #f8f9fa;
-}
-
-.lnd-assessment-card:last-child {
-    border-bottom: none;
+    background: white;
+    border-color: #3498db;
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
 }
 
 .lnd-assessment-row {
@@ -375,13 +380,13 @@ html, body {
 }
 
 .lnd-assessment-title {
-    font-size: 1.15em;
+    font-size: 1.1em;
     font-weight: 600;
     color: #2c3e50;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .lnd-status-badge {
@@ -405,10 +410,10 @@ html, body {
 
 .lnd-assessment-meta {
     display: flex;
-    gap: 30px;
+    gap: 20px;
     color: #7f8c8d;
-    font-size: 0.9em;
-    margin-bottom: 8px;
+    font-size: 0.85em;
+    margin-bottom: 6px;
 }
 
 .lnd-assessment-meta-item {
@@ -424,8 +429,11 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8em;
     color: white;
+}
+
+.lnd-assessment-meta-icon .material-icons {
+    font-size: 12px;
 }
 
 .lnd-assessment-meta-icon.creator {
@@ -462,58 +470,63 @@ html, body {
 }
 
 .lnd-action-btn {
-    padding: 10px 20px;
+    padding: 8px 14px;
     border: none;
-    border-radius: 6px;
+    border-radius: 18px;
     cursor: pointer;
-    font-size: 0.9em;
-    font-weight: 500;
+    font-size: 0.8em;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     transition: all 0.3s ease;
-    min-width: 90px;
+    min-width: 85px;
     justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .lnd-action-btn.review {
-    background: #3498db;
+    background: #5FC6F8;
     color: white;
 }
 
 .lnd-action-btn.review:hover {
-    background: #2980b9;
-    transform: translateY(-1px);
+    background: #4AB8F1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(95, 198, 248, 0.3);
 }
 
 .lnd-action-btn.approve {
-    background: #2ecc71;
+    background: #89DA4D;
     color: white;
 }
 
 .lnd-action-btn.approve:hover {
-    background: #27ae60;
-    transform: translateY(-1px);
+    background: #7BC73F;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(137, 218, 77, 0.3);
 }
 
 .lnd-action-btn.reject {
-    background: #e74c3c;
+    background: #E56666;
     color: white;
 }
 
 .lnd-action-btn.reject:hover {
-    background: #c0392b;
-    transform: translateY(-1px);
+    background: #DF4F4F;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 102, 102, 0.3);
 }
 
 .lnd-action-btn.add-students {
-    background: #3498db;
+    background: #5FC6F8;
     color: white;
 }
 
 .lnd-action-btn.add-students:hover {
-    background: #2980b9;
-    transform: translateY(-1px);
+    background: #4AB8F1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(95, 198, 248, 0.3);
 }
 
 .lnd-action-btn.view-report {
@@ -523,7 +536,8 @@ html, body {
 
 .lnd-action-btn.view-report:hover {
     background: #e67e22;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
 }
 ';
 echo html_writer::end_tag('style');
@@ -549,37 +563,45 @@ echo html_writer::start_div('lnd-metrics-grid');
 
 // Pending Assessments
 echo html_writer::start_div('lnd-metric-card pending');
-echo html_writer::div('📋', 'lnd-metric-icon');
 echo html_writer::start_div('lnd-metric-content');
 echo html_writer::tag('div', 'Pending Assessments', ['class' => 'lnd-metric-title']);
 echo html_writer::tag('div', '30', ['class' => 'lnd-metric-value']);
+echo html_writer::end_div();
+echo html_writer::start_div('lnd-metric-icon');
+echo html_writer::tag('i', 'assignment', ['class' => 'material-icons']);
 echo html_writer::end_div();
 echo html_writer::end_div();
 
 // Active Assessments
 echo html_writer::start_div('lnd-metric-card active');
-echo html_writer::div('✅', 'lnd-metric-icon');
 echo html_writer::start_div('lnd-metric-content');
 echo html_writer::tag('div', 'Active Assessments', ['class' => 'lnd-metric-title']);
 echo html_writer::tag('div', '80', ['class' => 'lnd-metric-value']);
+echo html_writer::end_div();
+echo html_writer::start_div('lnd-metric-icon');
+echo html_writer::tag('i', 'check_circle', ['class' => 'material-icons']);
 echo html_writer::end_div();
 echo html_writer::end_div();
 
 // Assigned Students
 echo html_writer::start_div('lnd-metric-card students');
-echo html_writer::div('👥', 'lnd-metric-icon');
 echo html_writer::start_div('lnd-metric-content');
 echo html_writer::tag('div', 'Assigned Students', ['class' => 'lnd-metric-title']);
 echo html_writer::tag('div', '1,250', ['class' => 'lnd-metric-value']);
+echo html_writer::end_div();
+echo html_writer::start_div('lnd-metric-icon');
+echo html_writer::tag('i', 'group', ['class' => 'material-icons']);
 echo html_writer::end_div();
 echo html_writer::end_div();
 
 // Avg Completion
 echo html_writer::start_div('lnd-metric-card completion');
-echo html_writer::div('📈', 'lnd-metric-icon');
 echo html_writer::start_div('lnd-metric-content');
 echo html_writer::tag('div', 'Avg completion', ['class' => 'lnd-metric-title']);
 echo html_writer::tag('div', '50%', ['class' => 'lnd-metric-value']);
+echo html_writer::end_div();
+echo html_writer::start_div('lnd-metric-icon');
+echo html_writer::tag('i', 'trending_up', ['class' => 'material-icons']);
 echo html_writer::end_div();
 echo html_writer::end_div();
 
@@ -596,99 +618,92 @@ echo html_writer::tag('button', 'Completed Assessment', ['class' => 'lnd-tab-btn
 echo html_writer::end_div();
 
 // View Analysis Button
-echo html_writer::tag('button', '📊 View Analysis', ['class' => 'lnd-view-analysis-btn', 'onclick' => 'viewAnalysis()']);
+echo html_writer::start_tag('button', ['class' => 'lnd-view-analysis-btn', 'onclick' => 'viewAnalysis()']);
+echo html_writer::tag('i', 'assessment', ['class' => 'material-icons', 'style' => 'font-size: 16px; margin-right: 6px;']);
+echo html_writer::span('View Analysis');
+echo html_writer::end_tag('button');
 
 echo html_writer::end_div(); // End assessment header
 
 // Assessment List Container
 echo html_writer::start_div('lnd-assessment-list');
 
-// Pending Assessment 1 (Java Basics Test)
-echo html_writer::start_div('lnd-assessment-card', ['id' => 'pending-assessments']);
-echo html_writer::start_div('lnd-assessment-row');
+// Define dynamic assessment data for LND dashboard
+$lndAssessments = [
+    ['id' => 'java-basics-1', 'title' => 'Java Basics Test', 'creator' => 'Anita Sharma', 'questions' => 1, 'time' => 45, 'students' => 156],
+    ['id' => 'assessment-1', 'title' => 'Advanced Java Programming', 'creator' => 'Anita Sharma', 'questions' => 5, 'time' => 90, 'students' => 89],
+    ['id' => 'assessment-2', 'title' => 'Database Fundamentals', 'creator' => 'Anita Sharma', 'questions' => 3, 'time' => 60, 'students' => 234]
+];
 
-echo html_writer::start_div('lnd-assessment-info');
-echo html_writer::start_div('lnd-assessment-title');
-echo html_writer::span('Java Basics Test', '');
-echo html_writer::span('Pending', 'lnd-status-badge pending');
-echo html_writer::end_div();
+// Generate pending assessment cards dynamically
+foreach ($lndAssessments as $index => $assessment) {
+    $cardId = ($index === 0) ? 'pending-assessments' : '';
+    
+    echo html_writer::start_div('lnd-assessment-card', $cardId ? ['id' => $cardId] : []);
+    echo html_writer::start_div('lnd-assessment-row');
 
-echo html_writer::start_div('lnd-assessment-meta');
-echo html_writer::start_div('lnd-assessment-meta-item');
-echo html_writer::div('👤', 'lnd-assessment-meta-icon creator');
-echo html_writer::span('Created By: Anita Sharma', '');
-echo html_writer::end_div();
+    echo html_writer::start_div('lnd-assessment-info');
+    echo html_writer::start_div('lnd-assessment-title');
+    echo html_writer::span($assessment['title'], '');
+    echo html_writer::span('Pending', 'lnd-status-badge pending');
+    echo html_writer::end_div();
 
-echo html_writer::start_div('lnd-assessment-meta-item');
-echo html_writer::div('❓', 'lnd-assessment-meta-icon questions');
-echo html_writer::span('1 Questions', '');
-echo html_writer::end_div();
+    echo html_writer::start_div('lnd-assessment-meta');
+    echo html_writer::start_div('lnd-assessment-meta-item');
+    echo html_writer::start_div('lnd-assessment-meta-icon creator');
+    echo html_writer::tag('i', 'person', ['class' => 'material-icons']);
+    echo html_writer::end_div();
+    echo html_writer::span('Created By: ' . $assessment['creator'], '');
+    echo html_writer::end_div();
 
-echo html_writer::start_div('lnd-assessment-meta-item');
-echo html_writer::div('⏱️', 'lnd-assessment-meta-icon time');
-echo html_writer::span('45 mins', '');
-echo html_writer::end_div();
+    echo html_writer::start_div('lnd-assessment-meta-item');
+    echo html_writer::start_div('lnd-assessment-meta-icon questions');
+    echo html_writer::tag('i', 'help_outline', ['class' => 'material-icons']);
+    echo html_writer::end_div();
+    echo html_writer::span($assessment['questions'] . ' Questions', '');
+    echo html_writer::end_div();
 
-echo html_writer::start_div('lnd-assessment-meta-item');
-echo html_writer::div('👥', 'lnd-assessment-meta-icon students');
-echo html_writer::span('156 Students', '');
-echo html_writer::end_div();
-echo html_writer::end_div(); // End meta
-echo html_writer::end_div(); // End info
+    echo html_writer::start_div('lnd-assessment-meta-item');
+    echo html_writer::start_div('lnd-assessment-meta-icon time');
+    echo html_writer::tag('i', 'schedule', ['class' => 'material-icons']);
+    echo html_writer::end_div();
+    echo html_writer::span($assessment['time'] . ' mins', '');
+    echo html_writer::end_div();
 
-echo html_writer::start_div('lnd-assessment-actions');
-echo html_writer::tag('button', '👁️ Review', ['class' => 'lnd-action-btn review', 'onclick' => 'reviewAssessment("java-basics-1")']);
-echo html_writer::tag('button', '✓ Approve', ['class' => 'lnd-action-btn approve', 'onclick' => 'approveAssessment("java-basics-1")']);
-echo html_writer::tag('button', '✗ Reject', ['class' => 'lnd-action-btn reject', 'onclick' => 'rejectAssessment("java-basics-1")']);
-echo html_writer::end_div();
+    echo html_writer::start_div('lnd-assessment-meta-item');
+    echo html_writer::start_div('lnd-assessment-meta-icon students');
+    echo html_writer::tag('i', 'group', ['class' => 'material-icons']);
+    echo html_writer::end_div();
+    echo html_writer::span($assessment['students'] . ' Students', '');
+    echo html_writer::end_div();
+    echo html_writer::end_div(); // End meta
+    echo html_writer::end_div(); // End info
 
-echo html_writer::end_div(); // End row
-echo html_writer::end_div(); // End card
+    echo html_writer::start_div('lnd-assessment-actions');
+    
+    echo html_writer::start_tag('button', ['class' => 'lnd-action-btn review', 'onclick' => 'reviewAssessment("' . $assessment['id'] . '")']);
+    echo html_writer::tag('i', 'visibility', ['class' => 'material-icons', 'style' => 'font-size: 14px; margin-right: 4px;']);
+    echo html_writer::span('Review');
+    echo html_writer::end_tag('button');
+    
+    echo html_writer::start_tag('button', ['class' => 'lnd-action-btn approve', 'onclick' => 'approveAssessment("' . $assessment['id'] . '")']);
+    echo html_writer::tag('i', 'check', ['class' => 'material-icons', 'style' => 'font-size: 14px; margin-right: 4px;']);
+    echo html_writer::span('Approve');
+    echo html_writer::end_tag('button');
+    
+    echo html_writer::start_tag('button', ['class' => 'lnd-action-btn reject', 'onclick' => 'rejectAssessment("' . $assessment['id'] . '")']);
+    echo html_writer::tag('i', 'close', ['class' => 'material-icons', 'style' => 'font-size: 14px; margin-right: 4px;']);
+    echo html_writer::span('Reject');
+    echo html_writer::end_tag('button');
+    
+    echo html_writer::end_div();
 
-// Pending Assessment 2 (Java Basics Test)
-echo html_writer::start_div('lnd-assessment-card');
-echo html_writer::start_div('lnd-assessment-row');
-
-echo html_writer::start_div('lnd-assessment-info');
-echo html_writer::start_div('lnd-assessment-title');
-echo html_writer::span('Java Basics Test', '');
-echo html_writer::span('Pending', 'lnd-status-badge pending');
-echo html_writer::end_div();
-
-echo html_writer::start_div('lnd-assessment-meta');
-echo html_writer::start_div('lnd-assessment-meta-item');
-echo html_writer::div('👤', 'lnd-assessment-meta-icon creator');
-echo html_writer::span('Created By: Anita Sharma', '');
-echo html_writer::end_div();
-
-echo html_writer::start_div('lnd-assessment-meta-item');
-echo html_writer::div('❓', 'lnd-assessment-meta-icon questions');
-echo html_writer::span('1 Questions', '');
-echo html_writer::end_div();
-
-echo html_writer::start_div('lnd-assessment-meta-item');
-echo html_writer::div('⏱️', 'lnd-assessment-meta-icon time');
-echo html_writer::span('45 mins', '');
-echo html_writer::end_div();
-
-echo html_writer::start_div('lnd-assessment-meta-item');
-echo html_writer::div('👥', 'lnd-assessment-meta-icon students');
-echo html_writer::span('156 Students', '');
-echo html_writer::end_div();
-echo html_writer::end_div(); // End meta
-echo html_writer::end_div(); // End info
-
-echo html_writer::start_div('lnd-assessment-actions');
-echo html_writer::tag('button', '👁️ Review', ['class' => 'lnd-action-btn review', 'onclick' => 'reviewAssessment("java-basics-2")']);
-echo html_writer::tag('button', '✓ Approve', ['class' => 'lnd-action-btn approve', 'onclick' => 'approveAssessment("java-basics-2")']);
-echo html_writer::tag('button', '✗ Reject', ['class' => 'lnd-action-btn reject', 'onclick' => 'rejectAssessment("java-basics-2")']);
-echo html_writer::end_div();
-
-echo html_writer::end_div(); // End row
-echo html_writer::end_div(); // End card
+    echo html_writer::end_div(); // End row
+    echo html_writer::end_div(); // End card
+}
 
 // Active Assessment (Java Basics Test)
-echo html_writer::start_div('lnd-assessment-card', ['id' => 'active-assessments', 'style' => 'display: none;']);
+echo html_writer::start_div('lnd-assessment-card', ['id' => 'active-assessments']);
 echo html_writer::start_div('lnd-assessment-row');
 
 echo html_writer::start_div('lnd-assessment-info');
@@ -699,30 +714,47 @@ echo html_writer::end_div();
 
 echo html_writer::start_div('lnd-assessment-meta');
 echo html_writer::start_div('lnd-assessment-meta-item');
-echo html_writer::div('👥', 'lnd-assessment-meta-icon students');
+echo html_writer::start_div('lnd-assessment-meta-icon students');
+echo html_writer::tag('i', 'group', ['class' => 'material-icons']);
+echo html_writer::end_div();
 echo html_writer::span('156 Students Assigned', '');
 echo html_writer::end_div();
 
 echo html_writer::start_div('lnd-assessment-meta-item');
-echo html_writer::div('✅', 'lnd-assessment-meta-icon completed');
+echo html_writer::start_div('lnd-assessment-meta-icon completed');
+echo html_writer::tag('i', 'check_circle', ['class' => 'material-icons']);
+echo html_writer::end_div();
 echo html_writer::span('89 Completed', '');
 echo html_writer::end_div();
 
 echo html_writer::start_div('lnd-assessment-meta-item');
-echo html_writer::div('📊', 'lnd-assessment-meta-icon score');
-echo html_writer::span('Avg Score: 85%', '');
+echo html_writer::start_div('lnd-assessment-meta-icon score');
+echo html_writer::tag('i', 'bar_chart', ['class' => 'material-icons']);
+echo html_writer::end_div();
+echo html_writer::span('Avg Score: 65%', '');
 echo html_writer::end_div();
 
 echo html_writer::start_div('lnd-assessment-meta-item');
-echo html_writer::div('📉', 'lnd-assessment-meta-icon below');
+echo html_writer::start_div('lnd-assessment-meta-icon below');
+echo html_writer::tag('i', 'trending_down', ['class' => 'material-icons']);
+echo html_writer::end_div();
 echo html_writer::span('Below 60%: 12', '');
 echo html_writer::end_div();
 echo html_writer::end_div(); // End meta
 echo html_writer::end_div(); // End info
 
 echo html_writer::start_div('lnd-assessment-actions');
-echo html_writer::tag('button', '+ Add Students', ['class' => 'lnd-action-btn add-students', 'onclick' => 'addStudents("java-basics-active")']);
-echo html_writer::tag('button', '📊 View Report', ['class' => 'lnd-action-btn view-report', 'onclick' => 'viewReport("java-basics-active")']);
+
+echo html_writer::start_tag('button', ['class' => 'lnd-action-btn add-students', 'onclick' => 'addStudents("java-basics-active")']);
+echo html_writer::tag('i', 'add', ['class' => 'material-icons', 'style' => 'font-size: 14px; margin-right: 4px;']);
+echo html_writer::span('Add Students');
+echo html_writer::end_tag('button');
+
+echo html_writer::start_tag('button', ['class' => 'lnd-action-btn view-report', 'onclick' => 'viewReport("java-basics-active")']);
+echo html_writer::tag('i', 'assessment', ['class' => 'material-icons', 'style' => 'font-size: 14px; margin-right: 4px;']);
+echo html_writer::span('View Report');
+echo html_writer::end_tag('button');
+
 echo html_writer::end_div();
 
 echo html_writer::end_div(); // End row
@@ -735,6 +767,9 @@ echo html_writer::end_div(); // End main container
 // JavaScript for L&D Dashboard Functionality
 echo html_writer::start_tag('script');
 echo '
+// Base URL for navigation
+var baseURL = "' . $CFG->wwwroot . '";
+
 // Assessment Tab Switching
 function switchAssessmentTab(tabName) {
     // Remove active class from all tabs
@@ -771,8 +806,7 @@ function viewAnalysis() {
 
 // Assessment Action Functions
 function reviewAssessment(assessmentId) {
-    alert("👁️ Opening Assessment Review Panel for: " + assessmentId + "\\n\\n• Question preview\\n• Difficulty settings\\n• Time limits\\n• Scoring criteria\\n• Student feedback");
-    // In real implementation: window.location.href = "/mod/quiz/edit.php?cmid=" + assessmentId;
+    window.location.href = baseURL + "/local/orgadmin/review_assessment.php?id=" + assessmentId;
 }
 
 function approveAssessment(assessmentId) {
@@ -796,8 +830,7 @@ function addStudents(assessmentId) {
 }
 
 function viewReport(assessmentId) {
-    alert("📊 Opening Detailed Report for: " + assessmentId + "\\n\\n• Individual student performance\\n• Question-wise analysis\\n• Time tracking\\n• Completion rates\\n• Export options (PDF/Excel)");
-    // In real implementation: window.location.href = "/mod/quiz/report.php?id=" + assessmentId;
+    window.location.href = baseURL + "/local/orgadmin/assessment_report.php?id=" + assessmentId;
 }
 
 // Initialize dashboard
