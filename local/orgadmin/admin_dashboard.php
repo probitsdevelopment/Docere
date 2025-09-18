@@ -44,7 +44,7 @@ echo html_writer::start_tag('style');
 echo '
 /* Reset and base styles */
 html, body {
-    background-color: #f5f5f5 !important;
+    background-color: #ffffff !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0 !important;
     padding: 0 !important;
@@ -67,7 +67,7 @@ html, body {
 .admin-container {
     width: 100%;
     padding: 20px 30px;
-    background: #f5f5f5;
+    background: #ffffff;
     min-height: calc(100vh - 70px);
 }
 
@@ -546,8 +546,8 @@ echo html_writer::start_div('admin-stats-grid');
 // Total Users Card
 echo html_writer::start_div('admin-stat-card total-users');
 echo html_writer::start_div('admin-stat-content');
-echo html_writer::tag('div', 'Total Users', ['class' => 'admin-stat-title']);
-echo html_writer::tag('div', number_format($statistics['total_users']), ['class' => 'admin-stat-value']);
+echo html_writer::tag('div', 'Total Students', ['class' => 'admin-stat-title']);
+echo html_writer::tag('div', number_format($statistics['students']), ['class' => 'admin-stat-value']);
 echo html_writer::end_div();
 echo html_writer::start_div('admin-stat-icon');
 echo html_writer::tag('i', 'group', ['class' => 'material-icons']);

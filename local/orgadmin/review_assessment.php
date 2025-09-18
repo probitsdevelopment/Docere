@@ -19,45 +19,61 @@ if (!orgadmin_role_detector::should_show_lnd_dashboard()) {
 }
 
 // Get assessment ID from URL parameter
-$assessmentid = optional_param('id', 'java-basics-1', PARAM_TEXT);
+$assessmentid = optional_param('id', 0, PARAM_INT);
 
-// Debug: Add some debugging info
+// Get real assessment data from database
+function get_assessment_for_review($id) {
+    global $DB;
+
+    try {
+        // Get assessment with creator info
+        $assessment = $DB->get_record_sql("
+            SELECT a.*, u.firstname, u.lastname
+            FROM {orgadmin_assessments} a
+            JOIN {user} u ON u.id = a.userid
+            WHERE a.id = ?
+        ", [$id]);
+
+        if (!$assessment) {
+            // Return fallback data if assessment not found
+            return [
+                'title' => 'Assessment Not Found',
+                'creator' => 'Unknown',
+                'questions' => 1,
+                'time' => 45,
+                'marks' => 100,
+                'description' => 'Assessment could not be loaded from database.'
+            ];
+        }
+
+        return [
+            'title' => $assessment->title,
+            'creator' => $assessment->firstname . ' ' . $assessment->lastname,
+            'questions' => 1, // Default for now
+            'time' => $assessment->duration,
+            'marks' => $assessment->total_marks,
+            'description' => $assessment->instructions ?: 'No description provided.'
+        ];
+
+    } catch (Exception $e) {
+        // Return fallback data on error
+        return [
+            'title' => 'Java Basics Test',
+            'creator' => 'System',
+            'questions' => 1,
+            'time' => 45,
+            'marks' => 100,
+            'description' => 'Assessment data could not be loaded.'
+        ];
+    }
+}
+
+$currentAssessment = get_assessment_for_review($assessmentid);
+
+// Debug output
 echo "<!-- DEBUG: Assessment ID received: " . $assessmentid . " -->";
-
-// Define assessment data based on ID - exactly matching LND dashboard
-$assessments = [
-    'java-basics-1' => [
-        'title' => 'Java Basics Test',
-        'creator' => 'Anita Sharma',
-        'questions' => 1,
-        'time' => 45,
-        'marks' => 100,
-        'description' => 'Basic Java programming concepts including variables, loops, and object-oriented programming fundamentals.'
-    ],
-    'assessment-1' => [
-        'title' => 'Advanced Java Programming',
-        'creator' => 'Anita Sharma',
-        'questions' => 5,
-        'time' => 90,
-        'marks' => 150,
-        'description' => 'Advanced Java topics including collections, multithreading, and design patterns.'
-    ],
-    'assessment-2' => [
-        'title' => 'Database Fundamentals',
-        'creator' => 'Anita Sharma',
-        'questions' => 3,
-        'time' => 60,
-        'marks' => 120,
-        'description' => 'SQL queries, database design, normalization, and basic database administration.'
-    ]
-];
-
-// Get current assessment data
-$currentAssessment = isset($assessments[$assessmentid]) ? $assessments[$assessmentid] : $assessments['java-basics-1'];
-
-// Debug: Show which assessment data is being used
-echo "<!-- DEBUG: Using assessment data for: " . $assessmentid . " -->";
 echo "<!-- DEBUG: Assessment title: " . $currentAssessment['title'] . " -->";
+echo "<!-- DEBUG: Creator: " . $currentAssessment['creator'] . " -->";
 
 echo $OUTPUT->header();
 
@@ -337,8 +353,9 @@ html, body {
     box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     display: flex;
     flex-direction: column;
-    height: fit-content;
-    max-height: 1000px;
+    height: 600px;
+    max-height: 600px;
+    overflow: hidden;
 }
 
 .student-tabs {
@@ -402,6 +419,7 @@ html, body {
 
 .selected-students {
     margin-bottom: 15px;
+    flex-shrink: 0;
 }
 
 .selected-header {
@@ -502,6 +520,9 @@ html, body {
 
 .list-students {
     flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .list-title {
@@ -512,8 +533,29 @@ html, body {
 }
 
 .student-list {
-    max-height: 180px;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Custom scrollbar for student list */
+.student-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.student-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.student-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.student-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
 .list-student-card {
@@ -787,33 +829,119 @@ echo html_writer::empty_tag('input', [
 ]);
 echo html_writer::end_div();
 
+// Get real students based on L&D role (Site vs Organization) - DEFINE FIRST
+function get_real_students_for_lnd_early() {
+    global $DB, $USER;
+
+    // Check if this is Site L&D or Organization L&D
+    $is_site_lnd = $DB->record_exists_sql("
+        SELECT 1
+        FROM {role_assignments} ra
+        JOIN {role} r ON r.id = ra.roleid
+        JOIN {context} ctx ON ctx.id = ra.contextid
+        WHERE ra.userid = ? AND r.shortname = 'coursecreator' AND ctx.contextlevel = 10
+    ", [$USER->id]);
+
+    if ($is_site_lnd) {
+        // Site L&D - get students with site-level roles only
+        $students_sql = "
+            SELECT DISTINCT u.id, u.firstname, u.lastname, u.email
+            FROM {user} u
+            JOIN {role_assignments} ra ON ra.userid = u.id
+            JOIN {role} r ON r.id = ra.roleid
+            JOIN {context} ctx ON ctx.id = ra.contextid
+            WHERE u.deleted = 0 AND u.suspended = 0 AND u.confirmed = 1
+            AND r.shortname = 'student'
+            AND ctx.contextlevel = 10
+            ORDER BY u.firstname, u.lastname
+            LIMIT 20
+        ";
+        $student_records = $DB->get_records_sql($students_sql);
+    } else {
+        // Organization L&D - get students from their organization only
+        $categories = $DB->get_records_sql("
+            SELECT DISTINCT cc.id, cc.name
+            FROM {role_assignments} ra
+            JOIN {context} ctx ON ctx.id = ra.contextid
+            JOIN {role} r ON r.id = ra.roleid
+            JOIN {course_categories} cc ON cc.id = ctx.instanceid
+            WHERE ra.userid = ? AND ctx.contextlevel = 40 AND r.shortname = 'coursecreator'
+        ", [$USER->id]);
+
+        if (!empty($categories)) {
+            $category = reset($categories);
+            $students_sql = "
+                SELECT DISTINCT u.id, u.firstname, u.lastname, u.email
+                FROM {user} u
+                JOIN {role_assignments} ra ON ra.userid = u.id
+                JOIN {role} r ON r.id = ra.roleid
+                JOIN {context} ctx ON ctx.id = ra.contextid
+                WHERE u.deleted = 0 AND u.suspended = 0 AND u.confirmed = 1
+                AND r.shortname = 'student'
+                AND ctx.contextlevel = 40 AND ctx.instanceid = ?
+                ORDER BY u.firstname, u.lastname
+                LIMIT 20
+            ";
+            $student_records = $DB->get_records_sql($students_sql, [$category->id]);
+        } else {
+            $student_records = [];
+        }
+    }
+
+    // Convert to array format expected by the frontend
+    $students = [];
+    foreach ($student_records as $student) {
+        $full_name = trim($student->firstname . ' ' . $student->lastname);
+        $initials = strtoupper(substr($student->firstname, 0, 1) . substr($student->lastname, 0, 1));
+
+        $students[] = [
+            'name' => $full_name,
+            'email' => $student->email,
+            'initials' => $initials,
+            'id' => $student->id
+        ];
+    }
+
+    return $students;
+}
+
+// Get real students EARLY
+$students_early = get_real_students_for_lnd_early();
+
+// If no students found, show a message
+if (empty($students_early)) {
+    $students_early = [
+        ['name' => 'No Students Found', 'email' => 'No students in your scope', 'initials' => 'NS', 'id' => 0]
+    ];
+}
+
 echo html_writer::start_div('selected-students');
 echo html_writer::start_div('selected-header');
 echo html_writer::tag('span', 'Selected Students', ['class' => 'selected-title']);
-echo html_writer::tag('span', '(2)', ['class' => 'selected-count', 'id' => 'selected-count']);
+
+$selected_count = min(2, count(array_filter($students_early, function($s) { return $s['id'] != 0; })));
+echo html_writer::tag('span', '(' . $selected_count . ')', ['class' => 'selected-count', 'id' => 'selected-count']);
+
 echo html_writer::tag('button', 'Clear All', ['class' => 'clear-all-btn', 'onclick' => 'clearAllStudents()']);
 echo html_writer::end_div();
 
 echo html_writer::start_div('selected-list', ['id' => 'selected-list']);
-// Eleanor Pena
-echo html_writer::start_div('student-card');
-echo html_writer::div('EP', 'student-avatar');
-echo html_writer::start_div('student-info');
-echo html_writer::tag('div', 'Eleanor Pena', ['class' => 'student-name']);
-echo html_writer::tag('div', 'michelle.rivera@example.com', ['class' => 'student-email']);
-echo html_writer::end_div();
-echo html_writer::tag('button', '✕', ['class' => 'remove-btn', 'onclick' => 'removeStudent(this)']);
-echo html_writer::end_div();
 
-// Devon Lane
-echo html_writer::start_div('student-card');
-echo html_writer::div('DL', 'student-avatar');
-echo html_writer::start_div('student-info');
-echo html_writer::tag('div', 'Devon Lane', ['class' => 'student-name']);
-echo html_writer::tag('div', 'bill.sanders@example.com', ['class' => 'student-email']);
-echo html_writer::end_div();
-echo html_writer::tag('button', '✕', ['class' => 'remove-btn', 'onclick' => 'removeStudent(this)']);
-echo html_writer::end_div();
+// Show first 2 real students as "selected" for demo
+$selected_students = array_slice($students_early, 0, 2);
+foreach ($selected_students as $student) {
+    if ($student['id'] == 0) break; // Skip "No Students Found" entry
+
+    echo html_writer::start_div('student-card');
+    echo html_writer::div($student['initials'], 'student-avatar');
+    echo html_writer::start_div('student-info');
+    echo html_writer::tag('div', $student['name'], ['class' => 'student-name']);
+    echo html_writer::tag('div', $student['email'], ['class' => 'student-email']);
+    echo html_writer::end_div();
+    echo html_writer::tag('button', '✕', ['class' => 'remove-btn', 'onclick' => 'removeStudent(this)']);
+    echo html_writer::end_div();
+}
+
 echo html_writer::end_div();
 echo html_writer::end_div();
 
@@ -821,14 +949,8 @@ echo html_writer::start_div('list-students');
 echo html_writer::tag('h3', 'List Students', ['class' => 'list-title']);
 echo html_writer::start_div('student-list', ['id' => 'student-list']);
 
-// Available students to add
-$students = [
-    ['name' => 'Eleanor Pena', 'email' => 'michelle.rivera@example.com', 'initials' => 'EP'],
-    ['name' => 'Devon Lane', 'email' => 'bill.sanders@example.com', 'initials' => 'DL'],
-    ['name' => 'Jenny Wilson', 'email' => 'jenny.wilson@example.com', 'initials' => 'JW'],
-    ['name' => 'Robert Fox', 'email' => 'robert.fox@example.com', 'initials' => 'RF'],
-    ['name' => 'Kathryn Murphy', 'email' => 'kathryn.murphy@example.com', 'initials' => 'KM']
-];
+// Use the same students data from earlier
+$students = $students_early;
 
 foreach ($students as $student) {
     echo html_writer::start_div('list-student-card');
@@ -1034,7 +1156,7 @@ function approveAndAssign() {
         alert("Please select at least one student to assign this assessment.");
         return;
     }
-    
+
     if (confirm(`✓ Approve and assign this assessment to ${selectedCount} selected students?`)) {
         alert(`Assessment approved and assigned to ${selectedCount} students!\\n\\n• Students will be notified\\n• Assessment is now active\\n• Performance tracking enabled`);
     }

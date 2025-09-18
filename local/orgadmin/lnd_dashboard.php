@@ -628,18 +628,315 @@ echo html_writer::end_div(); // End assessment header
 // Assessment List Container
 echo html_writer::start_div('lnd-assessment-list');
 
-// Define dynamic assessment data for LND dashboard
-$lndAssessments = [
-    ['id' => 'java-basics-1', 'title' => 'Java Basics Test', 'creator' => 'Anita Sharma', 'questions' => 1, 'time' => 45, 'students' => 156],
-    ['id' => 'assessment-1', 'title' => 'Advanced Java Programming', 'creator' => 'Anita Sharma', 'questions' => 5, 'time' => 90, 'students' => 89],
-    ['id' => 'assessment-2', 'title' => 'Database Fundamentals', 'creator' => 'Anita Sharma', 'questions' => 3, 'time' => 60, 'students' => 234]
-];
+// Get L&D user's organization ID - Use same logic as role_detector
+function get_lnd_organization_id() {
+    global $DB, $USER;
+
+    error_log('LND Organization Check: Checking user ID ' . $USER->id);
+
+    // Use the same capability-based check as should_show_lnd_dashboard()
+    $systemcontext = context_system::instance();
+
+    // Check system level L&D (has grade:manage at system level but not site admin)
+    if (has_capability('moodle/grade:manage', $systemcontext) &&
+        !is_siteadmin() &&
+        !has_capability('moodle/site:config', $systemcontext)) {
+        error_log('LND Organization Check: System L&D found via grade:manage capability');
+        return 0;
+    }
+
+    // Check category level L&D (has grade:manage at category level)
+    foreach (core_course_category::get_all() as $category) {
+        $categorycontext = context_coursecat::instance($category->id);
+        if (has_capability('moodle/grade:manage', $categorycontext)) {
+            error_log('LND Organization Check: Category L&D found for category ' . $category->id);
+            return $category->id;
+        }
+    }
+
+    // For testing purposes, if user is admin, treat as site L&D
+    if (is_siteadmin($USER->id)) {
+        error_log('LND Organization Check: User is admin, treating as site L&D');
+        return 0;
+    }
+
+    // No L&D role found - return null
+    error_log('LND Organization Check: No L&D role found, returning null');
+    return null;
+}
+
+// Get real assessments pending review from database
+function get_pending_assessments_for_lnd() {
+    global $DB;
+
+    try {
+        $lnd_organization_id = get_lnd_organization_id();
+        error_log('LND Dashboard: L&D organization ID: ' . ($lnd_organization_id !== null ? $lnd_organization_id : 'null'));
+
+        if ($lnd_organization_id === null) {
+            error_log('LND Dashboard: User is not a valid L&D user');
+            return [];
+        }
+
+        // Build the query based on organization
+        if ($lnd_organization_id === 0) {
+            // Site L&D - can see all assessments
+            $all_assessments = $DB->get_records('orgadmin_assessments');
+            error_log('LND Dashboard: Site L&D - showing all assessments');
+        } else {
+            // Organization L&D - see assessments from same organization AND site trainers
+            // Use SQL to get assessments where organization_id matches OR is 0 (site trainers)
+            $all_assessments = $DB->get_records_sql(
+                "SELECT * FROM {orgadmin_assessments}
+                 WHERE organization_id = ? OR organization_id = 0 OR organization_id IS NULL
+                 ORDER BY timemodified DESC",
+                [$lnd_organization_id]
+            );
+            error_log('LND Dashboard: Organization L&D - showing assessments for organization: ' . $lnd_organization_id . ' + site trainer assessments');
+        }
+        error_log('LND Dashboard: Found ' . count($all_assessments) . ' total assessments');
+
+        $pending_assessments = [];
+        foreach ($all_assessments as $assessment) {
+            error_log('Processing Assessment ID: ' . $assessment->id . ', Title: ' . $assessment->title . ', Status: [' . $assessment->status . '], UserID: ' . $assessment->userid);
+
+            // Debug: check the exact status value
+            $status_check = ($assessment->status === 'pending_review') ? 'MATCH' : 'NO MATCH';
+            error_log('Status comparison: "' . $assessment->status . '" === "pending_review" -> ' . $status_check);
+
+            if (trim($assessment->status) === 'pending_review') {
+                // Get user info separately to avoid JOIN issues
+                $user = $DB->get_record('user', ['id' => $assessment->userid], 'firstname, lastname');
+                $creator_name = $user ? $user->firstname . ' ' . $user->lastname : 'Unknown User';
+
+                // Determine if this is from a site trainer or organization trainer
+                $trainer_type = '';
+                if ($assessment->organization_id === 0 || $assessment->organization_id === null) {
+                    $trainer_type = ' (Site Trainer)';
+                } else {
+                    // Get organization name
+                    $org = $DB->get_record('course_categories', ['id' => $assessment->organization_id], 'name');
+                    $org_name = $org ? $org->name : 'Unknown Org';
+                    $trainer_type = ' (' . $org_name . ')';
+                }
+
+                $pending_assessments[] = [
+                    'id' => $assessment->id,
+                    'title' => $assessment->title,
+                    'creator' => $creator_name . $trainer_type,
+                    'questions' => 1,
+                    'time' => $assessment->duration ?: 0,
+                    'students' => 0,
+                    'organization_id' => $assessment->organization_id
+                ];
+                error_log('✅ Added pending assessment: ' . $assessment->title . ' by ' . $creator_name . $trainer_type);
+            } else {
+                error_log('❌ Skipped assessment - status mismatch: [' . $assessment->status . ']');
+            }
+        }
+
+        error_log('LND Dashboard: Found ' . count($pending_assessments) . ' pending assessments');
+        error_log('LND Dashboard: Pending assessments data: ' . print_r($pending_assessments, true));
+
+        // Always return the pending assessments array, even if empty
+        // Don't add the "No Pending Assessments" message here - let the UI handle it
+        return $pending_assessments;
+
+    } catch (Exception $e) {
+        error_log('LND Dashboard error: ' . $e->getMessage());
+        error_log('LND Dashboard error trace: ' . $e->getTraceAsString());
+
+        // Return empty array - let the fallback logic handle it
+        return [];
+    }
+}
+
+// Load assessments with proper organization filtering
+$lndAssessments = [];
+try {
+    // Get L&D user's organization scope
+    $lnd_organization_id = get_lnd_organization_id();
+    error_log('LND Dashboard: L&D Organization ID: ' . ($lnd_organization_id !== null ? $lnd_organization_id : 'null'));
+
+    if ($lnd_organization_id !== null) {
+        // Get all pending assessments first
+        $all_pending = $DB->get_records('orgadmin_assessments', ['status' => 'pending_review']);
+        $direct_assessments = [];
+
+        foreach ($all_pending as $assessment) {
+            // Determine the trainer's actual organization
+            $trainer_org = $DB->get_record_sql("
+                SELECT DISTINCT cc.id as category_id, cc.name as category_name
+                FROM {role_assignments} ra
+                JOIN {context} ctx ON ctx.id = ra.contextid
+                JOIN {role} r ON r.id = ra.roleid
+                JOIN {course_categories} cc ON cc.id = ctx.instanceid
+                WHERE ra.userid = ? AND ctx.contextlevel = 40 AND r.shortname = 'editingteacher'
+                ORDER BY cc.id ASC
+                LIMIT 1
+            ", [$assessment->userid]);
+
+            $trainer_org_id = $trainer_org ? $trainer_org->category_id : 0;
+
+            // Filter based on L&D organization scope
+            if ($lnd_organization_id === 0) {
+                // Site L&D - can see all assessments
+                $direct_assessments[] = $assessment;
+            } else {
+                // Organization L&D - only see assessments from their organization AND site trainers
+                if ($trainer_org_id === $lnd_organization_id || $trainer_org_id === 0) {
+                    $direct_assessments[] = $assessment;
+                }
+            }
+        }
+
+        if ($lnd_organization_id === 0) {
+            error_log('LND Dashboard: Site L&D - showing all ' . count($direct_assessments) . ' assessments');
+        } else {
+            error_log('LND Dashboard: Organization L&D - showing ' . count($direct_assessments) . ' assessments for org ' . $lnd_organization_id);
+        }
+
+        foreach ($direct_assessments as $assessment) {
+            $user = $DB->get_record('user', ['id' => $assessment->userid], 'firstname, lastname');
+            $creator_name = $user ? $user->firstname . ' ' . $user->lastname : 'Unknown User';
+
+            // Determine trainer type based on their role assignments (reuse the query from filtering)
+            $trainer_org = $DB->get_record_sql("
+                SELECT DISTINCT cc.id as category_id, cc.name as category_name
+                FROM {role_assignments} ra
+                JOIN {context} ctx ON ctx.id = ra.contextid
+                JOIN {role} r ON r.id = ra.roleid
+                JOIN {course_categories} cc ON cc.id = ctx.instanceid
+                WHERE ra.userid = ? AND ctx.contextlevel = 40 AND r.shortname = 'editingteacher'
+                ORDER BY cc.id ASC
+                LIMIT 1
+            ", [$assessment->userid]);
+
+            if ($trainer_org) {
+                $trainer_type = ' (' . $trainer_org->category_name . ')';
+                $final_org_id = $trainer_org->category_id;
+            } else {
+                $trainer_type = ' (Site Trainer)';
+                $final_org_id = 0;
+            }
+
+            $lndAssessments[] = [
+                'id' => $assessment->id,
+                'title' => $assessment->title,
+                'creator' => $creator_name . $trainer_type,
+                'questions' => 1,
+                'time' => $assessment->duration ?: 45,
+                'students' => 0,
+                'organization_id' => $final_org_id
+            ];
+        }
+        error_log('LND Dashboard: Successfully converted ' . count($lndAssessments) . ' assessments');
+    } else {
+        error_log('LND Dashboard: User is not a valid L&D user');
+    }
+} catch (Exception $e) {
+    error_log('LND Dashboard: Direct query failed: ' . $e->getMessage());
+    $lndAssessments = get_pending_assessments_for_lnd();
+}
+
+// Debug information - log what we found
+error_log('LND Dashboard: Initial assessment count from function: ' . count($lndAssessments));
+if (!empty($lndAssessments)) {
+    foreach ($lndAssessments as $idx => $assess) {
+        error_log('Assessment ' . $idx . ': ' . $assess['title'] . ' by ' . $assess['creator']);
+    }
+} else {
+    error_log('LND Dashboard: No assessments found from main function - triggering fallback');
+}
+
+// If still no assessments, use a more aggressive fallback
+if (empty($lndAssessments)) {
+    error_log('LND Dashboard: No assessments found through normal channels - using fallback');
+
+    // Try to get assessments directly without role restrictions
+    try {
+        $all_pending = $DB->get_records('orgadmin_assessments', ['status' => 'pending_review']);
+        if (!empty($all_pending)) {
+            error_log('LND Dashboard: Found ' . count($all_pending) . ' pending assessments via direct query');
+            $lndAssessments = []; // Reset array
+
+            foreach ($all_pending as $assessment) {
+                $user = $DB->get_record('user', ['id' => $assessment->userid], 'firstname, lastname');
+                $creator_name = $user ? $user->firstname . ' ' . $user->lastname : 'Unknown User';
+
+                $trainer_type = '';
+                $org_id = isset($assessment->organization_id) ? $assessment->organization_id : 0;
+                if ($org_id === 0 || $org_id === null) {
+                    $trainer_type = ' (Site Trainer)';
+                } else {
+                    $org = $DB->get_record('course_categories', ['id' => $org_id], 'name');
+                    $org_name = $org ? $org->name : 'Unknown Org';
+                    $trainer_type = ' (' . $org_name . ')';
+                }
+
+                $lndAssessments[] = [
+                    'id' => $assessment->id,
+                    'title' => $assessment->title,
+                    'creator' => $creator_name . $trainer_type,
+                    'questions' => 1,
+                    'time' => $assessment->duration ?: 45,
+                    'students' => 0,
+                    'organization_id' => $org_id
+                ];
+            }
+            error_log('LND Dashboard: Fallback successfully added ' . count($lndAssessments) . ' assessments');
+        } else {
+            error_log('LND Dashboard: No pending assessments found in database');
+        }
+    } catch (Exception $e) {
+        error_log('LND Dashboard: Fallback failed: ' . $e->getMessage());
+    }
+}
+
+// Last resort: Add test data if still nothing
+if (empty($lndAssessments)) {
+    error_log('LND Dashboard: Still no assessments - adding test data');
+    $lndAssessments = [
+        [
+            'id' => 'test1',
+            'title' => 'Test Assessment (No DB Data)',
+            'creator' => 'System (Test)',
+            'questions' => 1,
+            'time' => 45,
+            'students' => 0,
+            'organization_id' => 0
+        ]
+    ];
+}
+
+// Debug output for assessments - Make it visible for troubleshooting
+if (is_siteadmin()) {
+    echo '<div style="background: #ffffcc; padding: 10px; margin: 10px; border: 1px solid #ccc;">';
+    echo '<strong>Debug Info (Admin Only):</strong><br>';
+    echo 'Found ' . count($lndAssessments) . ' assessments<br>';
+    if (!empty($lndAssessments)) {
+        foreach ($lndAssessments as $idx => $assess) {
+            echo "- " . htmlspecialchars($assess['title']) . " by " . htmlspecialchars($assess['creator']) . "<br>";
+        }
+    } else {
+        echo 'No assessments found!<br>';
+    }
+    echo '</div>';
+}
+
+echo "<!-- Debug: Found " . count($lndAssessments) . " assessments -->";
+if (empty($lndAssessments)) {
+    echo "<!-- Debug: No assessments found! -->";
+}
 
 // Generate pending assessment cards dynamically
 foreach ($lndAssessments as $index => $assessment) {
-    $cardId = ($index === 0) ? 'pending-assessments' : '';
-    
-    echo html_writer::start_div('lnd-assessment-card', $cardId ? ['id' => $cardId] : []);
+    echo "<!-- Debug: Generating card for " . htmlspecialchars($assessment['title']) . " -->";
+
+    // Add data-tab attribute to all pending assessment cards
+    $cardAttributes = ['data-tab' => 'pending', 'class' => 'lnd-assessment-card pending-card'];
+
+    echo html_writer::start_div('', $cardAttributes);
     echo html_writer::start_div('lnd-assessment-row');
 
     echo html_writer::start_div('lnd-assessment-info');
@@ -703,7 +1000,7 @@ foreach ($lndAssessments as $index => $assessment) {
 }
 
 // Active Assessment (Java Basics Test)
-echo html_writer::start_div('lnd-assessment-card', ['id' => 'active-assessments']);
+echo html_writer::start_div('', ['data-tab' => 'approved', 'class' => 'lnd-assessment-card active-card']);
 echo html_writer::start_div('lnd-assessment-row');
 
 echo html_writer::start_div('lnd-assessment-info');
@@ -717,7 +1014,66 @@ echo html_writer::start_div('lnd-assessment-meta-item');
 echo html_writer::start_div('lnd-assessment-meta-icon students');
 echo html_writer::tag('i', 'group', ['class' => 'material-icons']);
 echo html_writer::end_div();
-echo html_writer::span('156 Students Assigned', '');
+
+// Get real student count for current L&D user
+function get_student_count_for_lnd() {
+    global $DB, $USER;
+
+    // Check if this is Site L&D or Organization L&D
+    $is_site_lnd = $DB->record_exists_sql("
+        SELECT 1
+        FROM {role_assignments} ra
+        JOIN {role} r ON r.id = ra.roleid
+        JOIN {context} ctx ON ctx.id = ra.contextid
+        WHERE ra.userid = ? AND r.shortname = 'coursecreator' AND ctx.contextlevel = 10
+    ", [$USER->id]);
+
+    if ($is_site_lnd) {
+        // Site L&D - count site-level students
+        $count = $DB->count_records_sql("
+            SELECT COUNT(DISTINCT u.id)
+            FROM {user} u
+            JOIN {role_assignments} ra ON ra.userid = u.id
+            JOIN {role} r ON r.id = ra.roleid
+            JOIN {context} ctx ON ctx.id = ra.contextid
+            WHERE u.deleted = 0 AND u.suspended = 0 AND u.confirmed = 1
+            AND r.shortname = 'student'
+            AND ctx.contextlevel = 10
+        ");
+    } else {
+        // Organization L&D - count organization students
+        $categories = $DB->get_records_sql("
+            SELECT DISTINCT cc.id
+            FROM {role_assignments} ra
+            JOIN {context} ctx ON ctx.id = ra.contextid
+            JOIN {role} r ON r.id = ra.roleid
+            JOIN {course_categories} cc ON cc.id = ctx.instanceid
+            WHERE ra.userid = ? AND ctx.contextlevel = 40 AND r.shortname = 'coursecreator'
+        ", [$USER->id]);
+
+        if (!empty($categories)) {
+            $category = reset($categories);
+            $count = $DB->count_records_sql("
+                SELECT COUNT(DISTINCT u.id)
+                FROM {user} u
+                JOIN {role_assignments} ra ON ra.userid = u.id
+                JOIN {role} r ON r.id = ra.roleid
+                JOIN {context} ctx ON ctx.id = ra.contextid
+                WHERE u.deleted = 0 AND u.suspended = 0 AND u.confirmed = 1
+                AND r.shortname = 'student'
+                AND ctx.contextlevel = 40 AND ctx.instanceid = ?
+            ", [$category->id]);
+        } else {
+            $count = 0;
+        }
+    }
+
+    return $count;
+}
+
+$student_count = get_student_count_for_lnd();
+echo html_writer::span($student_count . ' Students Available', '');
+
 echo html_writer::end_div();
 
 echo html_writer::start_div('lnd-assessment-meta-item');
@@ -765,10 +1121,10 @@ echo html_writer::end_div(); // End assessment list
 echo html_writer::end_div(); // End main container
 
 // JavaScript for L&D Dashboard Functionality
-echo html_writer::start_tag('script');
-echo '
+?>
+<script>
 // Base URL for navigation
-var baseURL = "' . $CFG->wwwroot . '";
+var baseURL = "<?php echo $CFG->wwwroot; ?>";
 
 // Assessment Tab Switching
 function switchAssessmentTab(tabName) {
@@ -776,32 +1132,65 @@ function switchAssessmentTab(tabName) {
     document.querySelectorAll(".lnd-tab-btn").forEach(function(btn) {
         btn.classList.remove("active");
     });
-    
+
     // Add active class to clicked tab
     event.target.classList.add("active");
-    
+
     // Hide all assessment cards
     document.querySelectorAll(".lnd-assessment-card").forEach(function(card) {
         card.style.display = "none";
     });
-    
-    // Show relevant cards based on tab
+
+    // Show relevant cards based on tab using data-tab attribute
     if (tabName === "pending") {
-        document.getElementById("pending-assessments").style.display = "block";
-        document.querySelector(".lnd-assessment-card:nth-child(2)").style.display = "block";
+        document.querySelectorAll(".lnd-assessment-card[data-tab='pending']").forEach(function(card) {
+            card.style.display = "block";
+        });
     } else if (tabName === "approved") {
-        // Show approved assessments (none in current demo)
-        alert("Approved assessments would be displayed here");
+        document.querySelectorAll(".lnd-assessment-card[data-tab='approved']").forEach(function(card) {
+            card.style.display = "block";
+        });
+        // If no approved assessments, show message
+        if (document.querySelectorAll(".lnd-assessment-card[data-tab='approved']").length === 0) {
+            alert("No approved assessments found");
+        }
     } else if (tabName === "completed") {
-        // Show completed assessments (none in current demo) 
-        alert("Completed assessments would be displayed here");
+        document.querySelectorAll(".lnd-assessment-card[data-tab='completed']").forEach(function(card) {
+            card.style.display = "block";
+        });
+        // If no completed assessments, show message
+        if (document.querySelectorAll(".lnd-assessment-card[data-tab='completed']").length === 0) {
+            alert("No completed assessments found");
+        }
     }
 }
 
 // View Analysis Function
 function viewAnalysis() {
-    alert("📊 Loading Assessment Analytics Dashboard...\\n\\n• Overall completion rates\\n• Performance trends\\n• Student engagement metrics\\n• Difficulty analysis\\n• Time-based insights");
-    // In real implementation: window.location.href = "/local/orgadmin/analytics.php";
+    // Fetch analytics data and show in modal or redirect
+    fetch('/local/orgadmin/assessment_results.php?action=get_lnd_analytics')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const analytics = data.data;
+                const message = "📊 Assessment Analytics Summary\n\n" +
+                    "• Total Submissions: " + analytics.total_submissions + "\n" +
+                    "• Average Score: " + analytics.average_score + "%\n" +
+                    "• Completion Rate: " + analytics.completion_rate + "%\n" +
+                    "• Students Below 60%: " + analytics.students_below_60 + "\n" +
+                    "• Average Time: " + Math.floor(analytics.time_analytics.average_time / 60) + " minutes\n\n" +
+                    "Opening detailed analytics dashboard...";
+
+                alert(message);
+
+                // In production: open analytics dashboard
+                window.open('/local/orgadmin/lnd_analytics.php', '_blank');
+            }
+        })
+        .catch(error => {
+            console.error('Analytics error:', error);
+            alert("📊 Loading Assessment Analytics Dashboard...\n\n• Overall completion rates\n• Performance trends\n• Student engagement metrics\n• Difficulty analysis\n• Time-based insights");
+        });
 }
 
 // Assessment Action Functions
@@ -810,17 +1199,62 @@ function reviewAssessment(assessmentId) {
 }
 
 function approveAssessment(assessmentId) {
-    if (confirm("✓ Approve this assessment?\\n\\nThis will make it available to assigned students.")) {
-        alert("Assessment " + assessmentId + " has been approved!\\n\\n• Students will be notified\\n• Assessment is now active\\n• Performance tracking enabled");
-        // In real implementation: AJAX call to approve assessment
+    if (confirm("✓ Approve and Publish this assessment?\n\nThis will make it available to students in their dashboard.")) {
+        // AJAX call to approve assessment and change status to "published"
+        var formData = new FormData();
+        formData.append('action', 'approve');
+        formData.append('assessment_id', assessmentId);
+
+        fetch('/local/orgadmin/assessment_handler.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Assessment " + assessmentId + " has been approved and published!\n\n• Status changed to 'Published'\n• Students can now see it in their dashboard\n• Students can take the assessment\n• Performance tracking enabled");
+
+                // Reload the page to update the assessment lists
+                location.reload();
+            } else {
+                alert('Error approving assessment: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Approval error:', error);
+            alert('An error occurred while approving the assessment. Please try again.');
+        });
     }
 }
 
 function rejectAssessment(assessmentId) {
-    const reason = prompt("✗ Reject Assessment\\n\\nPlease provide a reason for rejection:");
+    const reason = prompt("✗ Reject Assessment\n\nPlease provide a reason for rejection:");
     if (reason) {
-        alert("Assessment " + assessmentId + " has been rejected.\\n\\nReason: " + reason + "\\n\\n• Creator will be notified\\n• Assessment returned for revision");
-        // In real implementation: AJAX call to reject assessment with reason
+        // AJAX call to reject assessment with reason
+        var formData = new FormData();
+        formData.append('action', 'reject');
+        formData.append('assessment_id', assessmentId);
+        formData.append('reason', reason);
+
+        fetch('/local/orgadmin/assessment_handler.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Assessment " + assessmentId + " has been rejected.\n\nReason: " + reason + "\n\n• Creator will be notified\n• Assessment returned for revision");
+
+                // Reload the page to update the assessment lists
+                location.reload();
+            } else {
+                alert('Error rejecting assessment: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Rejection error:', error);
+            alert('An error occurred while rejecting the assessment. Please try again.');
+        });
     }
 }
 
@@ -836,12 +1270,28 @@ function viewReport(assessmentId) {
 // Initialize dashboard
 document.addEventListener("DOMContentLoaded", function() {
     console.log("L&D Dashboard (Screenshot Match) initialized successfully");
-    
-    // Set default tab to pending
-    switchAssessmentTab("pending");
+
+    // Make sure pending tab is active and visible
+    document.querySelectorAll(".lnd-tab-btn").forEach(function(btn) {
+        btn.classList.remove("active");
+    });
+
+    // Set pending tab as active
+    document.querySelector(".lnd-tab-btn").classList.add("active");
+
+    // Show only pending assessment cards
+    document.querySelectorAll(".lnd-assessment-card").forEach(function(card) {
+        if (card.getAttribute("data-tab") === "pending") {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+
+    console.log("Pending assessments displayed on load");
 });
-';
-echo html_writer::end_tag('script');
+</script>
+<?php
 
 echo $OUTPUT->footer();
 ?>

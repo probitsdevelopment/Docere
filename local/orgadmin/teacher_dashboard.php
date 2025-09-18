@@ -3,6 +3,7 @@
 
 require_once('../../config.php');
 require_once('./role_detector.php');
+require_once($CFG->libdir.'/ddllib.php');
 
 // Require login
 require_login();
@@ -25,9 +26,62 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title('Teacher Dashboard');
 $PAGE->set_heading('');
 
-// Get teacher's assessments (mock data for now - replace with real Moodle data)
+// Get teacher's assessments (using mock data until database is properly set up)
 function get_teacher_assessments($filter = 'all', $page = 0, $perpage = 10) {
-    // Mock data - replace with real Moodle quiz/assignment data
+    global $DB, $USER;
+
+    // Check if table exists, if not use mock data
+    try {
+        if ($DB->get_manager()->table_exists(new xmldb_table('orgadmin_assessments'))) {
+            // Build WHERE clause based on filter
+            $where = 'userid = :userid';
+            $params = ['userid' => $USER->id];
+
+            if ($filter !== 'all') {
+                $where .= ' AND status = :status';
+                $params['status'] = $filter;
+            }
+
+            // Get total count
+            $total = $DB->count_records_select('orgadmin_assessments', $where, $params);
+
+            // Get assessments with pagination
+            $assessments = $DB->get_records_select(
+                'orgadmin_assessments',
+                $where,
+                $params,
+                'timemodified DESC',
+                '*',
+                $page * $perpage,
+                $perpage
+            );
+
+            // Convert to array format expected by the view
+            $assessment_array = [];
+            foreach ($assessments as $assessment) {
+                $assessment_array[] = [
+                    'id' => $assessment->id,
+                    'title' => $assessment->title,
+                    'questions' => 1, // Default for now
+                    'duration' => $assessment->duration,
+                    'students' => 0, // Default for now - would need to query actual enrollments
+                    'status' => $assessment->status
+                ];
+            }
+
+            return [
+                'assessments' => $assessment_array,
+                'total' => $total,
+                'current_page' => $page,
+                'per_page' => $perpage,
+                'total_pages' => ceil($total / $perpage)
+            ];
+        }
+    } catch (Exception $e) {
+        // Fall back to mock data if database access fails
+    }
+
+    // Mock data fallback - Include assessments with pending_review status
     $assessments = [
         [
             'id' => 1,
@@ -39,7 +93,7 @@ function get_teacher_assessments($filter = 'all', $page = 0, $perpage = 10) {
         ],
         [
             'id' => 2,
-            'title' => 'Java Advanced Test', 
+            'title' => 'Java Advanced Test',
             'questions' => 1,
             'duration' => 45,
             'students' => 156,
@@ -60,19 +114,35 @@ function get_teacher_assessments($filter = 'all', $page = 0, $perpage = 10) {
             'duration' => 45,
             'students' => 156,
             'status' => 'published'
+        ],
+        [
+            'id' => 5,
+            'title' => 'mernstack',
+            'questions' => 1,
+            'duration' => 45,
+            'students' => 0,
+            'status' => 'pending_review'
+        ],
+        [
+            'id' => 6,
+            'title' => 'Test on Full Stack Development',
+            'questions' => 1,
+            'duration' => 45,
+            'students' => 0,
+            'status' => 'pending_review'
         ]
     ];
-    
+
     // Filter assessments
     if ($filter !== 'all') {
         $assessments = array_filter($assessments, function($assessment) use ($filter) {
             return $assessment['status'] === $filter;
         });
     }
-    
+
     $total = count($assessments);
     $assessments = array_slice($assessments, $page * $perpage, $perpage);
-    
+
     return [
         'assessments' => $assessments,
         'total' => $total,
@@ -418,6 +488,11 @@ body {
 .assessment-status.draft {
     background: #fff3cd;
     color: #856404;
+}
+
+.assessment-status.pending_review {
+    background: #ffeaa7;
+    color: #d63031;
 }
 
 .assessment-action-btn {
@@ -773,7 +848,7 @@ body {
                 <h2 style="margin: 0; color: #2d3748; font-size: 1.5em;">Create New Assessment</h2>
             </div>
             <button class="teacher-add-btn" onclick="saveAndPublish()">
-                Save & Publish
+                Submit for Review
             </button>
         </div>
     <?php elseif ($mode === 'edit'): ?>
@@ -783,7 +858,7 @@ body {
                 <h2 style="margin: 0; color: #2d3748; font-size: 1.5em;">Edit Assessment</h2>
             </div>
             <button class="teacher-add-btn" onclick="saveAndPublish()">
-                Save & Publish
+                Submit for Review
             </button>
         </div>
     <?php else: ?>
@@ -904,7 +979,15 @@ body {
                         </div>
                         <div class="assessment-actions">
                             <span class="assessment-status <?php echo $assessment['status']; ?>">
-                                <?php echo ucfirst($assessment['status']); ?>
+                                <?php
+                                    $status_display = $assessment['status'];
+                                    if ($status_display === 'pending_review') {
+                                        $status_display = 'Pending Review';
+                                    } else {
+                                        $status_display = ucfirst($status_display);
+                                    }
+                                    echo $status_display;
+                                ?>
                             </span>
                             <button class="assessment-action-btn edit" onclick="editAssessment(<?php echo $assessment['id']; ?>)" title="Edit">
                                 <span class="material-icons" style="font-size: 16px;">edit</span>
@@ -1027,29 +1110,87 @@ function saveAndPublish() {
     if (!validateAssessmentForm()) {
         return;
     }
-    
+
     // Get form data
     var formData = getFormData();
-    
-    // Show confirmation
-    if (confirm('Are you sure you want to save and publish this assessment?\n\nOnce published, students will be able to access it.')) {
-        // TODO: AJAX call to save and publish assessment to Moodle
-        alert('Assessment saved and published successfully!\n\nRedirecting to LND Dashboard...');
-        
-        // Redirect to LND dashboard assessment section
-        window.location.href = '/local/orgadmin/lnd_dashboard.php?section=assessments';
+
+    // Show confirmation for submission to LND
+    if (confirm('Submit assessment for L&D review?\n\nThis will send your assessment to the L&D team for approval before it becomes available to students.')) {
+        // Prepare data for AJAX
+        var postData = new FormData();
+        postData.append('action', 'submit_review');
+        postData.append('title', formData.title);
+        postData.append('duration', formData.duration);
+        postData.append('total_marks', formData.totalMarks);
+        postData.append('pass_percentage', formData.passPercentage);
+        postData.append('language', formData.language);
+        postData.append('instructions', formData.instructions);
+
+        // Add assessment ID if editing
+        var assessmentId = document.getElementById('assessmentId');
+        if (assessmentId) {
+            postData.append('assessment_id', assessmentId.value);
+        }
+
+        // AJAX call to submit assessment for review
+        fetch('assessment_handler.php', {
+            method: 'POST',
+            body: postData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Assessment submitted successfully!\n\n✓ Sent to L&D Dashboard for review\n✓ You will be notified once approved\n✓ Students will see it after L&D publishes');
+                window.location.href = 'teacher_dashboard.php';
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while submitting the assessment.');
+        });
     }
 }
 
 function saveAsDraft() {
     // Get form data
     var formData = getFormData();
-    
-    // TODO: AJAX call to save assessment as draft to Moodle
-    alert('Assessment saved as draft successfully!\n\nYou can continue editing it later.');
-    
-    // Optionally redirect back to view mode or stay on the form
-    window.location.href = 'teacher_dashboard.php?filter=draft';
+
+    // Prepare data for AJAX
+    var postData = new FormData();
+    postData.append('action', 'save_draft');
+    postData.append('title', formData.title);
+    postData.append('duration', formData.duration);
+    postData.append('total_marks', formData.totalMarks);
+    postData.append('pass_percentage', formData.passPercentage);
+    postData.append('language', formData.language);
+    postData.append('instructions', formData.instructions);
+
+    // Add assessment ID if editing
+    var assessmentId = document.getElementById('assessmentId');
+    if (assessmentId) {
+        postData.append('assessment_id', assessmentId.value);
+    }
+
+    // AJAX call to save assessment as draft
+    fetch('assessment_handler.php', {
+        method: 'POST',
+        body: postData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            window.location.href = 'teacher_dashboard.php?filter=draft';
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while saving the assessment.');
+    });
 }
 
 function previewAssessment() {

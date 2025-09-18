@@ -37,7 +37,7 @@ echo $OUTPUT->header();
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 body {
-    background: #f7fafc;
+    background: #ffffff;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
@@ -146,21 +146,26 @@ body {
     padding: 24px;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.admin-stat-content {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    flex: 1;
 }
 
 .admin-stat-icon {
     width: 40px;
     height: 40px;
     border-radius: 8px;
-    margin-bottom: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .admin-stat-icon .material-icons {
@@ -187,7 +192,7 @@ body {
 .admin-stat-title {
     font-size: 12px;
     color: #718096;
-    margin-bottom: 8px;
+    margin: 0 0 4px 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -490,32 +495,40 @@ body {
     <!-- Statistics Cards -->
     <div class="admin-stats">
         <div class="admin-stat-card total-users">
+            <div class="admin-stat-content">
+                <div class="admin-stat-title">Total Students</div>
+                <h2 class="admin-stat-value"><?php echo number_format($statistics['students']); ?></h2>
+            </div>
             <div class="admin-stat-icon">
                 <span class="material-icons">group</span>
             </div>
-            <div class="admin-stat-title">Total Users</div>
-            <h2 class="admin-stat-value"><?php echo number_format($statistics['total_users']); ?></h2>
         </div>
         <div class="admin-stat-card trainers">
+            <div class="admin-stat-content">
+                <div class="admin-stat-title">Trainers</div>
+                <h2 class="admin-stat-value"><?php echo number_format($statistics['trainers']); ?></h2>
+            </div>
             <div class="admin-stat-icon">
                 <span class="material-icons">school</span>
             </div>
-            <div class="admin-stat-title">Trainers</div>
-            <h2 class="admin-stat-value"><?php echo number_format($statistics['trainers']); ?></h2>
         </div>
         <div class="admin-stat-card stakeholders">
+            <div class="admin-stat-content">
+                <div class="admin-stat-title">Stakeholder</div>
+                <h2 class="admin-stat-value"><?php echo number_format($statistics['stakeholders']); ?></h2>
+            </div>
             <div class="admin-stat-icon">
                 <span class="material-icons">business</span>
             </div>
-            <div class="admin-stat-title">Stakeholder</div>
-            <h2 class="admin-stat-value"><?php echo number_format($statistics['stakeholders']); ?></h2>
         </div>
         <div class="admin-stat-card lnd">
+            <div class="admin-stat-content">
+                <div class="admin-stat-title">L&D</div>
+                <h2 class="admin-stat-value"><?php echo number_format($statistics['lnd']); ?></h2>
+            </div>
             <div class="admin-stat-icon">
                 <span class="material-icons">edit</span>
             </div>
-            <div class="admin-stat-title">L&D</div>
-            <h2 class="admin-stat-value"><?php echo number_format($statistics['lnd']); ?></h2>
         </div>
     </div>
 

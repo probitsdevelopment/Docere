@@ -740,7 +740,7 @@ echo html_writer::span('50m remaining', '');
 echo html_writer::end_div();
 echo html_writer::div('Java Basics Test', 'assessment-title');
 echo html_writer::div('Lorem Ipsum is simply dummy text of the printing and typesetting industry', 'assessment-description');
-echo html_writer::link(new moodle_url('/my/courses.php'), 'Start Assessment', ['class' => 'btn-start']);
+echo html_writer::div('Start Assessment', 'btn-start', ['onclick' => 'showAssessmentInstructions()']);
 echo html_writer::end_div();
 
 // Advanced Python Test (Locked)
@@ -808,11 +808,11 @@ echo html_writer::end_div(); // End past content
 echo html_writer::start_div('instructions-section');
 echo html_writer::start_div('instructions-header', ['onclick' => 'toggleInstructions()']);
 echo html_writer::tag('h3', 'Assessment Instruction', ['class' => 'instructions-title']);
-echo html_writer::span('∧', 'instructions-arrow', ['id' => 'instructions-arrow']);
+echo html_writer::span('⌄', 'instructions-arrow', ['id' => 'instructions-arrow']);
 echo html_writer::end_div();
 
 // Instructions content (hidden by default)
-echo html_writer::start_div('instructions-content active', ['id' => 'instructions-content']);
+echo html_writer::start_div('instructions-content', ['id' => 'instructions-content']);
 
 echo html_writer::start_div('instruction-item');
 echo html_writer::span('📝', 'instruction-icon');
@@ -840,7 +840,7 @@ echo html_writer::span('Rules: No external materials allowed');
 echo html_writer::end_div();
 
 // Take Assessment button
-echo html_writer::link(new moodle_url('/my/courses.php'), 'Take Assessment', ['class' => 'take-assessment-btn']);
+echo html_writer::link(new moodle_url('/local/orgadmin/simple_assessment.php'), 'Take Assessment', ['class' => 'take-assessment-btn']);
 
 echo html_writer::end_div(); // End instructions content
 echo html_writer::end_div(); // End instructions section
@@ -978,7 +978,7 @@ function switchTab(tabName) {
 function toggleInstructions() {
     const content = document.getElementById("instructions-content");
     const arrow = document.getElementById("instructions-arrow");
-    
+
     if (content.classList.contains("active")) {
         content.classList.remove("active");
         arrow.textContent = "⌄";
@@ -988,6 +988,34 @@ function toggleInstructions() {
         arrow.textContent = "∧";
         arrow.classList.add("expanded");
     }
+}
+
+// Show assessment instructions when Start Assessment button is clicked
+function showAssessmentInstructions() {
+    const content = document.getElementById("instructions-content");
+    const arrow = document.getElementById("instructions-arrow");
+
+    // Show the instructions section
+    content.classList.add("active");
+    arrow.textContent = "∧";
+    arrow.classList.add("expanded");
+
+    // Scroll to instructions section smoothly
+    document.querySelector(".instructions-section").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+    // Add a highlight effect
+    const instructionsSection = document.querySelector(".instructions-section");
+    instructionsSection.style.border = "2px solid #007bff";
+    instructionsSection.style.boxShadow = "0 4px 20px rgba(0,123,255,0.3)";
+
+    // Remove highlight after 3 seconds
+    setTimeout(() => {
+        instructionsSection.style.border = "";
+        instructionsSection.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+    }, 3000);
 }
 
 ';

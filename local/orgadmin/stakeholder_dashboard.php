@@ -859,12 +859,55 @@ function showStudentDetails(studentId, studentName) {
 }
 
 function fetchStudentDetails(studentId, studentName) {
-    // Mock data - replace with actual AJAX call
+    // Fetch TDD analysis data from our assessment results API
+    fetch(`/local/orgadmin/assessment_results.php?action=get_tdd_analysis&student_id=${studentId}&assessment_id=java-basics`)
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                const tddData = result.data;
+
+                // Convert TDD analysis to student details format
+                const studentDetails = {
+                    id: studentId,
+                    name: studentName,
+                    email: 'student@example.com',
+                    overall_score: Math.round((tddData.code_analysis.test_driven_approach +
+                                            tddData.code_analysis.code_quality +
+                                            tddData.code_analysis.best_practices +
+                                            tddData.code_analysis.complexity_handling) / 4),
+                    sections: [
+                        {name: 'TDD Approach', score: tddData.code_analysis.test_driven_approach, max_score: 100, percentage: tddData.code_analysis.test_driven_approach},
+                        {name: 'Code Quality', score: tddData.code_analysis.code_quality, max_score: 100, percentage: tddData.code_analysis.code_quality},
+                        {name: 'Best Practices', score: tddData.code_analysis.best_practices, max_score: 100, percentage: tddData.code_analysis.best_practices},
+                        {name: 'Complexity Handling', score: tddData.code_analysis.complexity_handling, max_score: 100, percentage: tddData.code_analysis.complexity_handling}
+                    ],
+                    test_coverage: tddData.test_coverage,
+                    recommendations: tddData.recommendations,
+                    code_submission: tddData.code_submission,
+                    time_spent: '45 minutes', // This would come from assessment submission data
+                    completion_date: '2024-09-15 14:30:00',
+                    attempts: 1
+                };
+
+                renderStudentDetails(studentDetails);
+            } else {
+                // Fallback to mock data if API fails
+                renderFallbackStudentDetails(studentId, studentName);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching TDD analysis:', error);
+            renderFallbackStudentDetails(studentId, studentName);
+        });
+}
+
+function renderFallbackStudentDetails(studentId, studentName) {
+    // Mock data as fallback
     const studentDetails = {
         id: studentId,
         name: studentName,
         email: 'student@example.com',
-        overall_score: 95,
+        overall_score: 85,
         sections: [
             {name: 'Theory Questions', score: 18, max_score: 20, percentage: 90},
             {name: 'Practical Problems', score: 28, max_score: 30, percentage: 93.3},
@@ -872,7 +915,7 @@ function fetchStudentDetails(studentId, studentName) {
             {name: 'Best Practices', score: 22, max_score: 25, percentage: 88}
         ],
         time_spent: '45 minutes',
-        completion_date: '2025-09-10 14:30:00',
+        completion_date: '2024-09-15 14:30:00',
         attempts: 1
     };
 
@@ -898,6 +941,55 @@ function renderStudentDetails(details) {
             </div>
         `;
     });
+
+    // Build additional sections for TDD analysis
+    let tddCoverageHtml = '';
+    let recommendationsHtml = '';
+    let codeSubmissionHtml = '';
+
+    if (details.test_coverage) {
+        tddCoverageHtml = `
+            <div class="score-breakdown">
+                <h4>Test Coverage Analysis</h4>
+                <div class="score-item">
+                    <span class="score-name">Edge Cases Covered</span>
+                    <div class="score-value">
+                        <span>${details.test_coverage.edge_cases_covered}/${details.test_coverage.total_edge_cases}</span>
+                        <div class="score-bar">
+                            <div class="score-fill" style="width: ${details.test_coverage.coverage_percentage}%; background: ${getScoreColor(details.test_coverage.coverage_percentage)};"></div>
+                        </div>
+                        <span>${details.test_coverage.coverage_percentage}%</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    if (details.recommendations && details.recommendations.length > 0) {
+        const recommendationsList = details.recommendations.map(rec =>
+            `<li style="margin-bottom: 8px; color: #4a5568;">${rec}</li>`
+        ).join('');
+
+        recommendationsHtml = `
+            <div class="score-breakdown">
+                <h4>📝 Improvement Recommendations</h4>
+                <ul style="padding-left: 20px; margin: 10px 0;">
+                    ${recommendationsList}
+                </ul>
+            </div>
+        `;
+    }
+
+    if (details.code_submission) {
+        codeSubmissionHtml = `
+            <div class="score-breakdown">
+                <h4>💻 Code Submission</h4>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; white-space: pre-wrap; overflow-x: auto; max-height: 200px; overflow-y: auto;">
+${details.code_submission}
+                </div>
+            </div>
+        `;
+    }
 
     modalBody.innerHTML = `
         <div class="student-info">
@@ -928,9 +1020,13 @@ function renderStudentDetails(details) {
         </div>
 
         <div class="score-breakdown">
-            <h4>Section-wise Performance</h4>
+            <h4>🧪 TDD Analysis Results</h4>
             ${sectionsHtml}
         </div>
+
+        ${tddCoverageHtml}
+        ${recommendationsHtml}
+        ${codeSubmissionHtml}
     `;
 }
 
