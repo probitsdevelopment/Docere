@@ -1,0 +1,9 @@
+/* Force wider container for user edit form */
+.mform {
+    max-width: 100vw !important;
+    width: 100% !important;
+}
+.user-edit-header {
+    max-width: 100vw !important;
+    width: 100% !important;
+}

@@ -22,6 +22,17 @@ select {
             border-bottom: 0;
         }
     }
+}
+
+/* Remove grey background from quiz activity header */
+.path-mod-quiz {
+    .activity-header:not(:empty) {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin-bottom: 0 !important;
+    }
     .activity-information {
 
         .activity-dates {

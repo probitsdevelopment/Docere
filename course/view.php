@@ -245,27 +245,13 @@
     }
 
     $PAGE->set_heading($course->fullname);
+    
+    // Add custom styles for course view
+    // $PAGE->requires->css('/course/styles.css');
+    
     echo $OUTPUT->header();
     
-    $basePort = 8080;
-$userId = $USER->id; // or $user->id depending on context
-$port = $basePort + $userId; // So user id 1 = 8081, id 2 = 8082, etc.
-
-$host = 'localhost'; // Use server IP/domain if needed
-
-echo '<div style="margin: 32px 0;">
-  <h3>Your Code Editor</h3>
-  <iframe 
-    src="http://' . $host . ':' . $port . '" 
-    width="100%" 
-    height="800" 
-    style="border:1px solid #ccc; border-radius:8px;"
-    allowfullscreen
-  ></iframe>
-  <p style="color:gray; font-size:13px;">
-    If you see a connection error, make sure your code-server container is running for this user on port ' . $port . '.
-  </p>
-</div>';
+    
 
     if ($USER->editing == 1) {
 

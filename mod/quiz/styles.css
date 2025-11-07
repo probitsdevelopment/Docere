@@ -4,12 +4,17 @@
     font-size: 0.7em;
 }
 
+/* Override formulation background color to white */
+.que .formulation {
+    background-color: #fff !important;
+}
+
 /** Attempt and review pages **/
 #page-mod-quiz-attempt #page .controls,
 #page-mod-quiz-summary #page .controls,
 #page-mod-quiz-review #page .controls {
-    text-align: center;
-    margin: 8px auto;
+    text-align: left !important;
+    margin: 8px 0 !important;
 }
 
 #page-mod-quiz-attempt .submitbtns,
@@ -1173,5 +1178,221 @@ table#categoryquestions {
     #page-mod-quiz-attempt .que,
     #page-mod-quiz-review .que {
         page-break-inside: avoid;
+    }
+}
+
+/* Remove gray background containers shown in developer tools */
+#page-mod-quiz-attempt .container-fluid.tertiary-navigation,
+#page-mod-quiz-attempt div.container-fluid.tertiary-navigation,
+#page-mod-quiz-attempt .tertiary-navigation {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Remove any other gradient backgrounds */
+#page-mod-quiz-attempt *[style*="linear-gradient"],
+#page-mod-quiz-attempt *[style*="background"] {
+    background: transparent !important;
+    background-image: none !important;
+}
+
+/* Move Back button to left side */
+#page-mod-quiz-attempt .singlebutton,
+#page-mod-quiz-attempt .single-button,
+#page-mod-quiz-attempt form.singlebutton,
+#page-mod-quiz-attempt .controls .singlebutton {
+    text-align: left !important;
+    margin: 8px 0 !important;
+    display: block !important;
+    width: auto !important;
+    float: left !important;
+}
+
+#page-mod-quiz-attempt .controls {
+    text-align: left !important;
+    margin: 8px 0 !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+}
+
+/* ================================================
+   BEAUTIFUL MCQ STYLING FOR QUIZ ATTEMPT PAGE
+   ================================================ */
+
+/* Main question container */
+#page-mod-quiz-attempt .que {
+    background: #ffffff !important;
+    border: 1px solid #e1e7ec !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+    margin: 12px 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    transition: all 0.3s ease !important;
+    max-width: 100% !important;
+}
+
+#page-mod-quiz-attempt .que:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    border-color: #1CB0F6 !important;
+}
+
+/* Question sidebar (left panel) */
+#page-mod-quiz-attempt .que .info {
+    background: transparent !important;
+    color: #333 !important;
+    border: 1px solid #ddd !important;
+    border-radius: 8px 0 0 8px !important;
+    float: left !important;
+    width: 140px !important;
+    padding: 12px !important;
+    margin: 0 !important;
+    min-height: 100px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+}
+
+/* Question number styling */
+#page-mod-quiz-attempt .que .info h3.no {
+    color: white !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    margin: 0 0 4px 0 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+#page-mod-quiz-attempt .que .info .state {
+    color: #e0f2fe !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+    margin-top: 8px !important;
+}
+
+#page-mod-quiz-attempt .que .info .grade {
+    color: #b3e5fc !important;
+    font-size: 11px !important;
+    margin-top: 4px !important;
+}
+
+/* Main content area */
+#page-mod-quiz-attempt .que .content {
+    margin-left: 140px !important;
+    padding: 16px !important;
+    background: #ffffff !important;
+}
+
+/* Question text */
+#page-mod-quiz-attempt .que .qtext {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    line-height: 1.5 !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 8px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+}
+
+/* Answer container */
+#page-mod-quiz-attempt .que .answer {
+    margin-top: 12px !important;
+}
+
+/* Individual answer options */
+#page-mod-quiz-attempt .que .answer > div,
+#page-mod-quiz-attempt .que .answer .r0,
+#page-mod-quiz-attempt .que .answer .r1 {
+    background: #fff !important;
+    border: 1px solid #fff !important;
+    border-radius: 6px !important;
+    padding: 10px 14px !important;
+    margin: 8px 0 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #374151 !important;
+    position: relative !important;
+}
+
+#page-mod-quiz-attempt .que .answer > div:hover,
+#page-mod-quiz-attempt .que .answer .r0:hover,
+#page-mod-quiz-attempt .que .answer .r1:hover {
+    background: #e0f7ff !important;
+    border-color: #1CB0F6 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(28, 176, 246, 0.15) !important;
+}
+
+/* Selected answer styling */
+#page-mod-quiz-attempt .que .answer > div:has(input:checked),
+#page-mod-quiz-attempt .que .answer .r0:has(input:checked),
+#page-mod-quiz-attempt .que .answer .r1:has(input:checked) {
+    background: #cdf4ff !important;
+    border-color: #1CB0F6 !important;
+    box-shadow: 0 0 0 2px rgba(28, 176, 246, 0.1) !important;
+}
+
+/* Radio button styling */
+#page-mod-quiz-attempt .que .answer input[type="radio"] {
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 12px !important;
+    accent-color: #1CB0F6 !important;
+    cursor: pointer !important;
+}
+
+/* Flag and Edit buttons */
+#page-mod-quiz-attempt .que .info .questionflag,
+#page-mod-quiz-attempt .que .info .edit {
+    margin-top: 12px !important;
+}
+
+#page-mod-quiz-attempt .que .info .questionflag a,
+#page-mod-quiz-attempt .que .info .edit a {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    text-decoration: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    transition: all 0.2s ease !important;
+    display: inline-block !important;
+    margin: 2px !important;
+}
+
+#page-mod-quiz-attempt .que .info .questionflag a:hover,
+#page-mod-quiz-attempt .que .info .edit a:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    #page-mod-quiz-attempt .que .info {
+        width: 100% !important;
+        min-height: auto !important;
+        padding: 10px !important;
+        border-radius: 8px 8px 0 0 !important;
+    }
+    
+    #page-mod-quiz-attempt .que .content {
+        margin-left: 0 !important;
+        padding: 12px !important;
+    }
+    
+    #page-mod-quiz-attempt .que .info h3.no {
+        font-size: 16px !important;
     }
 }

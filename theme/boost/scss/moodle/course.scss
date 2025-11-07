@@ -1,3 +1,70 @@
+/* Ensure main content area uses the desired background color */
+#topofscroll.main-inner {
+    background: #F9FAFB !important;
+}
+body#page-course-view, #page, .page, .main-content {
+    background: #F9FAFB !important;
+}
+
+.section .btn, .section .icon, .section .activity-action, .section .arrow-icon {
+    margin-left: 8px !important;
+}
+// Custom blue background for arrow icon
+.section .btn, .section .icon, .section .activity-action, .section .arrow-icon {
+    background: #2196f3 !important;
+    color: #fff !important;
+}
+/* Set left drawer (course index) background to white */
+.drawer-left, .courseindex, #theme_boost-drawers-courseindex {
+     background: #fff !important;
+}
+.section:not(.sectionid-0) {
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.08);
+}
+.section * {
+    border: none !important;
+    box-shadow: none !important;
+}
+.section .activity-item,
+.section .activity-list,
+.section .content,
+.section .sectionname,
+.section .summary {
+    border: none !important;
+    box-shadow: none !important;
+}
+.section .activity-item,
+.section .activity-list,
+.section .content,
+.section .sectionname,
+.section .summary {
+    border: none !important;
+    box-shadow: none !important;
+}
+.section {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fff;
+    padding: 16px;
+    margin-bottom: 24px;
+    box-shadow: none;
+}
+
+// Remove border from inner elements
+.section .activity-item {
+    border: none !important;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: none;
+    padding: 12px 20px;
+    margin-bottom: 8px;
+}
+
+// Remove border from other section children
+.section > .content, .section .sectionname, .section .summary, .section .activity-list {
+    border: none !important;
+    box-shadow: none !important;
+}
 /* course.less */
 
 /* COURSE CONTENT */

@@ -1,0 +1,63 @@
+/* Right align course navigation and remove grey lines */
+.secondary-navigation {
+    display: flex !important;
+    justify-content: flex-end !important;
+    width: 100% !important;
+    border: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+/* Remove grey separator lines */
+.moremenu,
+.moremenu .nav,
+.moremenu .nav-tabs,
+.more-nav,
+.secondary-navigation .moremenu {
+    border: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+.secondary-navigation .moremenu {
+    margin-left: auto !important;
+}
+
+/* Handle overflow menu alignment */
+.secondary-navigation .dropdown .dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+}
+
+/* Ensure proper spacing in right-aligned menu */
+.secondary-navigation .nav-item {
+    margin-left: 0.5rem !important;
+}
+
+/* Remove active indicator and borders */
+.secondary-navigation .nav-link.active:before,
+.secondary-navigation .nav-link.active:after,
+.secondary-navigation .nav-link:before,
+.secondary-navigation .nav-link:after {
+    display: none !important;
+}
+
+.nav-tabs,
+.nav-tabs .nav-link,
+.nav-tabs .nav-item.show .nav-link, 
+.nav-tabs .nav-link.active {
+    border: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+/* Ensure proper spacing for menu items */
+.moremenu .nav-link {
+    padding: 0.5rem 1rem !important;
+}
+
+/* Right align the more dropdown button */
+.moremenu .dropdownmoremenu {
+    margin-left: auto !important;
+}

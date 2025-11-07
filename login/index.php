@@ -212,32 +212,6 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
     /// Let's get them all set up.
         complete_user_login($user);
 
- $userid = $user->id;
-$containerName = "code-$userid";
-$volume = "C:/code-volumes/user$userid";
-$port = "808$userid";
-
-
-// Set your password here (customize as needed)
-$password = "mysecret";
-
-// Make sure the user's volume exists
-if (!is_dir($volume)) {
-    mkdir($volume, 0777, true);
-}
-
-// Remove old container if it exists (optional)
-shell_exec("cmd /c docker rm -f $containerName");
-
-// Launch the code-server container from your custom image (copy/paste disabled)
-$dockerCmd = "docker run -d --name $containerName -e PASSWORD=$password -e EXTENSIONS_GALLERY= -v \"$volume:/home/coder/project\" -p $port:8080 -p 3000:3000 my-code-server-node";
-
-
-
-shell_exec("cmd /c $dockerCmd");
-echo "Done";
-
-
 
         \core\session\manager::apply_concurrent_login_limit($user->id, session_id());
 

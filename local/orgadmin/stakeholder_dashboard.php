@@ -1,185 +1,113 @@
 <?php
-// local/orgadmin/stakeholder_dashboard.php - Stakeholder Dashboard
-
-require_once('../../config.php');
-require_once('./role_detector.php');
-
-// Require login
-require_login();
-
-// Check if user should see stakeholder dashboard
-if (!orgadmin_role_detector::should_show_stakeholder_dashboard()) {
-    redirect(new moodle_url('/my/index.php'));
-}
-
-// Get parameters
-$assessment_id = optional_param('assessment', 0, PARAM_INT);
-$page = optional_param('page', 0, PARAM_INT);
-$perpage = 10;
-
-// Set up page
-$PAGE->set_url('/local/orgadmin/stakeholder_dashboard.php');
-$PAGE->set_context(context_system::instance());
-$PAGE->set_title('Stakeholder Dashboard');
-$PAGE->set_heading('');
-
-// Mock data functions - replace with real Moodle data
-function get_stakeholder_assessments() {
-    return [
-        [
-            'id' => 1,
-            'title' => 'Java Basics Assessment',
-            'total_students' => 45,
-            'completed' => 38,
-            'avg_score' => 78.5,
-            'status' => 'active'
-        ],
-        [
-            'id' => 2,
-            'title' => 'PHP Programming Assessment',
-            'total_students' => 32,
-            'completed' => 29,
-            'avg_score' => 82.3,
-            'status' => 'active'
-        ],
-        [
-            'id' => 3,
-            'title' => 'Python Fundamentals Assessment',
-            'total_students' => 28,
-            'completed' => 25,
-            'avg_score' => 75.8,
-            'status' => 'active'
-        ],
-        [
-            'id' => 4,
-            'title' => 'React Development Assessment',
-            'total_students' => 35,
-            'completed' => 30,
-            'avg_score' => 80.2,
-            'status' => 'active'
-        ]
-    ];
-}
-
-function get_student_heatmap_data($assessment_id) {
-    // Generate different student data based on assessment ID
-    $base_students = [
-        ['id' => 1, 'name' => 'John Smith', 'email' => 'john@example.com'],
-        ['id' => 2, 'name' => 'Emma Wilson', 'email' => 'emma@example.com'],
-        ['id' => 3, 'name' => 'Michael Brown', 'email' => 'michael@example.com'],
-        ['id' => 4, 'name' => 'Sarah Davis', 'email' => 'sarah@example.com'],
-        ['id' => 5, 'name' => 'David Miller', 'email' => 'david@example.com'],
-        ['id' => 6, 'name' => 'Lisa Anderson', 'email' => 'lisa@example.com'],
-        ['id' => 7, 'name' => 'James Wilson', 'email' => 'james@example.com'],
-        ['id' => 8, 'name' => 'Jennifer Taylor', 'email' => 'jennifer@example.com'],
-        ['id' => 9, 'name' => 'Robert Johnson', 'email' => 'robert@example.com'],
-        ['id' => 10, 'name' => 'Mary Williams', 'email' => 'mary@example.com'],
-        ['id' => 11, 'name' => 'Christopher Lee', 'email' => 'chris@example.com'],
-        ['id' => 12, 'name' => 'Amanda Garcia', 'email' => 'amanda@example.com'],
-        ['id' => 13, 'name' => 'Daniel Martinez', 'email' => 'daniel@example.com'],
-        ['id' => 14, 'name' => 'Ashley Rodriguez', 'email' => 'ashley@example.com'],
-        ['id' => 15, 'name' => 'Matthew Hernandez', 'email' => 'matthew@example.com'],
-        ['id' => 16, 'name' => 'Jessica Lopez', 'email' => 'jessica@example.com'],
-        ['id' => 17, 'name' => 'Joshua Gonzalez', 'email' => 'joshua@example.com'],
-        ['id' => 18, 'name' => 'Nicole Perez', 'email' => 'nicole@example.com'],
-        ['id' => 19, 'name' => 'Anthony Torres', 'email' => 'anthony@example.com'],
-        ['id' => 20, 'name' => 'Stephanie Rivera', 'email' => 'stephanie@example.com'],
-        // Add more students to test scrolling (simulate larger classes)
-        ['id' => 21, 'name' => 'Kevin Brown', 'email' => 'kevin@example.com'],
-        ['id' => 22, 'name' => 'Rachel Green', 'email' => 'rachel@example.com'],
-        ['id' => 23, 'name' => 'Mark Thompson', 'email' => 'mark@example.com'],
-        ['id' => 24, 'name' => 'Lisa Chen', 'email' => 'lisa.chen@example.com'],
-        ['id' => 25, 'name' => 'Alex Parker', 'email' => 'alex@example.com'],
-        ['id' => 26, 'name' => 'Sophie Miller', 'email' => 'sophie@example.com'],
-        ['id' => 27, 'name' => 'Tom Wilson', 'email' => 'tom@example.com'],
-        ['id' => 28, 'name' => 'Anna Davis', 'email' => 'anna@example.com'],
-        ['id' => 29, 'name' => 'Chris Martin', 'email' => 'chris.martin@example.com'],
-        ['id' => 30, 'name' => 'Maya Patel', 'email' => 'maya@example.com'],
-        ['id' => 31, 'name' => 'Jake Johnson', 'email' => 'jake@example.com'],
-        ['id' => 32, 'name' => 'Emily White', 'email' => 'emily@example.com'],
-        ['id' => 33, 'name' => 'Ryan Clark', 'email' => 'ryan@example.com'],
-        ['id' => 34, 'name' => 'Grace Lee', 'email' => 'grace@example.com'],
-        ['id' => 35, 'name' => 'Nathan Hall', 'email' => 'nathan@example.com']
-    ];
-
-    // Generate different score patterns based on assessment type
-    $students = [];
-    foreach ($base_students as $student) {
-        $score = 0;
-
-        switch ($assessment_id) {
-            case 1: // Java Basics Assessment - Mixed performance
-                $scores = [95, 88, 92, 76, 85, 67, 91, 73, 89, 84, 55, 78, 82, 70, 86, 93, 79, 87, 64, 90,
-                          83, 77, 91, 68, 85, 72, 88, 75, 81, 79, 86, 74, 89, 76, 83];
-                $score = $scores[$student['id'] - 1] ?? 75;
-                break;
-
-            case 2: // PHP Programming Assessment - Generally higher scores
-                $scores = [98, 91, 95, 83, 89, 77, 94, 81, 92, 88, 72, 85, 87, 79, 90, 96, 84, 91, 75, 93,
-                          89, 86, 94, 80, 92, 87, 95, 82, 90, 85, 93, 81, 96, 84, 91];
-                $score = $scores[$student['id'] - 1] ?? 85;
-                break;
-
-            case 3: // Python Fundamentals Assessment - Lower average scores
-                $scores = [82, 75, 88, 62, 71, 54, 86, 68, 77, 73, 43, 65, 74, 58, 79, 89, 66, 81, 51, 84,
-                          69, 72, 65, 58, 76, 63, 80, 67, 74, 61, 78, 64, 82, 69, 75];
-                $score = $scores[$student['id'] - 1] ?? 65;
-                break;
-
-            case 4: // React Development Assessment - Variable performance
-                $scores = [89, 94, 78, 85, 92, 69, 87, 76, 91, 83, 58, 81, 88, 72, 86, 95, 74, 89, 63, 92,
-                          85, 79, 93, 71, 88, 75, 91, 77, 84, 80, 87, 73, 90, 76, 89];
-                $score = $scores[$student['id'] - 1] ?? 80;
-                break;
-
-            default:
-                // Random scores for unknown assessments
-                $score = rand(40, 98);
-        }
-
-        $students[] = [
-            'id' => $student['id'],
-            'name' => $student['name'],
-            'email' => $student['email'],
-            'score' => $score
+require_once(__DIR__ . '/../../config.php');
+// Fetch org students' assessment scores for custom assessments (not quizzes)
+function get_org_student_assessment_scores($assessment_id) {
+    global $DB;
+    // Fetch all students with marks for this assessment
+    $sql = "SELECT t.student_id, u.firstname, u.lastname, u.email, t.total_marks
+            FROM {student_assessment_totals} t
+            JOIN {user} u ON u.id = t.student_id
+            WHERE t.question_id = ?";
+    $totals = $DB->get_records_sql($sql, [$assessment_id]);
+    $result = [];
+    foreach ($totals as $row) {
+        $result[] = [
+            'id' => $row->student_id,
+            'name' => $row->firstname . ' ' . $row->lastname,
+            'email' => $row->email,
+            'total_marks' => (float)$row->total_marks
         ];
     }
-
-    return $students;
+    return $result;
 }
 
-function get_student_details($student_id, $assessment_id) {
-    // Mock detailed student performance data
-    return [
-        'id' => $student_id,
-        'name' => 'John Smith',
-        'email' => 'john@example.com',
-        'overall_score' => 95,
-        'sections' => [
-            ['name' => 'Theory Questions', 'score' => 18, 'max_score' => 20, 'percentage' => 90],
-            ['name' => 'Practical Problems', 'score' => 28, 'max_score' => 30, 'percentage' => 93.3],
-            ['name' => 'Code Review', 'score' => 24, 'max_score' => 25, 'percentage' => 96],
-            ['name' => 'Best Practices', 'score' => 22, 'max_score' => 25, 'percentage' => 88]
-        ],
-        'time_spent' => '45 minutes',
-        'completion_date' => '2025-09-10 14:30:00',
-        'attempts' => 1
-    ];
+
+
+$perpage = 10;
+
+global $DB;
+
+// Get courseid and assessment_id from GET parameters
+$courseid = isset($_GET['courseid']) ? intval($_GET['courseid']) : 0;
+$assessment_id = isset($_GET['assessment']) ? intval($_GET['assessment']) : 0;
+
+// Detect stakeholder's organization category
+$orgcatid = 0;
+if (!empty($USER->id)) {
+    $orgcatid = $DB->get_field_sql('SELECT ctx.instanceid FROM {role_assignments} ra JOIN {context} ctx ON ctx.id = ra.contextid WHERE ra.userid = ? AND ctx.contextlevel = 40 LIMIT 1', [$USER->id]);
+}
+// Fetch only courses for stakeholder's organization
+if ($orgcatid) {
+    $courses = $DB->get_records_sql('SELECT id, fullname FROM {course} WHERE category = ? ORDER BY fullname', [$orgcatid]);
+} else {
+    $courses = [];
 }
 
-$assessments = get_stakeholder_assessments();
-$selected_assessment = null;
-$heatmap_data = null;
-
-if ($assessment_id > 0) {
-    foreach ($assessments as $assessment) {
-        if ($assessment['id'] == $assessment_id) {
-            $selected_assessment = $assessment;
-            $heatmap_data = get_student_heatmap_data($assessment_id);
-            break;
-        }
+// Fetch all available assessments for this course
+$assessments = [];
+if ($courseid) {
+    $assessment_records = $DB->get_records_sql('SELECT id AS question_id, qtitle FROM {local_questions} WHERE courseid = ?', [$courseid]);
+    foreach ($assessment_records as $rec) {
+        $completed = $DB->count_records('student_assessment_totals', ['question_id' => $rec->question_id, 'courseid' => $courseid]);
+        $total_students = $completed;
+        $avg_score = $DB->get_field_sql('SELECT AVG(total_marks) FROM {student_assessment_totals} WHERE question_id = ? AND courseid = ?', [$rec->question_id, $courseid]);
+        $assessments[] = [
+            'id' => $rec->question_id,
+            'title' => $rec->qtitle ? $rec->qtitle : ('Assessment ' . $rec->question_id),
+            'completed' => $completed,
+            'total_students' => $total_students,
+            'avg_score' => round($avg_score, 1)
+        ];
     }
 }
+
+// Set selected assessment info
+$selected_assessment = null;
+foreach ($assessments as $assessment) {
+    if ($assessment_id && $assessment['id'] == $assessment_id) {
+        $selected_assessment = $assessment;
+        break;
+    }
+}
+
+// Fetch heatmap data for selected assessment in this course
+$heatmap_data = [];
+if ($assessment_id && $courseid) {
+    $sql = "SELECT t.student_id, u.firstname, u.lastname, u.email, t.total_marks
+            FROM {student_assessment_totals} t
+            JOIN {user} u ON u.id = t.student_id
+            WHERE t.question_id = ? AND t.courseid = ?";
+    $totals = $DB->get_records_sql($sql, [$assessment_id, $courseid]);
+    foreach ($totals as $row) {
+        $heatmap_data[] = [
+            'id' => $row->student_id,
+            'name' => $row->firstname . ' ' . $row->lastname,
+            'email' => $row->email,
+            'total_marks' => (float)$row->total_marks
+        ];
+    }
+}
+
+// Fetch overall heatmap data for all assessments in a course
+if (!empty($_GET['overall']) && $courseid) {
+    $sql = "SELECT t.student_id, u.firstname, u.lastname, u.email, SUM(t.total_marks) AS overall_marks
+            FROM {student_assessment_totals} t
+            JOIN {user} u ON u.id = t.student_id
+            WHERE t.courseid = ?
+            GROUP BY t.student_id, u.firstname, u.lastname, u.email";
+    $totals = $DB->get_records_sql($sql, [$courseid]);
+    $heatmap_data = [];
+    foreach ($totals as $row) {
+        $heatmap_data[] = [
+            'id' => $row->student_id,
+            'name' => $row->firstname . ' ' . $row->lastname,
+            'email' => $row->email,
+            'total_marks' => (float)$row->overall_marks
+        ];
+    }
+}
+
+// ...existing code...
 
 // Start output
 echo $OUTPUT->header();
@@ -314,12 +242,17 @@ body {
     background: #58CC02;
     color: white;
     border: none;
-    padding: 8px 16px;
+    padding: 8px 24px;
     border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    width: 100%;
+    width: auto;
+    min-width: 160px;
+    max-width: 220px;
+    display: block;
+    margin-left: 0;
+    margin-top: 0;
     transition: background-color 0.2s;
 }
 
@@ -582,7 +515,10 @@ body {
                 <span class="material-icons">calendar_today</span>
                 <?php echo date('D, j M Y'); ?>
             </div>
-            <p class="stakeholder-welcome-subtitle">Monitor and analyze student assessment performance</p>
+            <p class="stakeholder-welcome-subtitle">
+                Monitor and analyze student quiz performance
+                <br><strong>Organization: <?php echo htmlspecialchars($organization_name); ?></strong>
+            </p>
         </div>
         <div style="position: relative; z-index: 2;">
             <div style="display: flex; align-items: center; gap: 15px;">
@@ -612,26 +548,215 @@ body {
     </div>
 
     <div class="stakeholder-main-content">
-        <!-- Assessment List (Left Sidebar) -->
+        <!-- Course List (Left Sidebar) -->
         <div class="assessment-list">
-            <h3>Assessment Overview</h3>
-            <?php foreach ($assessments as $assessment): ?>
-                <div class="assessment-item <?php echo ($assessment_id == $assessment['id']) ? 'active' : ''; ?>">
-                    <div class="assessment-title"><?php echo htmlspecialchars($assessment['title']); ?></div>
-                    <div class="assessment-stats">
-                        <span><?php echo $assessment['completed']; ?>/<?php echo $assessment['total_students']; ?> completed</span>
-                        <span>Avg: <?php echo $assessment['avg_score']; ?>%</span>
-                    </div>
-                    <button class="view-btn" onclick="viewAssessment(<?php echo $assessment['id']; ?>)">
-                        View Student Heatmap
-                    </button>
+            <h3>Courses</h3>
+            <input type="text" id="course-search" placeholder="Search courses..." style="width: 100%; margin-bottom: 12px; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 15px;">
+            <div id="course-list-container">
+            <?php if (empty($courses)): ?>
+                <div style="text-align: center; padding: 40px 20px; color: #64748b;">
+                    <div class="material-icons" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;">school</div>
+                    <p><strong>No Courses Available</strong></p>
                 </div>
-            <?php endforeach; ?>
+            <?php else: ?>
+                <?php foreach ($courses as $course): ?>
+                    <div class="assessment-item <?php echo ($courseid == $course->id) ? 'active' : ''; ?>">
+                        <div class="assessment-title"><?php echo htmlspecialchars($course->fullname); ?></div>
+                        <button class="view-btn" onclick="viewCourseHeatmap(<?php echo $course->id; ?>)">
+                            View Student Heatmap
+                        </button>
+                        <button class="view-btn" style="background:#1CB0F6;margin-top:10px;" onclick="viewOverallHeatmap(<?php echo $course->id; ?>)">
+                            View Overall Assessment Heatmap
+                        </button>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            </div>
+            <script>
+            // Simple client-side search for courses
+            document.getElementById('course-search').addEventListener('input', function() {
+                var filter = this.value.toLowerCase();
+                var items = document.querySelectorAll('#course-list-container .assessment-item');
+                items.forEach(function(item) {
+                    var title = item.querySelector('.assessment-title').textContent.toLowerCase();
+                    if (title.indexOf(filter) > -1) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // Handler for overall heatmap button
+            function viewOverallHeatmap(courseid) {
+                window.location.href = '?courseid=' + courseid + '&overall=1';
+            }
+            </script>
         </div>
 
         <!-- Heatmap Area (Right) -->
         <div class="heatmap-container">
-            <?php if ($selected_assessment && $heatmap_data): ?>
+            <?php if (!empty($_GET['overall']) && $courseid): ?>
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                    <button class="export-btn" onclick="exportOverallData()">
+                        <span class="material-icons" style="font-size: 18px;">download</span>
+                        Export Data
+                    </button>
+                </div>
+                <!-- Assessment Filter Dropdown for overall heatmap view -->
+                <div style="margin-bottom:20px;">
+                    <label for="assessment-overall-filter" style="font-weight:600; margin-right:10px;">Filter by Assessment:</label>
+                    <select id="assessment-overall-filter" style="padding:6px 12px; border-radius:6px; border:1px solid #cbd5e1; font-size:15px;">
+                        <option value="all" <?php if (!empty($_GET['overall'])) echo 'selected'; ?>>All Assessments</option>
+                        <?php foreach ($assessments as $assessment): ?>
+                            <option value="<?php echo $assessment['id']; ?>" <?php if ($assessment_id == $assessment['id']) echo 'selected'; ?>><?php echo htmlspecialchars($assessment['title']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <script>
+                document.getElementById('assessment-overall-filter').addEventListener('change', function() {
+                    var val = this.value;
+                    var courseid = <?php echo json_encode($courseid); ?>;
+                    if (val === 'all') {
+                        window.location.href = '?courseid=' + courseid + '&overall=1';
+                    } else {
+                        window.location.href = '?courseid=' + courseid + '&assessment=' + val;
+                    }
+                });
+                </script>
+                <h3 class="heatmap-title">Overall Assessment Heatmap</h3>
+                <!-- Debug output removed -->
+                <div class="heatmap-scroll-container">
+                    <?php if (empty($heatmap_data)): ?>
+                        <div style="text-align:center; padding:40px 20px; color:#64748b;">
+                            <div class="material-icons" style="font-size:48px; margin-bottom:16px; opacity:0.5;">quiz</div>
+                            <p><strong>No combined results available for this course.</strong></p>
+                        </div>
+                    <?php else: ?>
+                        <div id="studentHeatmap"></div>
+                    <?php endif; ?>
+                </div>
+            <?php elseif ($courseid && empty($assessment_id)): ?>
+                <h3 class="heatmap-title">Assessments for Selected Course</h3>
+                <!-- Assessment Filter Dropdown for assessment list -->
+                <div style="margin-bottom:20px;">
+                    <label for="assessment-list-filter" style="font-weight:600; margin-right:10px;">Filter by Assessment:</label>
+                    <select id="assessment-list-filter" style="padding:6px 12px; border-radius:6px; border:1px solid #cbd5e1; font-size:15px;">
+                        <option value="all">All Assessments</option>
+                        <?php foreach ($assessments as $assessment): ?>
+                            <option value="<?php echo $assessment['id']; ?>" <?php if ($assessment_id == $assessment['id']) echo 'selected'; ?>><?php echo htmlspecialchars($assessment['title']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <script>
+                document.getElementById('assessment-list-filter').addEventListener('change', function() {
+                    var val = this.value;
+                    var courseid = <?php echo json_encode($courseid); ?>;
+                    if (val === 'all') {
+                        window.location.href = '?courseid=' + courseid;
+                    } else {
+                        window.location.href = '?courseid=' + courseid + '&assessment=' + val;
+                    }
+                });
+                </script>
+                <div id="assessment-list-container">
+                <?php if (empty($assessments)): ?>
+                    <div style="text-align: center; padding: 40px 20px; color: #64748b;">
+                        <div class="material-icons" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;">quiz</div>
+                        <p><strong>No Assessments Available</strong></p>
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($assessments as $assessment): ?>
+                        <?php if (!$assessment_id || $assessment_id == $assessment['id']): ?>
+                        <div class="assessment-item <?php echo ($assessment_id == $assessment['id']) ? 'active' : ''; ?>">
+                            <div class="assessment-title"><?php echo htmlspecialchars($assessment['title']); ?></div>
+                            <div class="assessment-stats">
+                                <span><?php echo $assessment['completed']; ?>/<?php echo $assessment['total_students']; ?> completed</span>
+                                <span>Avg: <?php echo $assessment['avg_score']; ?>%</span>
+                            </div>
+                            <button class="view-btn" onclick="viewAssessment(<?php echo $assessment['id']; ?>, <?php echo $courseid; ?>)">
+                                View Student Marks
+                            </button>
+                        </div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                </div>
+            <?php elseif ($selected_assessment && $heatmap_data): ?>
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Only run for individual assessment view
+                    var studentData = <?php echo json_encode($heatmap_data); ?>;
+                    if (studentData && studentData.length > 0 && document.getElementById('studentHeatmap')) {
+                        // Prepare data for bar chart
+                        var names = studentData.map(function(s) { return s.name; });
+                        var scores = studentData.map(function(s) { return s.total_marks || s.score; });
+                        var chartDom = document.getElementById('studentHeatmap');
+                        var chart = echarts.init(chartDom);
+                        var option = {
+                            tooltip: {
+                                trigger: 'axis',
+                                axisPointer: { type: 'none' }
+                            },
+                            xAxis: {
+                                type: 'category',
+                                data: names,
+                                axisLabel: { rotate: 30, fontSize: 12 }
+                            },
+                            yAxis: {
+                                type: 'value',
+                                name: 'Marks',
+                                min: 0,
+                                max: 100
+                            },
+                            series: [{
+                                data: scores,
+                                type: 'bar',
+                                barWidth: '30%', // Slightly thinner bars
+                                barCategoryGap: '0%', // No gap between bars
+                                itemStyle: {
+                                    color: function(params) {
+                                        var score = params.value;
+                                        if (score >= 90) return '#059669';
+                                        if (score >= 80) return '#22c55e';
+                                        if (score >= 60) return '#eab308';
+                                        if (score >= 40) return '#f59e0b';
+                                        return '#dc2626';
+                                    }
+                                },
+                                label: {
+                                    show: true,
+                                    position: 'top',
+                                    formatter: '{c}%'
+                                },
+                                emphasis: {} // Remove hover background effect
+                            }]
+                        };
+                        chart.setOption(option);
+                    }
+                });
+                </script>
+                <!-- Assessment Filter Dropdown for heatmap view -->
+                <div style="margin-bottom:20px;">
+                    <label for="assessment-heatmap-filter" style="font-weight:600; margin-right:10px;">Filter by Assessment:</label>
+                    <select id="assessment-heatmap-filter" style="padding:6px 12px; border-radius:6px; border:1px solid #cbd5e1; font-size:15px;">
+                        <option value="all">All Assessments</option>
+                        <?php foreach ($assessments as $assessment): ?>
+                            <option value="<?php echo $assessment['id']; ?>" <?php if ($assessment_id == $assessment['id']) echo 'selected'; ?>><?php echo htmlspecialchars($assessment['title']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <script>
+                document.getElementById('assessment-heatmap-filter').addEventListener('change', function() {
+                    var val = this.value;
+                    var courseid = <?php echo json_encode($courseid); ?>;
+                    if (val === 'all') {
+                        window.location.href = '?courseid=' + courseid;
+                    } else {
+                        window.location.href = '?courseid=' + courseid + '&assessment=' + val;
+                    }
+                });
+                </script>
                 <div class="heatmap-header">
                     <h3 class="heatmap-title"><?php echo htmlspecialchars($selected_assessment['title']); ?> - Student Performance</h3>
                     <button class="export-btn" onclick="exportData()">
@@ -668,9 +793,9 @@ body {
                 </div>
             <?php else: ?>
                 <div class="empty-state">
-                    <div class="material-icons">assessment</div>
-                    <h3>Select an Assessment</h3>
-                    <p>Choose an assessment from the left panel to view the student performance heatmap.</p>
+                    <div class="material-icons">school</div>
+                    <h3>Select a Course</h3>
+                    <p>Choose a course from the left panel to view its assessments and student marks.</p>
                 </div>
             <?php endif; ?>
         </div>
@@ -691,157 +816,143 @@ body {
 </div>
 
 <script>
-let currentAssessmentId = <?php echo $assessment_id; ?>;
-let heatmapChart = null;
-
-<?php if ($selected_assessment && $heatmap_data): ?>
-// Initialize heatmap on page load
+function exportOverallData() {
+    // Create CSV data for overall heatmap
+    const studentData = <?php echo json_encode($heatmap_data ?? []); ?>;
+    if (!studentData || studentData.length === 0) {
+        alert('No data to export');
+        return;
+    }
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Student Name,Email,Overall Marks (%)\n";
+    studentData.forEach(student => {
+        csvContent += `"${student.name}","${student.email}",${student.total_marks}\n`;
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "overall_assessment_heatmap.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+// Only run heatmap for overall assessment view
 document.addEventListener('DOMContentLoaded', function() {
-    initializeHeatmap();
+    <?php if (!empty($_GET['overall'])): ?>
+    var studentData = <?php echo json_encode($heatmap_data); ?>;
+    if (studentData && studentData.length > 0 && document.getElementById('studentHeatmap')) {
+        // Heatmap logic (unchanged)
+        let currentAssessmentId = <?php echo $assessment_id; ?>;
+        let heatmapChart = null;
+        function getScoreColor(score) {
+            if (score >= 90) return '#059669';
+            if (score >= 80) return '#22c55e';
+            if (score >= 60) return '#eab308';
+            if (score >= 40) return '#f59e0b';
+            return '#dc2626';
+        }
+        const studentsPerRow = 9;
+        const totalStudents = studentData.length;
+        const totalRows = Math.ceil(totalStudents / studentsPerRow);
+        const cellWidth = 80;
+        const cellHeight = 80;
+        const totalWidth = studentsPerRow * cellWidth + 40;
+        const totalHeight = totalRows * cellHeight + 40;
+        const chartDom = document.getElementById('studentHeatmap');
+        chartDom.style.width = totalWidth + 'px';
+        chartDom.style.height = totalHeight + 'px';
+        const heatmapData = [];
+        studentData.forEach((student, index) => {
+            const row = Math.floor(index / studentsPerRow);
+            const col = index % studentsPerRow;
+            const marks = (typeof student.total_marks !== 'undefined') ? student.total_marks : student.score;
+            heatmapData.push([
+                col,
+                row,
+                marks,
+                student.name,
+                student.id,
+                getScoreColor(marks)
+            ]);
+        });
+        heatmapChart = echarts.init(chartDom);
+        const option = {
+            tooltip: {
+                trigger: 'item',
+                formatter: function(params) {
+                    const [col, row, score, name, id] = params.data;
+                    return `<strong>${name}</strong><br/>Marks: ${score}`;
+                }
+            },
+            grid: {
+                left: '20px',
+                right: '20px',
+                top: '20px',
+                bottom: '20px',
+                containLabel: false
+            },
+            xAxis: {
+                type: 'category',
+                data: Array.from({length: studentsPerRow}, (_, i) => ''),
+                splitArea: { show: false },
+                axisLabel: { show: false },
+                axisTick: { show: false },
+                axisLine: { show: false }
+            },
+            yAxis: {
+                type: 'category',
+                data: Array.from({length: Math.ceil(studentData.length / studentsPerRow)}, (_, i) => ''),
+                splitArea: { show: false },
+                axisLabel: { show: false },
+                axisTick: { show: false },
+                axisLine: { show: false }
+            },
+            series: [{
+                name: 'Student Scores',
+                type: 'heatmap',
+                data: heatmapData,
+                label: {
+                    show: true,
+                    formatter: function(params) {
+                        const [col, row, score, name, id, color] = params.data;
+                        return name.split(' ').map(n => n.charAt(0)).join('') + '\n' + score + '%';
+                    },
+                    fontSize: 10,
+                    fontWeight: 'bold'
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                },
+                itemStyle: {
+                    borderColor: '#fff',
+                    borderWidth: 2,
+                    color: function(params) {
+                        const [col, row, score, name, id, customColor] = params.data;
+                        return customColor;
+                    }
+                }
+            }]
+        };
+        heatmapChart.setOption(option);
+        heatmapChart.on('click', function(params) {
+            if (params.componentType === 'series') {
+                const [col, row, score, name, studentId, color] = params.data;
+                showStudentDetails(studentId, name);
+            }
+        });
+    }
+    <?php endif; ?>
 });
 
-function initializeHeatmap() {
-    const chartDom = document.getElementById('studentHeatmap');
-    heatmapChart = echarts.init(chartDom);
-
-    // Student data from PHP
-    const studentData = <?php echo json_encode($heatmap_data); ?>;
-
-    // Function to get color based on score
-    function getScoreColor(score) {
-        if (score >= 90) return '#059669'; // Dark green for 90-100%
-        if (score >= 80) return '#22c55e'; // Light green for 80-89%
-        if (score >= 60) return '#eab308'; // Yellow for 60-79%
-        if (score >= 40) return '#f59e0b'; // Orange for 40-59%
-        return '#dc2626'; // Red for 0-39%
-    }
-
-    // Calculate dynamic dimensions
-    const studentsPerRow = 9; // 9 students per row (9x9 grid)
-    const totalStudents = studentData.length;
-    const totalRows = Math.ceil(totalStudents / studentsPerRow);
-    const actualColumnsInLastRow = totalStudents % studentsPerRow || studentsPerRow;
-
-    // Cell dimensions
-    const cellWidth = 80;  // Width of each student cell
-    const cellHeight = 80; // Height of each student cell (square)
-
-    // Calculate total dimensions based on actual data
-    const totalWidth = studentsPerRow * cellWidth + 40; // Add padding
-    const totalHeight = totalRows * cellHeight + 40; // Add padding
-
-    // Set chart container size
-    chartDom.style.width = totalWidth + 'px';
-    chartDom.style.height = totalHeight + 'px';
-
-    // Prepare data for heatmap (grid layout)
-    const heatmapData = [];
-
-    studentData.forEach((student, index) => {
-        const row = Math.floor(index / studentsPerRow);
-        const col = index % studentsPerRow;
-
-        heatmapData.push([
-            col, // x coordinate
-            row, // y coordinate
-            student.score, // value for color
-            student.name,
-            student.id,
-            getScoreColor(student.score) // custom color
-        ]);
-    });
-
-    const option = {
-        tooltip: {
-            trigger: 'item',
-            formatter: function(params) {
-                const [col, row, score, name, id] = params.data;
-                return `<strong>${name}</strong><br/>Score: ${score}%`;
-            }
-        },
-        grid: {
-            left: '20px',
-            right: '20px',
-            top: '20px',
-            bottom: '20px',
-            containLabel: false
-        },
-        xAxis: {
-            type: 'category',
-            data: Array.from({length: studentsPerRow}, (_, i) => ''),
-            splitArea: {
-                show: false
-            },
-            axisLabel: {
-                show: false
-            },
-            axisTick: {
-                show: false
-            },
-            axisLine: {
-                show: false
-            }
-        },
-        yAxis: {
-            type: 'category',
-            data: Array.from({length: Math.ceil(studentData.length / studentsPerRow)}, (_, i) => ''),
-            splitArea: {
-                show: false
-            },
-            axisLabel: {
-                show: false
-            },
-            axisTick: {
-                show: false
-            },
-            axisLine: {
-                show: false
-            }
-        },
-        series: [{
-            name: 'Student Scores',
-            type: 'heatmap',
-            data: heatmapData,
-            label: {
-                show: true,
-                formatter: function(params) {
-                    const [col, row, score, name, id, color] = params.data;
-                    return name.split(' ').map(n => n.charAt(0)).join('') + '\n' + score + '%';
-                },
-                fontSize: 10,
-                fontWeight: 'bold'
-            },
-            emphasis: {
-                itemStyle: {
-                    shadowBlur: 10,
-                    shadowColor: 'rgba(0, 0, 0, 0.5)'
-                }
-            },
-            itemStyle: {
-                borderColor: '#fff',
-                borderWidth: 2,
-                color: function(params) {
-                    const [col, row, score, name, id, customColor] = params.data;
-                    return customColor;
-                }
-            }
-        }]
-    };
-
-    heatmapChart.setOption(option);
-
-    // Add click event
-    heatmapChart.on('click', function(params) {
-        if (params.componentType === 'series') {
-            const [col, row, score, name, studentId, color] = params.data;
-            showStudentDetails(studentId, name);
-        }
-    });
+function viewCourseHeatmap(courseId) {
+    window.location.href = `stakeholder_dashboard.php?courseid=${courseId}`;
 }
-<?php endif; ?>
 
-function viewAssessment(assessmentId) {
-    window.location.href = `stakeholder_dashboard.php?assessment=${assessmentId}`;
+function viewAssessment(assessmentId, courseId) {
+    window.location.href = `stakeholder_dashboard.php?courseid=${courseId}&assessment=${assessmentId}`;
 }
 
 function showStudentDetails(studentId, studentName) {
@@ -1056,7 +1167,8 @@ function exportData() {
     csvContent += "Student Name,Email,Score (%),Assessment\n";
 
     studentData.forEach(student => {
-        csvContent += `"${student.name}","${student.email}",${student.score},"${assessmentTitle}"\n`;
+        const marks = (typeof student.total_marks !== 'undefined') ? student.total_marks : student.score;
+        csvContent += `"${student.name}","${student.email}",${marks},"${assessmentTitle}"\n`;
     });
 
     const encodedUri = encodeURI(csvContent);

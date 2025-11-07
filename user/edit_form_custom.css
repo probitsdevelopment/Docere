@@ -1,0 +1,64 @@
+/* Custom UI for General section in user edit form */
+.user-edit-general-card {
+    background: #f8f9fb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding: 32px 24px 24px 24px;
+    margin-bottom: 32px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.user-edit-general-card .fheader {
+    font-size: 1.3em;
+    font-weight: 700;
+    margin-bottom: 24px;
+    background: none;
+    border: none;
+    padding: 0;
+}
+.user-edit-general-card .form-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 16px;
+}
+.user-edit-general-card .form-group > .form-item {
+    flex: 1 1 45%;
+    min-width: 220px;
+}
+.user-edit-general-card textarea,
+.user-edit-general-card select,
+.user-edit-general-card input[type="text"],
+.user-edit-general-card input[type="email"] {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 15px;
+    background: #fff;
+    margin-top: 6px;
+    margin-bottom: 0;
+    box-sizing: border-box;
+}
+.user-edit-general-card textarea {
+    min-height: 80px;
+    flex-basis: 100%;
+}
+.user-edit-general-card label {
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 4px;
+    display: block;
+}
+.user-edit-general-card .form-item {
+    margin-bottom: 0;
+}
+@media (max-width: 700px) {
+    .user-edit-general-card .form-group {
+        flex-direction: column;
+        gap: 16px 0;
+    }
+    .user-edit-general-card .form-group > .form-item {
+        min-width: 100%;
+    }
+}

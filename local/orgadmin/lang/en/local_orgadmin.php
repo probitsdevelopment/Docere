@@ -1,7 +1,7 @@
 <?php
 // English strings for local_orgadmin.
 
-$string['pluginname'] = 'Org Admin Dashboard';
+$string['pluginname'] = 'User';
 
 // Capability string (needed for db/access.php).
 $string['orgadmin:adduser'] = 'Can add/assign users within their organization';

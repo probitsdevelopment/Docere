@@ -39,6 +39,11 @@ html, body {
 
 /* Override Moodle container constraints */
 #page-wrapper,
+/* Ensure avatar background is transparent */
+.character-avatar {
+    background: transparent !important;
+    box-shadow: none !important;
+}
 #page,
 #page-content,
 .container-fluid,
@@ -140,6 +145,14 @@ html, body {
     margin: 0 0 4px 0;
     color: #2d3436;
 }
+/* Set welcome banner height to 156px */
+.welcome-section {
+     height: 156px !important;
+     min-height: 156px !important;
+     max-height: 156px !important;
+     display: flex;
+     align-items: center;
+}
 
 .welcome-date {
     display: flex;
@@ -188,17 +201,17 @@ html, body {
     border-left-color: rgba(255,255,255,0.8);
 }
 
-.character-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: #ff7675;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    border: 2px solid rgba(255,255,255,0.2);
-}
+// .character-avatar {
+//     width: 60px;
+//     height: 60px;
+//     border-radius: 50%;
+//     background: #ff7675;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     font-size: 26px;
+//     border: 2px solid rgba(255,255,255,0.2);
+// }
 
 /* Main content area - with sidebar layout */
 .dashboard-content {
@@ -711,7 +724,7 @@ echo html_writer::end_div();
 
 echo html_writer::start_div('character-section');
 echo html_writer::div('Good to see you back, ' . $USER->firstname . '. Ready to learn?', 'speech-bubble');
-echo html_writer::div('🧑‍🎓', 'character-avatar');
+echo html_writer::div('<img src="image.png" alt="Student Avatar" style="height: 120px; width: 120px; object-fit: contain;">', 'character-avatar');
 echo html_writer::end_div();
 
 echo html_writer::end_div(); // End welcome section
@@ -776,27 +789,26 @@ echo html_writer::start_div('tab-content', ['id' => 'content-past']);
 echo html_writer::start_div('assessment-cards');
 
 // Past assessment cards
-echo html_writer::start_div('past-assessment-card');
-echo html_writer::start_div('score-badge');
-echo html_writer::span('📊', '');
-echo html_writer::span('18/20', 'score-number');
-echo html_writer::span('Score', 'score-label');
-echo html_writer::end_div();
-echo html_writer::div('Java Basics Test', 'assessment-title');
-echo html_writer::div('Completed on: 20 July 2025', 'completion-date');
-echo html_writer::link('#', 'View Report', ['class' => 'btn-view-report']);
-echo html_writer::end_div();
 
-echo html_writer::start_div('past-assessment-card');
-echo html_writer::start_div('score-badge');
-echo html_writer::span('📊', '');
-echo html_writer::span('18/20', 'score-number');
-echo html_writer::span('Score', 'score-label');
-echo html_writer::end_div();
-echo html_writer::div('Java Basics Test', 'assessment-title');
-echo html_writer::div('Completed on: 20 July 2025', 'completion-date');
-echo html_writer::link('#', 'View Report', ['class' => 'btn-view-report']);
-echo html_writer::end_div();
+// Fetch and display student's assessment scores from student_assessment_totals
+global $DB, $USER;
+$student_scores = $DB->get_records('student_assessment_totals', ['student_id' => $USER->id], 'submission_date DESC');
+if ($student_scores) {
+    foreach ($student_scores as $score) {
+        echo html_writer::start_div('past-assessment-card');
+        echo html_writer::start_div('score-badge');
+        echo html_writer::span('📊', '');
+        echo html_writer::span($score->total_marks, 'score-number');
+        echo html_writer::span('Score', 'score-label');
+        echo html_writer::end_div();
+        echo html_writer::div('Assessment ID: ' . $score->question_id, 'assessment-title');
+        echo html_writer::div('Completed on: ' . htmlspecialchars($score->submission_date), 'completion-date');
+        echo html_writer::link('#', 'View Report', ['class' => 'btn-view-report']);
+        echo html_writer::end_div();
+    }
+} else {
+    echo html_writer::div('No assessment results found.', 'completion-date');
+}
 
 // Navigation arrow for past assessments
 echo html_writer::div('→', 'nav-arrow');
@@ -850,41 +862,12 @@ echo html_writer::end_div(); // End main content
 // Sidebar
 echo html_writer::start_div('sidebar');
 
-// Calendar widget
-echo html_writer::start_div('calendar-widget');
-echo html_writer::div('September', 'calendar-header');
-
-// Generate calendar
-$currentMonth = 9; // September
-$currentYear = 2025;
-$daysInMonth = 30;
-$firstDay = 0; // Sunday
-
-echo html_writer::start_div('calendar-grid');
-
-// Days of week headers
-$daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-foreach ($daysOfWeek as $day) {
-    echo html_writer::div($day, 'calendar-day header');
-}
-
-// Empty cells for days before month starts
-for ($i = 0; $i < $firstDay; $i++) {
-    echo html_writer::div('', 'calendar-day');
-}
-
-// Days of current month
-$today = (int)date('j'); // Get current day of month
-for ($day = 1; $day <= $daysInMonth; $day++) {
-    $class = 'calendar-day';
-    if ($day == $today) { // Highlight today's date
-        $class .= ' today';
-    }
-    echo html_writer::div($day, $class);
-}
-
-echo html_writer::end_div(); // End calendar grid
-echo html_writer::end_div(); // End calendar widget
+// Calendar widget using Moodle's built-in mini calendar
+require_once($CFG->dirroot . '/calendar/lib.php');
+$calendarinfo = calendar_information::create(time(), SITEID);
+list($calendarviewdata, $template) = calendar_get_view($calendarinfo, 'mini');
+$minicalendarhtml = $OUTPUT->render_from_template($template, $calendarviewdata);
+echo html_writer::div($minicalendarhtml, 'calendar-widget');
 echo html_writer::end_div(); // End sidebar
 
 echo html_writer::end_div(); // End dashboard content

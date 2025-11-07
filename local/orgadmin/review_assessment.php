@@ -798,12 +798,12 @@ echo html_writer::start_div('settings-section');
 echo html_writer::tag('h3', 'Assessment Settings', ['class' => 'settings-title']);
 
 echo html_writer::start_div('checkbox-item');
-echo html_writer::empty_tag('input', ['type' => 'checkbox', 'id' => 'multiple-attempts', 'checked' => true]);
+echo html_writer::empty_tag('input', ['type' => 'checkbox', 'id' => 'multiple-attempts', 'name' => 'allow_multiple_attempts', 'value' => '1', 'checked' => true]);
 echo html_writer::tag('label', 'Allow multiple attempts', ['for' => 'multiple-attempts']);
 echo html_writer::end_div();
 
 echo html_writer::start_div('checkbox-item');
-echo html_writer::empty_tag('input', ['type' => 'checkbox', 'id' => 'email-notifications']);
+echo html_writer::empty_tag('input', ['type' => 'checkbox', 'id' => 'email-notifications', 'name' => 'send_email_notifications', 'value' => '1']);
 echo html_writer::tag('label', 'Send email notifications to students', ['for' => 'email-notifications']);
 echo html_writer::end_div();
 echo html_writer::end_div();
@@ -984,12 +984,39 @@ echo html_writer::end_div();
 
 echo html_writer::start_div('assessment-list', ['id' => 'assessment-list']);
 
-// Define assessment list data - matching LND dashboard exactly
-$listAssessments = [
-    ['id' => 'java-basics-1', 'title' => 'Java Basics Test', 'creator' => 'Anita Sharma', 'questions' => 1, 'time' => 45, 'students' => 156],
-    ['id' => 'assessment-1', 'title' => 'Advanced Java Programming', 'creator' => 'Anita Sharma', 'questions' => 5, 'time' => 90, 'students' => 89],
-    ['id' => 'assessment-2', 'title' => 'Database Fundamentals', 'creator' => 'Anita Sharma', 'questions' => 3, 'time' => 60, 'students' => 234]
-];
+// Get real assessment list data from database
+function get_real_assessment_list() {
+    global $DB;
+
+    try {
+        // Get all pending assessments from database
+        $assessments = $DB->get_records('orgadmin_assessments', ['status' => 'pending_review']);
+        $listAssessments = [];
+
+        foreach ($assessments as $assessment) {
+            // Get user info
+            $user = $DB->get_record('user', ['id' => $assessment->userid], 'firstname, lastname');
+            $creator_name = $user ? $user->firstname . ' ' . $user->lastname : 'Unknown User';
+
+            $listAssessments[] = [
+                'id' => $assessment->id,
+                'title' => $assessment->title,
+                'creator' => $creator_name,
+                'questions' => 1, // Default for now since we don't store question count
+                'time' => $assessment->duration ?: 45,
+                'students' => 0 // Default for now since we don't track this yet
+            ];
+        }
+
+        return $listAssessments;
+
+    } catch (Exception $e) {
+        error_log('Error getting assessment list: ' . $e->getMessage());
+        return []; // Return empty array instead of dummy data
+    }
+}
+
+$listAssessments = get_real_assessment_list();
 
 // Assessment cards
 foreach ($listAssessments as $index => $assessment) {
@@ -1157,8 +1184,59 @@ function approveAndAssign() {
         return;
     }
 
-    if (confirm(`✓ Approve and assign this assessment to ${selectedCount} selected students?`)) {
-        alert(`Assessment approved and assigned to ${selectedCount} students!\\n\\n• Students will be notified\\n• Assessment is now active\\n• Performance tracking enabled`);
+    // Get assessment settings
+    const allowMultipleAttempts = document.getElementById('multiple-attempts').checked ? 1 : 0;
+    const sendEmailNotifications = document.getElementById('email-notifications').checked ? 1 : 0;
+
+    // Get assessment ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const assessmentId = urlParams.get('id');
+
+    if (!assessmentId) {
+        alert('Error: Assessment ID not found');
+        return;
+    }
+
+    if (confirm(`✓ Approve and assign this assessment to ${selectedCount} selected students?\\n\\nSettings:\\n• Multiple attempts: ${allowMultipleAttempts ? 'Enabled' : 'Disabled'}\\n• Email notifications: ${sendEmailNotifications ? 'Enabled' : 'Disabled'}`)) {
+
+        // Create form data
+        const formData = new FormData();
+        formData.append('action', 'approve_and_assign');
+        formData.append('assessment_id', assessmentId);
+        formData.append('allow_multiple_attempts', allowMultipleAttempts);
+        formData.append('send_email_notifications', sendEmailNotifications);
+        formData.append('sesskey', M.cfg.sesskey);
+
+        // Collect selected students
+        const selectedStudents = Array.from(document.querySelectorAll("#selected-list .student-card")).map(card => {
+            return {
+                id: card.dataset.studentId,
+                name: card.querySelector('.student-name').textContent,
+                email: card.querySelector('.student-email').textContent
+            };
+        });
+        formData.append('selected_students', JSON.stringify(selectedStudents));
+
+        // Submit to assessment handler
+        fetch(M.cfg.wwwroot + '/local/orgadmin/assessment_handler.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Assessment approved and assigned successfully!\\n\\n• ${selectedCount} students assigned\\n• Settings applied\\n• ${sendEmailNotifications ? 'Email notifications sent' : 'No email notifications sent'}`);
+
+                // Redirect back to LND dashboard
+                window.location.href = M.cfg.wwwroot + '/local/orgadmin/lnd_dashboard.php';
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error occurred'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error submitting assessment approval');
+        });
     }
 }
 

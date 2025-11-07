@@ -39,6 +39,9 @@
     clear: none;
 }
 
+     a.nav-link[href*="coursecompetencies"] {
+          display: none !important;
+     }
 #page-user-profile .node_category,
 .path-user .node_category {
     ul {
@@ -105,23 +108,79 @@
 }
 
 .userlist table#participants {
-    text-align: center;
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    margin: 1rem 0 !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    overflow: hidden !important;
 }
 
 .userlist table#participants td {
     text-align: left;
-    padding: 4px;
+    padding: 12px 16px !important;
     vertical-align: middle;
+    border-right: 1px solid #f1f5f9 !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    font-size: 0.875rem !important;
+    color: #374151 !important;
+    background-color: white !important;
 }
+
 
 .userlist table#participants th {
     text-align: left;
-    padding: 4px;
+    padding: 12px 16px !important;
+    border-right: 1px solid #e5e7eb !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    color: #374151 !important;
+}
+
+// Make first column cells in participants table body white
+.userlist table#participants tbody th {
+    background-color: white !important;
+}
+
+.userlist table#participants thead tr th {
+    background-color: #D2EFFD !important;
+}
+
+/* Remove borders from last columns */
+.userlist table#participants td:last-child,
+.userlist table#participants th:last-child {
+    border-right: none !important;
+}
+
+/* Remove alternating row backgrounds - all white */
+.userlist table#participants tbody tr {
+    background-color: white !important;
+}
+
+.userlist table#participants tbody tr:nth-child(even) {
+    background-color: white !important;
+}
+
+.userlist table#participants tbody tr:nth-child(odd) {
+    background-color: white !important;
+}
+
+/* Hover effects */
+.userlist table#participants tr:hover {
+    background-color: #f8fafc !important;
+}
+
+.userlist table#participants tr:hover td {
+    background-color: #f8fafc !important;
 }
 
 .userlist {
     table.controls {
         width: 100%;
+        margin-bottom: 1rem;
 
         tr {
             vertical-align: top;
@@ -139,6 +198,49 @@
                 display: block;
             }
         }
+    }
+    
+    /* Style the dropdown at bottom */
+    select {
+        background: white !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 6px !important;
+        padding: 8px 12px !important;
+        font-size: 0.875rem !important;
+        color: #374151 !important;
+        min-width: 150px !important;
+    }
+    
+    /* Style checkboxes */
+    input[type="checkbox"] {
+        width: 16px !important;
+        height: 16px !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 4px !important;
+        margin: 0 !important;
+    }
+    
+    /* Style user links */
+    a {
+        color: #1f2937 !important;
+        text-decoration: none !important;
+        font-weight: 500 !important;
+        background-color: transparent !important;
+        
+        &:hover {
+            color: #1CB0F6 !important;
+            text-decoration: underline !important;
+            background-color: transparent !important;
+        }
+    }
+    
+    /* Remove gray background from user initials/avatars */
+    .userpicture,
+    .avatar,
+    .user-avatar,
+    .userinitials {
+        background-color: transparent !important;
+        background: transparent !important;
     }
 }
 
@@ -325,4 +427,531 @@
         }
 
     }
+}
+
+/* Change blue colors on participants/user pages to #1CB0F6 */
+
+/* Apply filters button - more specific selectors */
+.btn-primary,
+button.btn-primary,
+input[type="submit"].btn-primary,
+button[data-action="apply"],
+.userlist .btn-primary,
+.userlist button[type="submit"],
+input[value*="Apply"],
+button[value*="Apply"],
+.btn.btn-primary {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+    color: white !important;
+}
+
+.btn-primary:hover,
+button.btn-primary:hover,
+.userlist .btn-primary:hover,
+.userlist button[type="submit"]:hover {
+    background-color: #0ea5e9 !important;
+    border-color: #0ea5e9 !important;
+}
+
+/* Letter navigation buttons (A, B, C, etc.) - broader selectors */
+.page-user .btn,
+.initials-bar .btn,
+.letter-selector .btn,
+.alphabetical-selector .btn,
+.userlist .btn,
+.userlist .alphabetical-navigation .btn,
+.userlist .alpha .btn,
+.userlist a[data-filtervalue],
+a[href*="sort"],
+.page-content .btn-link {
+    background-color: transparent !important;
+    border-color: #e5e7eb !important;
+    color: #374151 !important;
+}
+
+/* Active/selected letter navigation buttons */
+.page-user .btn.active,
+.page-user .btn:active,
+.initials-bar .btn.active,
+.initials-bar .btn:active,
+.letter-selector .btn.active,
+.userlist .btn.active,
+.userlist .alphabetical-navigation .btn.active,
+.userlist .alphabetical-navigation .btn:active,
+.userlist .alpha .btn.active,
+.userlist .alpha .btn:active,
+.userlist a[data-filtervalue].active,
+a[href*="sort"].active {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+    color: white !important;
+}
+
+/* Hover state for letter navigation */
+.page-user .btn:hover,
+.initials-bar .btn:hover,
+.letter-selector .btn:hover,
+.userlist .btn:hover,
+.userlist .alphabetical-navigation .btn:hover,
+.userlist .alpha .btn:hover,
+.userlist a[data-filtervalue]:hover,
+a[href*="sort"]:hover {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+    color: white !important;
+}
+
+/* MODERN PARTICIPANTS TABLE STYLING */
+/* Clean, professional table design matching the screenshot */
+
+/* Main participants table styling */
+.userlist table#participants,
+.path-user table,
+.participants-table,
+table.generaltable,
+table.flexible {
+    background: white !important;
+    border: 1px solid #e1e5e9 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    margin: 1.5rem 0 !important;
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    overflow: hidden !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+/* Table header styling - cleaner design */
+.userlist table#participants th,
+.path-user table th,
+table.generaltable th,
+table.flexible th {
+    // background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+    border-bottom: 2px solid #e1e5e9 !important;
+    border-right: 1px solid #e8ecf0 !important;
+    border-left: none !important;
+    border-top: none !important;
+    padding: 16px 20px !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    color: #4a5568 !important;
+    text-align: left !important;
+    letter-spacing: 0.025em !important;
+    text-transform: none !important;
+}
+
+/* First header column special styling */
+.userlist table#participants th:first-child,
+.path-user table th:first-child {
+    border-top-left-radius: 12px !important;
+    padding-left: 24px !important;
+}
+
+/* Last header column special styling */
+.userlist table#participants th:last-child,
+.path-user table th:last-child {
+    border-right: none !important;
+    border-top-right-radius: 12px !important;
+    padding-right: 24px !important;
+}
+
+/* Table row styling - alternating with clean separation */
+.userlist table#participants tbody tr,
+.path-user table tbody tr,
+table.generaltable tbody tr,
+table.flexible tbody tr {
+    border-bottom: 1px solid #f4f6f8 !important;
+    transition: all 0.2s ease !important;
+    background-color: white !important;
+}
+
+/* Alternating row colors for better readability */
+.userlist table#participants tbody tr:nth-child(even),
+.path-user table tbody tr:nth-child(even) {
+    background-color: #fafbfc !important;
+}
+
+/* Table cell styling - improved spacing and typography */
+.userlist table#participants td,
+.path-user table td,
+table.generaltable td,
+table.flexible td {
+    padding: 16px 20px !important;
+    border-right: 1px solid #f4f6f8 !important;
+    border-left: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    font-size: 0.875rem !important;
+    color: #2d3748 !important;
+    vertical-align: middle !important;
+    line-height: 1.5 !important;
+}
+
+/* First cell in each row */
+.userlist table#participants td:first-child,
+.path-user table td:first-child {
+    padding-left: 24px !important;
+    font-weight: 500 !important;
+}
+
+/* Last cell in each row */
+.userlist table#participants td:last-child,
+.path-user table td:last-child {
+    border-right: none !important;
+    padding-right: 24px !important;
+}
+
+/* Enhanced hover effect */
+.userlist table#participants tbody tr:hover,
+.path-user table tbody tr:hover {
+    background-color: #f0f9ff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.userlist table#participants tbody tr:hover td,
+.path-user table tbody tr:hover td {
+    color: #1a202c !important;
+}
+
+/* Checkbox styling - modern design */
+.userlist table#participants input[type="checkbox"],
+.path-user table input[type="checkbox"] {
+    width: 18px !important;
+    height: 18px !important;
+    border: 2px solid #cbd5e0 !important;
+    border-radius: 4px !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.userlist table#participants input[type="checkbox"]:checked,
+.path-user table input[type="checkbox"]:checked {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+}
+
+/* Status badges styling - matching screenshot */
+.userlist table#participants .badge,
+.path-user table .badge,
+.userlist table#participants span[class*="badge"],
+.path-user table span[class*="badge"] {
+    background-color: #10b981 !important;
+    color: white !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    padding: 4px 12px !important;
+    border-radius: 16px !important;
+    display: inline-block !important;
+    text-transform: capitalize !important;
+    letter-spacing: 0.025em !important;
+}
+
+/* Email links styling */
+.userlist table#participants a[href*="mailto"],
+.path-user table a[href*="mailto"] {
+    color: #1CB0F6 !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+}
+
+.userlist table#participants a[href*="mailto"]:hover,
+.path-user table a[href*="mailto"]:hover {
+    color: #0ea5e9 !important;
+    text-decoration: underline !important;
+}
+
+/* User names styling */
+.userlist table#participants a[href*="/user/"],
+.path-user table a[href*="/user/"] {
+    color: #2d3748 !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+}
+
+.userlist table#participants a[href*="/user/"]:hover,
+.path-user table a[href*="/user/"]:hover {
+    color: #1CB0F6 !important;
+}
+
+/* Action buttons styling */
+.userlist table#participants .action-icon,
+.path-user table .action-icon,
+.userlist table#participants .btn-link,
+.path-user table .btn-link {
+    padding: 6px !important;
+    margin: 0 2px !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+    opacity: 0.7 !important;
+}
+
+.userlist table#participants .action-icon:hover,
+.path-user table .action-icon:hover,
+.userlist table #participants .btn-link:hover,
+.path-user table .btn-link:hover {
+    background-color: #f7fafc !important;
+    opacity: 1 !important;
+}
+
+/* User name links */
+.userlist table#participants a,
+.path-user table a {
+    color: #1f2937 !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+}
+
+.userlist table#participants a:hover,
+.path-user table a:hover {
+    color: #1CB0F6 !important;
+    text-decoration: underline !important;
+}
+
+/* Override any existing table striping - all white background */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: white !important;
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: white !important;
+}
+
+/* Force all table rows to white background */
+.userlist .table-striped tbody tr,
+.userlist .table tbody tr,
+.userlist tbody tr {
+    background-color: white !important;
+}
+
+/* Remove gray background from user name cells and elements */
+.userlist table#participants td,
+.userlist table#participants .userpicture,
+.userlist table#participants .userinitials,
+.userlist table#participants .avatar {
+    background-color: white !important;
+    background: white !important;
+}
+
+/* Specifically target user name column */
+.userlist table#participants td:first-child,
+.userlist table#participants td .userpicture,
+.userlist table#participants td .userinitials {
+    background-color: white !important;
+    background: transparent !important;
+}
+
+/* Force remove gray background from all user elements */
+.userlist table#participants .userinitials,
+.userlist .userinitials,
+.userinitials,
+.user-initials,
+.avatar .userinitials,
+.userpicture .userinitials,
+td .userinitials,
+span.userinitials {
+    background-color: transparent !important;
+    background: none !important;
+    background-image: none !important;
+}
+
+/* Remove background from user picture containers */
+.userlist table#participants .userpicture,
+.userlist .userpicture,
+.userpicture {
+    background-color: transparent !important;
+    background: none !important;
+}
+
+/* Target any element with user initials */
+[class*="userinitials"],
+[class*="user-initials"],
+[class*="avatar"] {
+    background-color: white !important;
+    background: white !important;
+}
+
+/* More specific targeting for user initials with background colors */
+.userinitials,
+span.userinitials,
+div.userinitials,
+.user-initials,
+.avatar .userinitials,
+.userpicture .userinitials {
+    background-color: white !important;
+    background: white !important;
+    background-image: none !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* Target Bootstrap-style user avatars */
+.bg-primary,
+.bg-secondary,
+.bg-success,
+.bg-info,
+.bg-warning,
+.bg-danger,
+.bg-light,
+.bg-dark {
+    background-color: white !important;
+    background: white !important;
+    color: #374151 !important;
+}
+
+/* Target any colored background classes in user context */
+.userlist .bg-primary,
+.userlist .bg-secondary,
+.userlist .bg-success,
+.userlist .bg-info,
+.userlist .bg-warning,
+.userlist .bg-danger,
+.userlist .bg-light,
+.userlist .bg-dark,
+.path-user .bg-primary,
+.path-user .bg-secondary,
+.path-user .bg-success,
+.path-user .bg-info,
+.path-user .bg-warning,
+.path-user .bg-danger,
+.path-user .bg-light,
+.path-user .bg-dark {
+    background-color: white !important;
+    background: white !important;
+    color: #374151 !important;
+}
+
+/* Target user initials in table cells specifically */
+.userlist table#participants td .userinitials,
+.userlist table#participants td span.userinitials,
+.userlist table#participants td div.userinitials,
+.path-user table td .userinitials,
+.path-user table td span.userinitials,
+.path-user table td div.userinitials {
+    background-color: white !important;
+    background: white !important;
+    background-image: none !important;
+    border: 1px solid #e5e7eb !important;
+    color: #374151 !important;
+}
+
+/* More aggressive targeting for user initials with high specificity */
+table#participants .userinitials,
+table#participants span.userinitials,
+table#participants div.userinitials,
+table.generaltable .userinitials,
+table.flexible .userinitials,
+.userlist .userinitials,
+.path-user .userinitials {
+    background-color: white !important;
+    background: white !important;
+    background-image: none !important;
+    border: 1px solid #e5e7eb !important;
+    color: #374151 !important;
+}
+
+/* Override any inline styles or specific color classes */
+.userinitials[style*="background"],
+span.userinitials[style*="background"],
+div.userinitials[style*="background"] {
+    background-color: white !important;
+    background: white !important;
+}
+
+/* Target specific Bootstrap color utility classes that might be applied */
+.userinitials.bg-primary,
+.userinitials.bg-secondary,
+.userinitials.bg-success,
+.userinitials.bg-info,
+.userinitials.bg-warning,
+.userinitials.bg-danger,
+.userinitials.bg-light,
+.userinitials.bg-dark,
+span.userinitials.bg-primary,
+span.userinitials.bg-secondary,
+span.userinitials.bg-success,
+span.userinitials.bg-info,
+span.userinitials.bg-warning,
+span.userinitials.bg-danger,
+span.userinitials.bg-light,
+span.userinitials.bg-dark,
+div.userinitials.bg-primary,
+div.userinitials.bg-secondary,
+div.userinitials.bg-success,
+div.userinitials.bg-info,
+div.userinitials.bg-warning,
+div.userinitials.bg-danger,
+div.userinitials.bg-light,
+div.userinitials.bg-dark {
+    background-color: white !important;
+    background: white !important;
+    color: #374151 !important;
+}
+
+/* Catchall for any element containing user initials */
+[class*="initials"],
+[class*="user-avatar"],
+[class*="avatar"],
+.userpicture [class*="bg-"],
+.userpicture .userinitials,
+td .userpicture .userinitials,
+a .userinitials,
+.userlist a .userinitials {
+    background-color: white !important;
+    background: white !important;
+    background-image: none !important;
+    border: 1px solid #e5e7eb !important;
+    color: #374151 !important;
+}
+
+/* Course navigation menu items - move to right and black text */
+.secondary-navigation .navigation {
+    border-bottom: none !important;
+    background-color: transparent !important;
+}
+
+.secondary-navigation .navigation .nav-tabs {
+    justify-content: flex-end !important;
+    border-bottom: none !important;
+    background-color: transparent !important;
+}
+
+.secondary-navigation .navigation .nav-tabs .nav-item .nav-link {
+    color: #000000 !important;
+    border: none !important;
+    border-bottom: none !important;
+    background-color: transparent !important;
+}
+
+.secondary-navigation .navigation .nav-tabs .nav-item .nav-link:hover,
+.secondary-navigation .navigation .nav-tabs .nav-item .nav-link:focus {
+    color: #1CB0F6 !important;
+    border: none !important;
+    border-bottom: none !important;
+    background-color: transparent !important;
+}
+
+.secondary-navigation .navigation .nav-tabs .nav-item .nav-link.active {
+    color: #000000 !important;
+    border: none !important;
+    border-bottom: none !important;
+    background-color: transparent !important;
+}
+
+/* Remove any gray backgrounds from secondary navigation */
+.secondary-navigation,
+.secondary-navigation .navigation,
+.secondary-navigation .moremenu,
+.moremenu .nav-tabs,
+.moremenu .nav-link.active {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+// Ensure all table headers use the Bootstrap variable for header background
+th, thead th, table th, .generaltable th, .generaltable thead th, .generaltable.generalbox th, .generaltable.generalbox thead th {
+    background: none !important;
+    background-color: $table-head-bg !important;
 }

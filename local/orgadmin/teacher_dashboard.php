@@ -115,22 +115,6 @@ function get_teacher_assessments($filter = 'all', $page = 0, $perpage = 10) {
             'students' => 156,
             'status' => 'published'
         ],
-        [
-            'id' => 5,
-            'title' => 'mernstack',
-            'questions' => 1,
-            'duration' => 45,
-            'students' => 0,
-            'status' => 'pending_review'
-        ],
-        [
-            'id' => 6,
-            'title' => 'Test on Full Stack Development',
-            'questions' => 1,
-            'duration' => 45,
-            'students' => 0,
-            'status' => 'pending_review'
-        ]
     ];
 
     // Filter assessments
@@ -789,6 +773,151 @@ body {
     background: #4b5563;
     text-decoration: none;
 }
+
+/* Question Fields Styles */
+.add-question-btn {
+    background: #58CC02;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.2s;
+}
+
+.add-question-btn:hover {
+    background: #4DB300;
+}
+
+.add-question-btn .material-icons {
+    font-size: 18px;
+}
+
+.question-card {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.question-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.question-card-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: #2d3748;
+}
+
+.remove-question-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: background-color 0.2s;
+}
+
+.remove-question-btn:hover {
+    background: #dc2626;
+}
+
+.remove-question-btn .material-icons {
+    font-size: 16px;
+}
+
+.question-details-container {
+    margin-top: 15px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.question-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.question-details-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #4a5568;
+}
+
+.add-detail-btn {
+    background: #1CB0F6;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: background-color 0.2s;
+}
+
+.add-detail-btn:hover {
+    background: #1A9BD8;
+}
+
+.add-detail-btn .material-icons {
+    font-size: 16px;
+}
+
+.detail-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr 80px 40px;
+    gap: 10px;
+    align-items: end;
+    margin-bottom: 10px;
+}
+
+.remove-detail-btn {
+    background: #fed7d7;
+    color: #e53e3e;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    height: 38px;
+}
+
+.remove-detail-btn:hover {
+    background: #feb2b2;
+}
+
+.remove-detail-btn .material-icons {
+    font-size: 18px;
+}
 </style>
 
 <div class="teacher-container">
@@ -835,7 +964,7 @@ body {
                 </div>
                 
                 <div class="teacher-speech-bubble">
-                    Good to see you back, <?php echo $USER->firstname; ?>!<br>Ready to learn?
+                    Good to see you back, <?php echo $USER->firstname; ?>!<br>
                 </div>
             </div>
         </div>
@@ -887,19 +1016,33 @@ body {
                             <input type="hidden" id="assessmentId" name="assessment_id" value="<?php echo $edit_assessment['id']; ?>">
                         <?php endif; ?>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="assessmentTitle">Assessments Title</label>
-                                <input type="text" id="assessmentTitle" name="title" class="form-input"
-                                       placeholder="Enter assessment title"
-                                       value="<?php echo $mode === 'edit' ? htmlspecialchars($edit_assessment['title']) : ''; ?>">
-                            </div>
-                            <div class="form-group">
-                                <label for="duration">Duration (minutes)</label>
-                                <input type="number" id="duration" name="duration" class="form-input"
-                                       placeholder="45"
-                                       value="<?php echo $mode === 'edit' ? $edit_assessment['duration'] : ''; ?>">
-                            </div>
+                        <div class="form-group">
+                            <label for="assessmentCourse">Course</label>
+                            <select id="assessmentCourse" name="courseid" class="form-select" required>
+                                <option value="">Select Course</option>
+                                <?php
+                                // Detect org category
+                                $orgcatid = 0;
+                                if (!empty($USER->id)) {
+                                    $orgcatid = $DB->get_field_sql('SELECT ctx.instanceid FROM {role_assignments} ra JOIN {context} ctx ON ctx.id = ra.contextid WHERE ra.userid = ? AND ctx.contextlevel = 40 LIMIT 1', [$USER->id]);
+                                }
+                                $courses = [];
+                                if ($orgcatid) {
+                                    $courses = $DB->get_records_sql('SELECT id, fullname FROM {course} WHERE category = ? ORDER BY fullname', [$orgcatid]);
+                                }
+                                $selected_courseid = ($mode === 'edit' && !empty($edit_assessment['courseid'])) ? $edit_assessment['courseid'] : '';
+                                foreach ($courses as $course) {
+                                    $selected = ($selected_courseid == $course->id) ? 'selected' : '';
+                                    echo "<option value=\"{$course->id}\" $selected>" . htmlspecialchars($course->fullname) . "</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="assessmentTitle">Assessments Title</label>
+                            <input type="text" id="assessmentTitle" name="title" class="form-input"
+                                   placeholder="Enter assessment title"
+                                   value="<?php echo $mode === 'edit' ? htmlspecialchars($edit_assessment['title']) : ''; ?>">
                         </div>
 
                         <div class="form-row">
@@ -936,14 +1079,16 @@ body {
                                       placeholder="Enter assessment instructions..."><?php echo $mode === 'edit' ? htmlspecialchars($edit_assessment['instructions']) : ''; ?></textarea>
                         </div>
 
-                        <div class="form-group">
-                            <label class="upload-label">Upload the question</label>
-                            <div class="upload-area" onclick="document.getElementById('questionFile').click()">
-                                <div class="upload-icon">
-                                    <span class="material-icons">file_upload</span>
-                                </div>
-                                <div class="upload-text">Upload the question</div>
-                                <input type="file" id="questionFile" name="question_file" style="display: none;" accept=".pdf,.doc,.docx,.txt">
+                        <!-- Questions Section -->
+                        <div class="form-group" style="margin-top: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <label class="upload-label" style="margin-bottom: 0;">Questions</label>
+                                <button type="button" class="add-question-btn" onclick="addQuestionField()">
+                                    <span class="material-icons">add_circle</span> Add Question
+                                </button>
+                            </div>
+                            <div id="questionsContainer">
+                                <!-- Question fields will be added here dynamically -->
                             </div>
                         </div>
                     </form>
@@ -1097,10 +1242,84 @@ function editAssessment(id) {
     window.location.href = 'teacher_dashboard.php?mode=edit&edit_id=' + id;
 }
 
-function deleteAssessment(id, title) {
+// Show message function for user feedback
+function showMessage(message, type) {
+    // Create message element
+    var messageDiv = document.createElement('div');
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 4px;
+        color: white;
+        font-weight: bold;
+        z-index: 10000;
+        max-width: 300px;
+        transition: opacity 0.3s;
+    `;
+
+    if (type === 'success') {
+        messageDiv.style.backgroundColor = '#28a745';
+    } else if (type === 'error') {
+        messageDiv.style.backgroundColor = '#dc3545';
+    } else {
+        messageDiv.style.backgroundColor = '#007bff';
+    }
+
+    messageDiv.textContent = message;
+    document.body.appendChild(messageDiv);
+
+    // Remove message after 3 seconds
+    setTimeout(() => {
+        messageDiv.style.opacity = '0';
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.parentNode.removeChild(messageDiv);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Make function globally available
+window.deleteAssessment = function(id, title) {
     if (confirm('Are you sure you want to delete assessment "' + title + '"?\n\nThis action cannot be undone.')) {
-        alert('Delete Assessment ' + id + ' - to be integrated with Moodle deletion API');
-        // AJAX call to delete assessment
+        // Create a hidden form and submit it
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = (typeof M !== 'undefined' && M.cfg ? M.cfg.wwwroot : window.location.origin + '/moodle42/moodle') + '/local/orgadmin/assessment_handler.php';
+
+        // Add CSRF token
+        var sesskey = document.createElement('input');
+        sesskey.type = 'hidden';
+        sesskey.name = 'sesskey';
+        sesskey.value = (typeof M !== 'undefined' && M.cfg ? M.cfg.sesskey : '<?php echo sesskey(); ?>');
+        form.appendChild(sesskey);
+
+        // Add action
+        var actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'delete';
+        form.appendChild(actionInput);
+
+        // Add assessment ID
+        var idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'assessment_id';
+        idInput.value = id;
+        form.appendChild(idInput);
+
+        // Add return URL
+        var returnInput = document.createElement('input');
+        returnInput.type = 'hidden';
+        returnInput.name = 'return_url';
+        returnInput.value = window.location.href;
+        form.appendChild(returnInput);
+
+        // Submit form
+        document.body.appendChild(form);
+        form.submit();
     }
 }
 
@@ -1120,11 +1339,29 @@ function saveAndPublish() {
         var postData = new FormData();
         postData.append('action', 'submit_review');
         postData.append('title', formData.title);
-        postData.append('duration', formData.duration);
+    postData.append('courseid', formData.courseid || '');
         postData.append('total_marks', formData.totalMarks);
         postData.append('pass_percentage', formData.passPercentage);
         postData.append('language', formData.language);
         postData.append('instructions', formData.instructions);
+
+        // Add questions data
+        if (formData.questions && formData.questions.length > 0) {
+            formData.questions.forEach((question, qIdx) => {
+                postData.append(`questions[${qIdx}][qid]`, question.qid);
+                postData.append(`questions[${qIdx}][qtitle]`, question.qtitle);
+                postData.append(`questions[${qIdx}][expectation]`, question.expectation);
+                postData.append(`questions[${qIdx}][programming_language]`, question.programming_language);
+
+                if (question.details && question.details.length > 0) {
+                    question.details.forEach((detail, dIdx) => {
+                        postData.append(`questions[${qIdx}][details][${dIdx}][qdetailid]`, detail.qdetailid);
+                        postData.append(`questions[${qIdx}][details][${dIdx}][qdetailtitle]`, detail.qdetailtitle);
+                        postData.append(`questions[${qIdx}][details][${dIdx}][max_marks]`, detail.max_marks);
+                    });
+                }
+            });
+        }
 
         // Add assessment ID if editing
         var assessmentId = document.getElementById('assessmentId');
@@ -1161,11 +1398,29 @@ function saveAsDraft() {
     var postData = new FormData();
     postData.append('action', 'save_draft');
     postData.append('title', formData.title);
-    postData.append('duration', formData.duration);
+    postData.append('courseid', formData.courseid || '');
     postData.append('total_marks', formData.totalMarks);
     postData.append('pass_percentage', formData.passPercentage);
     postData.append('language', formData.language);
     postData.append('instructions', formData.instructions);
+
+    // Add questions data
+    if (formData.questions && formData.questions.length > 0) {
+        formData.questions.forEach((question, qIdx) => {
+            postData.append(`questions[${qIdx}][qid]`, question.qid);
+            postData.append(`questions[${qIdx}][qtitle]`, question.qtitle);
+            postData.append(`questions[${qIdx}][expectation]`, question.expectation);
+            postData.append(`questions[${qIdx}][programming_language]`, question.programming_language);
+
+            if (question.details && question.details.length > 0) {
+                question.details.forEach((detail, dIdx) => {
+                    postData.append(`questions[${qIdx}][details][${dIdx}][qdetailid]`, detail.qdetailid);
+                    postData.append(`questions[${qIdx}][details][${dIdx}][qdetailtitle]`, detail.qdetailtitle);
+                    postData.append(`questions[${qIdx}][details][${dIdx}][max_marks]`, detail.max_marks);
+                });
+            }
+        });
+    }
 
     // Add assessment ID if editing
     var assessmentId = document.getElementById('assessmentId');
@@ -1225,80 +1480,218 @@ function cancelAssessment() {
 // Helper Functions
 function validateAssessmentForm() {
     var title = document.getElementById('assessmentTitle').value.trim();
-    var duration = document.getElementById('duration').value;
     var totalMarks = document.getElementById('totalMarks').value;
     var passPercentage = document.getElementById('passPercentage').value;
-    
+
     if (!title) {
         alert('Please enter an assessment title.');
         document.getElementById('assessmentTitle').focus();
         return false;
     }
-    
-    if (!duration || duration <= 0) {
-        alert('Please enter a valid duration in minutes.');
-        document.getElementById('duration').focus();
-        return false;
-    }
-    
+
     if (!totalMarks || totalMarks <= 0) {
         alert('Please enter valid total marks.');
         document.getElementById('totalMarks').focus();
         return false;
     }
-    
+
     if (!passPercentage || passPercentage < 0 || passPercentage > 100) {
         alert('Please enter a valid pass percentage (0-100).');
         document.getElementById('passPercentage').focus();
         return false;
     }
-    
+
+    // Check if at least one question exists
+    const questionsContainer = document.getElementById('questionsContainer');
+    if (!questionsContainer || questionsContainer.querySelectorAll('.question-card').length === 0) {
+        alert('Please add at least one question to the assessment.');
+        return false;
+    }
+
     return true;
 }
 
 function getFormData() {
+    // Collect questions data
+    const questionsData = [];
+    const questionCards = document.querySelectorAll('.question-card');
+
+    questionCards.forEach((card, index) => {
+        const questionIndex = card.dataset.questionIndex;
+        const qid = card.querySelector(`input[name="questions[${questionIndex}][qid]"]`).value;
+        const qtitle = card.querySelector(`input[name="questions[${questionIndex}][qtitle]"]`).value;
+        const expectation = card.querySelector(`textarea[name="questions[${questionIndex}][expectation]"]`).value;
+        const programming_language = card.querySelector(`select[name="questions[${questionIndex}][programming_language]"]`).value;
+
+        // Collect details for this question
+        const details = [];
+        const detailRows = card.querySelectorAll('.detail-row');
+        detailRows.forEach((row, detailIdx) => {
+            const detailContainer = row.closest(`#details-container-${questionIndex}`);
+            const actualDetailIndex = Array.from(detailContainer.children).indexOf(row) + 1;
+
+            details.push({
+                qdetailid: row.querySelector(`input[name="questions[${questionIndex}][details][${actualDetailIndex}][qdetailid]"]`).value,
+                qdetailtitle: row.querySelector(`input[name="questions[${questionIndex}][details][${actualDetailIndex}][qdetailtitle]"]`).value,
+                max_marks: row.querySelector(`input[name="questions[${questionIndex}][details][${actualDetailIndex}][max_marks]"]`).value
+            });
+        });
+
+        questionsData.push({
+            qid: qid,
+            qtitle: qtitle,
+            expectation: expectation,
+            programming_language: programming_language,
+            details: details
+        });
+    });
+
     return {
         title: document.getElementById('assessmentTitle').value.trim(),
-        duration: parseInt(document.getElementById('duration').value),
+        courseid: (document.getElementById('assessmentCourse') ? document.getElementById('assessmentCourse').value : ''),
         totalMarks: parseInt(document.getElementById('totalMarks').value),
         passPercentage: parseInt(document.getElementById('passPercentage').value),
         language: document.getElementById('language').value,
         instructions: document.getElementById('instructions').value.trim(),
-        questionFile: document.getElementById('questionFile').files[0] || null
+        questions: questionsData
     };
 }
 
 function checkForUnsavedChanges() {
     // Check if any form fields have been filled
     var title = document.getElementById('assessmentTitle').value.trim();
-    var duration = document.getElementById('duration').value;
     var totalMarks = document.getElementById('totalMarks').value;
     var passPercentage = document.getElementById('passPercentage').value;
     var language = document.getElementById('language').value;
     var instructions = document.getElementById('instructions').value.trim();
-    var hasFile = document.getElementById('questionFile').files.length > 0;
-    
-    return title || duration || totalMarks || passPercentage || language || instructions || hasFile;
+    const questionsContainer = document.getElementById('questionsContainer');
+    var hasQuestions = questionsContainer && questionsContainer.querySelectorAll('.question-card').length > 0;
+
+    return title || totalMarks || passPercentage || language || instructions || hasQuestions;
 }
 
-// File upload functionality
+// Question Management Functions
+let questionCounter = 0;
+
+function addQuestionField() {
+    questionCounter++;
+    const container = document.getElementById('questionsContainer');
+
+    const questionCard = document.createElement('div');
+    questionCard.className = 'question-card';
+    questionCard.id = 'question-' + questionCounter;
+    questionCard.dataset.questionIndex = questionCounter;
+
+    questionCard.innerHTML = `
+        <div class="question-card-header">
+            <div class="question-card-title">Question ${questionCounter}</div>
+            <button type="button" class="remove-question-btn" onclick="removeQuestion(${questionCounter})">
+                <span class="material-icons">delete</span> Remove
+            </button>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Question ID (QID)</label>
+                <input type="text" name="questions[${questionCounter}][qid]" class="form-input" placeholder="Q1" required>
+            </div>
+            <div class="form-group">
+                <label>Programming Language</label>
+                <select name="questions[${questionCounter}][programming_language]" class="form-select" required>
+                    <option value="">Select Language</option>
+                    <option value="java">Java</option>
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="cpp">C++</option>
+                    <option value="csharp">C#</option>
+                    <option value="php">PHP</option>
+                    <option value="ruby">Ruby</option>
+                    <option value="go">Go</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Question Title</label>
+            <input type="text" name="questions[${questionCounter}][qtitle]" class="form-input" placeholder="Enter question title" required>
+        </div>
+
+        <div class="form-group">
+            <label>Expectation</label>
+            <textarea name="questions[${questionCounter}][expectation]" class="form-textarea" rows="3" placeholder="Describe what is expected from this question" required></textarea>
+        </div>
+
+        <div class="question-details-container">
+            <div class="question-details-header">
+                <div class="question-details-title">Question Details (Criteria/Rubric)</div>
+                <button type="button" class="add-detail-btn" onclick="addDetailField(${questionCounter})">
+                    <span class="material-icons">add</span> Add Detail
+                </button>
+            </div>
+            <div id="details-container-${questionCounter}">
+                <!-- Detail fields will be added here -->
+            </div>
+        </div>
+    `;
+
+    container.appendChild(questionCard);
+
+    // Auto-add first detail field
+    addDetailField(questionCounter);
+}
+
+function removeQuestion(questionIndex) {
+    if (confirm('Are you sure you want to remove this question?')) {
+        const questionCard = document.getElementById('question-' + questionIndex);
+        if (questionCard) {
+            questionCard.remove();
+        }
+    }
+}
+
+function addDetailField(questionIndex) {
+    const container = document.getElementById('details-container-' + questionIndex);
+    const detailCount = container.querySelectorAll('.detail-row').length + 1;
+
+    const detailRow = document.createElement('div');
+    detailRow.className = 'detail-row';
+
+    detailRow.innerHTML = `
+        <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 12px;">Detail ID</label>
+            <input type="text" name="questions[${questionIndex}][details][${detailCount}][qdetailid]" class="form-input" placeholder="D${detailCount}">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 12px;">Detail Title</label>
+            <input type="text" name="questions[${questionIndex}][details][${detailCount}][qdetailtitle]" class="form-input" placeholder="Criteria ${detailCount}" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 12px;">Description</label>
+            <input type="text" name="questions[${questionIndex}][details][${detailCount}][description]" class="form-input" placeholder="Describe this criterion">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 12px;">Max Marks</label>
+            <input type="number" name="questions[${questionIndex}][details][${detailCount}][max_marks]" class="form-input" placeholder="10" min="0" required>
+        </div>
+        <button type="button" class="remove-detail-btn" onclick="removeDetail(this)">
+            <span class="material-icons">close</span>
+        </button>
+    `;
+
+    container.appendChild(detailRow);
+}
+
+function removeDetail(button) {
+    const detailRow = button.parentElement;
+    detailRow.remove();
+}
+
+// Initialize with one question on page load
 document.addEventListener('DOMContentLoaded', function() {
-    const fileInput = document.getElementById('questionFile');
-    const uploadArea = document.querySelector('.upload-area');
-    const uploadText = document.querySelector('.upload-text');
-    
-    if (fileInput && uploadArea) {
-        fileInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                uploadText.textContent = this.files[0].name;
-                uploadArea.style.borderColor = '#10b981';
-                uploadArea.style.backgroundColor = '#ecfdf5';
-            } else {
-                uploadText.textContent = 'Upload the question';
-                uploadArea.style.borderColor = '#cbd5e0';
-                uploadArea.style.backgroundColor = '#f8fafc';
-            }
-        });
+    // Auto-add first question if in create/edit mode
+    const questionsContainer = document.getElementById('questionsContainer');
+    if (questionsContainer) {
+        addQuestionField();
     }
 });
 </script>

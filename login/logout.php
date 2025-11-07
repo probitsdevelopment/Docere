@@ -58,11 +58,7 @@ foreach($authsequence as $authname) {
     $authplugin = get_auth_plugin($authname);
     $authplugin->logoutpage_hook();
 }
-// ...
-$userid = $USER->id;
-$containerName = "code-$userid";
-shell_exec("cmd /c docker stop $containerName && docker rm $containerName");
-// ... (rest of Moodle logout code)
+
 require_logout();
 
 redirect($redirect);

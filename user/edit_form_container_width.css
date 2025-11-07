@@ -1,0 +1,6 @@
+.container, .user-edit-header, .mform {
+    max-width: 1400px !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}

@@ -1,0 +1,184 @@
+/* Override for collapsible section arrow icon background */
+.mform .collapsible .fheader .icon, 
+.mform .collapsible .fheader [class*="arrow"],
+.mform .collapsible .fheader [class*="chevron"],
+.mform .collapsible .fheader .fa {
+    background-color: #1cb0f6 !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+}
+
+/* If the arrow is an SVG or uses ::before, also try: */
+.mform .collapsible .fheader svg,
+.mform .collapsible .fheader i,
+.mform .collapsible .fheader span {
+    background-color: #1cb0f6 !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+}
+
+.mform .collapsible .fheader .fa:before,
+.mform .collapsible .fheader [class*="arrow"]:before,
+.mform .collapsible .fheader [class*="chevron"]:before {
+    background-color: #1cb0f6 !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+}
+/* Full page redesign for user edit form */
+.user-edit-header {
+    display: flex;
+    align-items: center;
+    background: #f8f9fb;
+    border-radius: 16px;
+    padding: 32px 32px 16px 32px;
+    margin-bottom: 24px;
+    max-width: none !important;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.user-edit-header .profile-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    margin-right: 24px;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2em;
+    color: #bbb;
+}
+.user-edit-header .profile-name {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #222;
+}
+.mform {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding: 32px 24px 24px 24px;
+    margin-bottom: 32px;
+    max-width: none !important;
+    width: 100% !important;
+#region-main {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+    margin-left: auto;
+    margin-right: auto;
+}
+.mform .fheader {
+    font-size: 1.2em;
+    font-weight: 700;
+    margin-bottom: 24px;
+    background: none;
+    border: none;
+    padding: 0;
+}
+.mform .form-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 16px;
+    justify-content: space-between;
+}
+.mform .form-group > .form-item {
+    flex: 1 1 48%;
+    min-width: 320px;
+}
+.mform textarea,
+.mform select,
+.mform input[type="text"],
+.mform input[type="email"] {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 15px;
+    background: #fff;
+    margin-top: 6px;
+    margin-bottom: 0;
+    box-sizing: border-box;
+}
+.mform textarea {
+    min-height: 80px;
+    flex-basis: 100%;
+}
+.mform label {
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 4px;
+    display: block;
+}
+.mform .form-item {
+    margin-bottom: 0;
+}
+.mform .form-inline {
+    display: flex;
+    gap: 16px;
+}
+.mform .form-group .form-item-full {
+    flex-basis: 100%;
+}
+.mform .form-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 24px;
+}
+.mform .form-buttons input[type="submit"],
+.mform .form-buttons input[type="button"] {
+    background: #1cb0f6;
+    color: #fff;
+    border-radius: 8px;
+    border: none;
+    padding: 10px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.mform .form-buttons input[type="submit"]:hover,
+.mform .form-buttons input[type="button"]:hover {
+    background: #139ad6;
+}
+.mform .collapsible {
+    background: #f8f9fb;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    padding: 16px 20px;
+}
+.mform .collapsible .fheader {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+@media (max-width: 700px) {
+    .user-edit-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 24px 12px 12px 12px;
+    max-width: 100vw !important;
+    }
+    .user-edit-header .profile-img {
+        margin-bottom: 12px;
+        margin-right: 0;
+    }
+    .mform {
+        padding: 16px 8px 16px 8px;
+        max-width: 100vw;
+        width: 100vw;
+    }
+    .mform .form-group {
+        flex-direction: column;
+        gap: 16px 0;
+    }
+    .mform .form-group > .form-item {
+        min-width: 100%;
+    }
+}

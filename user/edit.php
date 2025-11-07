@@ -306,6 +306,8 @@ if ($userform->is_cancelled()) {
 
 
 // Display page header.
+echo '<link rel="stylesheet" type="text/css" href="' . $CFG->wwwroot . '/user/edit_form_container_width.css">';
+
 $streditmyprofile = get_string('editmyprofile');
 $strparticipants  = get_string('participants');
 $userfullname     = fullname($user, true);
@@ -314,7 +316,12 @@ $PAGE->set_title("$course->shortname: $streditmyprofile");
 $PAGE->set_heading($userfullname);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($userfullname);
+// Load Material Icons for proper icon rendering
+echo '<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">';
+echo '<link rel="stylesheet" type="text/css" href="' . $CFG->wwwroot . '/user/edit_form_page_custom.css">';
+echo '<link rel="stylesheet" type="text/css" href="' . $CFG->wwwroot . '/user/edit_form_page_custom_fix.css">';
+echo '<link rel="stylesheet" type="text/css" href="' . $CFG->wwwroot . '/user/edit_form_page_custom_width.css">';
+echo '<link rel="stylesheet" type="text/css" href="' . $CFG->wwwroot . '/user/edit_form_page_custom_width_force.css">';
 
 if ($emailchanged) {
     echo $emailchangedhtml;

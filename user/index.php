@@ -178,7 +178,7 @@ echo '<div class="userlist">';
 // Do this so we can get the total number of rows.
 ob_start();
 $participanttable->set_filterset($filterset);
-$participanttable->out($perpage, true);
+$participanttable->out($perpage, false); // Disable initials bar (A-Z selector)
 $participanttablehtml = ob_get_contents();
 ob_end_clean();
 

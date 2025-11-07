@@ -420,10 +420,23 @@ class core_external extends external_api {
         // Overwriting page_requirements_manager with the fragment one so only JS included from
         // this point is returned to the user.
         $PAGE->start_collecting_javascript_requirements();
-        $data = component_callback($params['component'], 'output_fragment_' . $params['callback'], array($arguments));
-        $jsfooter = $PAGE->requires->get_end_code();
-        $output = array('html' => $data, 'javascript' => $jsfooter);
-        return $output;
+        try {
+            $data = component_callback($params['component'], 'output_fragment_' . $params['callback'], array($arguments));
+            $jsfooter = $PAGE->requires->get_end_code();
+            $output = array('html' => $data, 'javascript' => $jsfooter);
+            return $output;
+        } catch (\moodle_exception $e) {
+            // If a redirect was attempted during fragment rendering (e.g. session expired),
+            // return JavaScript to the client to perform the redirect instead of throwing
+            // an exception that would show an AJAX error modal.
+            if (isset($e->errorcode) && $e->errorcode === 'redirecterrordetected') {
+                // Send client-side JS to redirect to login page.
+                $loginurl = get_login_url();
+                $js = "window.location = '" . $loginurl->out(false) . "';";
+                return array('html' => '', 'javascript' => $js);
+            }
+            throw $e;
+        }
     }
 
     /**

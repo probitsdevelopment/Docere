@@ -1,0 +1,508 @@
+/* Override primary navigation links color */
+.primary-navigation .navigation .nav-link,
+.primary-navigation .navigation .nav-link:hover,
+.primary-navigation .navigation .nav-link:focus,
+.primary-navigation .navigation .nav-link:visited {
+    color: #000000 !important;
+    text-decoration: none;
+}
+
+/* Active primary navigation link */
+.primary-navigation .navigation .nav-link.active {
+    color: #000000 !important;
+    font-weight: 600;
+    border-bottom-color: #dc2626;
+}
+
+/* Secondary navigation text color */
+.secondary-navigation .moremenu .nav-link {
+    color: #000000 !important;
+}
+
+/* Participants page blue color override to #1CB0F6 */
+.btn-primary,
+button.btn-primary,
+input[type="submit"].btn-primary,
+.userlist .btn-primary,
+button[data-action*="apply"] {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+    color: white !important;
+}
+
+.btn-primary:hover,
+button.btn-primary:hover,
+.userlist .btn-primary:hover {
+    background-color: #0ea5e9 !important;
+    border-color: #0ea5e9 !important;
+}
+
+/* Letter navigation buttons - target specific alphabet selectors */
+.btn-outline-secondary,
+.btn-secondary,
+.alphabet-selector .btn,
+.letter-filter .btn,
+.initials .btn,
+.page-content .btn-outline-secondary,
+.userlist .btn-outline-secondary,
+button[name*="alpha"],
+a[href*="sort"] {
+    background-color: transparent !important;
+    border-color: #dee2e6 !important;
+    color: #6c757d !important;
+}
+
+/* Active alphabet letters - blue background */
+.btn-outline-secondary.active,
+.btn-outline-secondary:active,
+.btn-secondary.active,
+.alphabet-selector .btn.active,
+.letter-filter .btn.active,
+.initials .btn.active,
+.page-content .btn-outline-secondary.active,
+.userlist .btn-outline-secondary.active,
+button[name*="alpha"].active,
+a[href*="sort"].active,
+.btn[data-value].active {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+    color: white !important;
+}
+
+/* Hover states for alphabet letters */
+.btn-outline-secondary:hover,
+.btn-secondary:hover,
+.alphabet-selector .btn:hover,
+.letter-filter .btn:hover,
+.initials .btn:hover,
+.page-content .btn-outline-secondary:hover,
+.userlist .btn-outline-secondary:hover,
+button[name*="alpha"]:hover,
+a[href*="sort"]:hover,
+.btn[data-value]:hover {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+    color: white !important;
+}
+
+/* Override Bootstrap default blue colors for alphabet navigation */
+body .btn-primary:not([class*="apply"]):not([value*="Apply"]) {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+}
+
+/* Force alphabet button styling with highest specificity */
+body .page-content .btn.btn-primary,
+body .userlist .btn.btn-primary:not([value*="Apply"]),
+body .btn.btn-primary[data-filtervalue],
+body .initials-bar .btn-primary,
+body div .btn-primary[href*="initials"] {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+    color: white !important;
+}
+
+body .page-content .btn.btn-primary:hover,
+body .userlist .btn.btn-primary:hover:not([value*="Apply"]),
+body .btn.btn-primary[data-filtervalue]:hover {
+    background-color: #0ea5e9 !important;
+    border-color: #0ea5e9 !important;
+}
+
+/* Global override for any remaining blue buttons on participants page */
+.path-user .btn-primary,
+.page-user .btn-primary,
+body[class*="user"] .btn-primary {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+    color: white !important;
+}
+
+.path-user .btn-primary:hover,
+.page-user .btn-primary:hover,
+body[class*="user"] .btn-primary:hover {
+    background-color: #0ea5e9 !important;
+    border-color: #0ea5e9 !important;
+}
+
+/* PARTICIPANTS TABLE STYLING - MATCH FIGMA DESIGN */
+/* Ultra high specificity selectors to override Moodle defaults */
+
+/* Main participants table container - Multiple possible selectors */
+html body.path-user table,
+html body.path-user .table,
+html body.path-user #participants,
+html body .userlist table#participants,
+html body .participants-table,
+html body table.flexible,
+html body table.generaltable,
+html body .table-responsive table,
+html body #page-content table,
+html body .main-inner table {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    margin: 1rem 0 !important;
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Table header styling - Ultra specific */
+html body.path-user table th,
+html body.path-user .table th,
+html body.path-user #participants th,
+html body .userlist table#participants th,
+html body table.flexible th,
+html body table.generaltable th,
+html body .table-responsive table th,
+html body #page-content table th,
+html body .main-inner table th,
+html body th {
+    background-color: #f8fafc !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    border-right: 1px solid #e5e7eb !important;
+    border-left: none !important;
+    border-top: none !important;
+    padding: 12px 16px !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    color: #374151 !important;
+    text-align: left !important;
+}
+
+/* Remove border from last header */
+.path-user #participants th:last-child,
+.userlist table#participants th:last-child,
+table.flexible.table th:last-child {
+    border-right: none !important;
+}
+
+/* First header cell (checkbox column) */
+.path-user #participants th:first-child,
+.userlist table#participants th:first-child {
+    width: 40px !important;
+    text-align: center !important;
+}
+
+/* Table row styling - Ultra specific */
+html body.path-user table tr,
+html body.path-user .table tr,
+html body.path-user #participants tr,
+html body .userlist table#participants tr,
+html body table.flexible tr,
+html body table.generaltable tr,
+html body .table-responsive table tr,
+html body #page-content table tr,
+html body .main-inner table tr,
+html body tr {
+    border-bottom: 1px solid #f1f5f9 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    transition: background-color 0.2s ease !important;
+    background-color: white !important;
+}
+
+/* Table cell styling - Ultra specific */
+html body.path-user table td,
+html body.path-user .table td,
+html body.path-user #participants td,
+html body .userlist table#participants td,
+html body table.flexible td,
+html body table.generaltable td,
+html body .table-responsive table td,
+html body #page-content table td,
+html body .main-inner table td,
+html body td {
+    padding: 12px 16px !important;
+    border-right: 1px solid #f1f5f9 !important;
+    border-left: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    font-size: 0.875rem !important;
+    color: #374151 !important;
+    vertical-align: middle !important;
+    background-color: transparent !important;
+}
+
+/* Remove border from last cell */
+.path-user #participants td:last-child,
+.userlist table#participants td:last-child,
+table.flexible.table td:last-child {
+    border-right: none !important;
+}
+
+/* Hover effect for rows */
+.path-user #participants tr:hover,
+.userlist table#participants tr:hover,
+table.flexible.table tr:hover {
+    background-color: #f8fafc !important;
+}
+
+/* Checkbox styling */
+.path-user #participants input[type="checkbox"],
+.userlist table#participants input[type="checkbox"] {
+    width: 16px !important;
+    height: 16px !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 4px !important;
+    margin: 0 !important;
+}
+
+/* User name links */
+.path-user #participants a,
+.userlist table#participants a {
+    color: #1f2937 !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+}
+
+.path-user #participants a:hover,
+.userlist table#participants a:hover {
+    color: #1CB0F6 !important;
+    text-decoration: underline !important;
+}
+
+/* Bottom controls styling */
+.path-user .controls,
+.userlist .controls {
+    margin: 1rem 0 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+/* "With selected users" dropdown styling */
+.path-user select,
+.userlist select,
+.participants select {
+    background: white !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    font-size: 0.875rem !important;
+    color: #374151 !important;
+    min-width: 150px !important;
+}
+
+/* Clean up any unwanted borders */
+.path-user table,
+.userlist table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+/* Remove any extra table styling */
+html body.path-user .table-striped tbody tr:nth-of-type(odd),
+html body .table-striped tbody tr:nth-of-type(odd) {
+    background-color: white !important;
+}
+
+html body.path-user .table-striped tbody tr:nth-of-type(even),
+html body .table-striped tbody tr:nth-of-type(even) {
+    background-color: #fafbfc !important;
+}
+
+/* Override Bootstrap and Moodle defaults */
+html body.path-user .table-bordered,
+html body .table-bordered {
+    border: 1px solid #e5e7eb !important;
+}
+
+html body.path-user .table-bordered th,
+html body .table-bordered th,
+html body.path-user .table-bordered td,
+html body .table-bordered td {
+    border: 1px solid #f1f5f9 !important;
+}
+
+/* Force override any existing table classes */
+html body table[class*="table"] {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+/* Remove any Moodle-specific table styling */
+html body .generaltable,
+html body .flexible {
+    background: white !important;
+    border-radius: 8px !important;
+}
+
+/* Specific targeting for participants page */
+html body#page-user-index table,
+html body.pagelayout-course table,
+html body .page-content table {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ULTIMATE OVERRIDE - Target all possible alphabet button selectors */
+/* This should catch any Bootstrap or Moodle button variations */
+
+/* All Bootstrap primary buttons on user pages */
+html body.path-user .btn-primary,
+html body.page-user .btn-primary,
+html body .page-content .btn-primary,
+html body .userlist .btn-primary,
+html body .participants .btn-primary,
+html body .enrolled-users .btn-primary,
+html body .filter-container .btn-primary,
+html body [data-region="participants"] .btn-primary,
+html body .initials-container .btn-primary,
+html body .alphabet-filter .btn-primary {
+    background-color: #1CB0F6 !important;
+    background-image: none !important;
+    border-color: #1CB0F6 !important;
+    color: #ffffff !important;
+}
+
+/* Hover states */
+html body.path-user .btn-primary:hover,
+html body.page-user .btn-primary:hover,
+html body .page-content .btn-primary:hover,
+html body .userlist .btn-primary:hover,
+html body .participants .btn-primary:hover,
+html body .enrolled-users .btn-primary:hover,
+html body .filter-container .btn-primary:hover,
+html body [data-region="participants"] .btn-primary:hover,
+html body .initials-container .btn-primary:hover,
+html body .alphabet-filter .btn-primary:hover {
+    background-color: #0ea5e9 !important;
+    background-image: none !important;
+    border-color: #0ea5e9 !important;
+    color: #ffffff !important;
+}
+
+/* Target specific alphabet navigation elements */
+html body .btn[href*="initials"],
+html body .btn[href*="alpha"],
+html body .btn[data-initial],
+html body .btn[data-letter],
+html body a.btn[href*="sort"],
+html body button[name*="initial"],
+html body .letter-nav .btn,
+html body .alphabet-nav .btn {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+    color: white !important;
+}
+
+/* JAVASCRIPT DEBUGGING - Add styles that JavaScript can also apply */
+/* This creates a fallback if CSS alone isn't working */
+
+/* Target by exact Bootstrap classes that might be dynamically added */
+html body .btn.btn-primary[data-bs-toggle],
+html body .btn.btn-primary[role="button"],
+html body .btn.btn-outline-primary,
+html body .btn.btn-info,
+html body .active.btn,
+html body .btn[aria-pressed="true"] {
+    background-color: #1CB0F6 !important;
+    background-image: none !important;
+    border-color: #1CB0F6 !important;
+    color: #ffffff !important;
+}
+
+/* Catch-all for any button with blue-ish background */
+html body .btn[style*="background"] {
+    background-color: #1CB0F6 !important;
+    background-image: none !important;
+    border-color: #1CB0F6 !important;
+}
+
+/* Force all buttons on participants page to use our color */
+html body.path-user .btn-primary,
+html body .path-user .btn-primary,
+html body [class*="user"] .btn-primary {
+    background: linear-gradient(to bottom, #1CB0F6, #1CB0F6) !important;
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+}
+
+/* FORCE ALPHABET BUTTONS - ULTRA HIGH SPECIFICITY */
+html body div.page-content .btn-primary,
+html body .path-user div .btn-primary,
+html body .userlist-container .btn-primary,
+html body #page-content .btn-primary,
+html body main .btn-primary,
+html body .main-inner .btn-primary {
+    background-color: #1CB0F6 !important;
+    background-image: none !important;
+    background: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+    color: #ffffff !important;
+}
+
+/* ULTRA SPECIFIC TARGETING */
+html body.path-user main .btn-primary:not([value*="Apply"]):not([class*="apply"]) {
+    background-color: #1CB0F6 !important;
+    background: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+    color: #ffffff !important;
+}
+
+/* NUCLEAR OPTION - Replace Bootstrap default blue with our blue */
+/* This targets the exact Bootstrap 4/5 default primary color */
+.btn-primary {
+    --bs-btn-bg: #1CB0F6 !important;
+    --bs-btn-border-color: #1CB0F6 !important;
+    --bs-btn-hover-bg: #0ea5e9 !important;
+    --bs-btn-hover-border-color: #0ea5e9 !important;
+    --bs-btn-active-bg: #0ea5e9 !important;
+    --bs-btn-active-border-color: #0ea5e9 !important;
+}
+
+/* FINAL OVERRIDE - Replace any Bootstrap default blue (#007bff) */
+.btn[style*="#007bff"] {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+}
+
+/* Override CSS custom properties for Bootstrap 5 */
+:root {
+    --bs-primary: #1CB0F6 !important;
+    --bs-btn-primary-bg: #1CB0F6 !important;
+    --bs-btn-primary-border-color: #1CB0F6 !important;
+}
+
+/* Last resort - target all blue backgrounds */
+.btn[class*="primary"]:not([value*="Apply"]) {
+    background-color: #1CB0F6 !important;
+    background-image: none !important;
+    border-color: #1CB0F6 !important;
+    color: white !important;
+}
+
+
+
+
+
+/* Navigation tabs text color */
+.nav-tabs .nav-link {
+    color: #000000 !important;
+}
+
+/* More menu items */
+.more-nav .nav-item a {
+    color: #000000 !important;
+}
+
+/* Style dropdown menu items with hover effect */
+.dropdown-item {
+    color: #000000 !important;
+    transition: color 0.2s ease !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus,
+.dropdown-item:active {
+    color: #1CB0F6 !important;
+    background: transparent !important;
+    text-decoration: none !important;
+}

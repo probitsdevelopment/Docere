@@ -58,24 +58,7 @@ echo "Using user: " . $user->firstname . " " . $user->lastname . " (ID: " . $use
 $time = time();
 
 $assessments = [
-    [
-        'title' => 'mernstack',
-        'duration' => 45,
-        'total_marks' => 100,
-        'pass_percentage' => 70,
-        'language' => 'en',
-        'instructions' => 'This is a comprehensive test covering MERN stack development.',
-        'status' => 'pending_review'
-    ],
-    [
-        'title' => 'Test on Full Stack Development',
-        'duration' => 45,
-        'total_marks' => 100,
-        'pass_percentage' => 70,
-        'language' => 'en',
-        'instructions' => 'Advanced test on full stack development concepts.',
-        'status' => 'pending_review'
-    ]
+    // No test assessments - use real data only
 ];
 
 foreach ($assessments as $assessment_data) {

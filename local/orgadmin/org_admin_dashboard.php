@@ -99,8 +99,7 @@ body {
 }
 
 .admin-welcome-character {
-    position: relative;
-    z-index: 2;
+    display: none;
 }
 
 .admin-character {
@@ -443,49 +442,23 @@ body {
 <div class="admin-container">
     <!-- Welcome Banner -->
     <div class="admin-welcome">
-        <div class="admin-welcome-content">
-            <h1>Welcome Back, <?php echo fullname($USER); ?></h1>
-            <div class="admin-welcome-date">
-                <span class="material-icons">calendar_today</span>
-                <?php echo date('D, j M Y'); ?>
+    <div class="admin-welcome-content" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="flex: 1; text-align: left;">
+                <h1>Welcome Back, <?php echo fullname($USER); ?></h1>
+                <div class="admin-welcome-date">
+                    <span class="material-icons">calendar_today</span>
+                    <?php echo date('D, j M Y'); ?>
+                </div>
+                <p class="admin-welcome-subtitle">Manage your organization users and track their progress</p>
             </div>
-            <p class="admin-welcome-subtitle">Manage your organization users and track their progress</p>
+            <div style="position: absolute; right: 40px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 16px;">
+                <img src="Gray and Blue Gradient Man 3D Avatar.png" alt="Org Admin Avatar" style="height: 100px; width: 100px; object-fit: contain;">
+                <div class="admin-speech-bubble">Good to see you back, <?php echo $USER->firstname; ?>!<br>Ready to learn?</div>
+            </div>
         </div>
         <div class="admin-welcome-character">
-            <div style="display: flex; align-items: flex-end; gap: 10px;">
-                <!-- Professional Character Illustration -->
-                <div style="position: relative; width: 80px; height: 100px;">
-                    <!-- Body/Suit -->
-                    <div style="width: 45px; height: 55px; background: #2c3e50; border-radius: 8px 8px 0 0; position: absolute; bottom: 0; left: 17px;"></div>
-                    <!-- Tie -->
-                    <div style="width: 6px; height: 25px; background: #34495e; position: absolute; bottom: 20; left: 37px;"></div>
-                    <!-- Shirt -->
-                    <div style="width: 35px; height: 15px; background: #ecf0f1; position: absolute; bottom: 35px; left: 22px;"></div>
-                    <!-- Head -->
-                    <div style="width: 40px; height: 45px; background: #f4a261; border-radius: 50% 50% 45% 45%; position: absolute; top: 0; left: 20px;"></div>
-                    <!-- Hair -->
-                    <div style="width: 35px; height: 20px; background: #8b4513; border-radius: 50% 50% 40% 40%; position: absolute; top: 2px; left: 22px;"></div>
-                    <!-- Glasses -->
-                    <div style="position: absolute; top: 18px; left: 25px;">
-                        <!-- Frame -->
-                        <div style="width: 30px; height: 2px; background: #2c3e50; margin-bottom: 2px;"></div>
-                        <!-- Left lens -->
-                        <div style="width: 12px; height: 10px; border: 2px solid #2c3e50; border-radius: 50%; display: inline-block; background: rgba(255,255,255,0.1);"></div>
-                        <!-- Bridge -->
-                        <div style="width: 2px; height: 2px; background: #2c3e50; display: inline-block; margin: 0 2px;"></div>
-                        <!-- Right lens -->
-                        <div style="width: 12px; height: 10px; border: 2px solid #2c3e50; border-radius: 50%; display: inline-block; background: rgba(255,255,255,0.1);"></div>
-                    </div>
-                    <!-- Eyes -->
-                    <div style="width: 3px; height: 3px; background: #2c3e50; border-radius: 50%; position: absolute; top: 22px; left: 30px;"></div>
-                    <div style="width: 3px; height: 3px; background: #2c3e50; border-radius: 50%; position: absolute; top: 22px; left: 45px;"></div>
-                    <!-- Smile -->
-                    <div style="width: 8px; height: 4px; border: 2px solid #2c3e50; border-top: none; border-radius: 0 0 8px 8px; position: absolute; top: 32px; left: 36px;"></div>
-                </div>
-                
-                <div class="admin-speech-bubble">
-                    Good to see you back, <?php echo $USER->firstname; ?>!<br>Ready to learn?
-                </div>
+            <div style="display: flex; align-items: center; justify-content: flex-end; height: 100%;">
+                <img src="Gray and Blue Gradient Man 3D Avatar.png" alt="Org Admin Avatar" style="height: 100px; width: 100px; object-fit: contain;">
             </div>
         </div>
     </div>

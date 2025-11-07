@@ -78,6 +78,9 @@ html, body {
     padding: 30px;
     margin-bottom: 20px;
     position: relative;
+    height: 156px !important;
+    min-height: 156px !important;
+    max-height: 156px !important;
     overflow: hidden;
     border: 3px solid #149EDF;
 }
@@ -110,15 +113,15 @@ html, body {
 }
 
 /* Character and Speech Bubble */
-.admin-character {
-    position: absolute;
-    right: 150px;
-    bottom: -20px;
-    width: 120px;
-    height: 140px;
-    background: url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 120 140\'%3E%3Cg%3E%3Ccircle cx=\'60\' cy=\'45\' r=\'35\' fill=\'%23f4b99d\'/%3E%3Ccircle cx=\'50\' cy=\'40\' r=\'3\' fill=\'%23333\'/%3E%3Ccircle cx=\'70\' cy=\'40\' r=\'3\' fill=\'%23333\'/%3E%3Cpath d=\'M45 50 Q60 60 75 50\' stroke=\'%23333\' stroke-width=\'2\' fill=\'none\'/%3E%3Crect x=\'35\' y=\'75\' width=\'50\' height=\'60\' rx=\'5\' fill=\'%234a90e2\'/%3E%3Cpath d=\'M30 20 Q15 5 35 10 Q55 15 45 30\' fill=\'%23d4931a\'/%3E%3Cpath d=\'M90 20 Q105 5 85 10 Q65 15 75 30\' fill=\'%23d4931a\'/%3E%3C/g%3E%3C/svg%3E") no-repeat center center;
-    background-size: contain;
-}
+// .admin-character {
+//     position: absolute;
+//     right: 150px;
+//     bottom: -20px;
+//     width: 120px;
+//     height: 140px;
+//     background: url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 120 140\'%3E%3Cg%3E%3Ccircle cx=\'60\' cy=\'45\' r=\'35\' fill=\'%23f4b99d\'/%3E%3Ccircle cx=\'50\' cy=\'40\' r=\'3\' fill=\'%23333\'/%3E%3Ccircle cx=\'70\' cy=\'40\' r=\'3\' fill=\'%23333\'/%3E%3Cpath d=\'M45 50 Q60 60 75 50\' stroke=\'%23333\' stroke-width=\'2\' fill=\'none\'/%3E%3Crect x=\'35\' y=\'75\' width=\'50\' height=\'60\' rx=\'5\' fill=\'%234a90e2\'/%3E%3Cpath d=\'M30 20 Q15 5 35 10 Q55 15 45 30\' fill=\'%23d4931a\'/%3E%3Cpath d=\'M90 20 Q105 5 85 10 Q65 15 75 30\' fill=\'%23d4931a\'/%3E%3C/g%3E%3C/svg%3E") no-repeat center center;
+//     background-size: contain;
+// }
 
 .admin-speech-bubble {
     position: absolute;
@@ -524,7 +527,7 @@ echo html_writer::tag('p', 'Continue your learning journey and take your upcomin
 echo html_writer::end_div();
 
 // Character and Speech Bubble
-echo html_writer::div('', 'admin-character');
+echo html_writer::div('<img src="Gray and Blue Gradient Man 3D Avatar.png" alt="Admin Avatar" style="height: 120px; width: 120px; object-fit: contain; position: absolute; right: 140px; top: 20px;">', 'admin-character');
 echo html_writer::div("Good to see you back, $username.<br>Ready to learn?", 'admin-speech-bubble');
 echo html_writer::end_div();
 

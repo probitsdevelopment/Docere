@@ -17,8 +17,8 @@ if (!orgadmin_role_detector::should_show_lnd_dashboard()) {
     redirect($dashboardurl);
 }
 
-// Get assessment ID from URL parameter
-$assessmentId = optional_param('id', 'java-basics-active', PARAM_ALPHANUMEXT);
+// Get assessment ID from URL parameter - now expects real assessment IDs
+$assessmentId = optional_param('id', 0, PARAM_INT);
 
 // Assessment data mapping - In real implementation, fetch from database
 $assessmentDataMap = [

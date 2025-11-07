@@ -19,8 +19,8 @@
     }
 }
 
-// Grade upgrade notice.
-.core_grades_notices {
+// Grade upgrade notices.
+.upgrade_grades_notices {
     .singlebutton {
         display: inline-block;
     }
@@ -490,16 +490,338 @@
 /**
  * User report.
  */
+.path-grade-report-user {
+    /* Compact user report dropdown section - no borders */
+    .tertiary-navigation {
+        background-color: transparent !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        margin-bottom: 24px !important;
+        padding: 12px 16px !important;
+        border: none !important;
+        min-height: 60px !important;
+        max-height: 60px !important;
+        height: 60px !important;
+        display: flex !important;
+        align-items: center !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+        position: relative !important;
+    }
+
+    /* Remove borders from parent cards to prevent overlap */
+    .card:has(.tertiary-navigation) {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Very compact dropdown styling - button no borders, menu visible */
+    .tertiary-navigation .dropdown,
+    .tertiary-navigation select,
+    .tertiary-navigation .form-control,
+    .tertiary-navigation .btn {
+        padding: 6px 8px !important;
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        max-height: 36px !important;
+        margin: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+        background: transparent !important;
+        vertical-align: middle !important;
+    }
+
+    /* Ensure dropdown menu is visible */
+    .tertiary-navigation .dropdown-menu {
+        background-color: white !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        z-index: 1050 !important;
+        display: none !important;
+    }
+
+    .tertiary-navigation .dropdown.show .dropdown-menu,
+    .tertiary-navigation .dropdown-menu.show {
+        display: block !important;
+    }
+
+    .tertiary-navigation .dropdown-menu .dropdown-item {
+        padding: 8px 16px !important;
+        color: #374151 !important;
+        text-decoration: none !important;
+    }
+
+    .tertiary-navigation .dropdown-menu .dropdown-item:hover {
+        background-color: #f3f4f6 !important;
+        color: #1f2937 !important;
+    }
+
+    /* Remove extra spacing and fix text positioning */
+    .tertiary-navigation * {
+        margin: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    /* Fix dropdown arrow and text positioning */
+    .tertiary-navigation .dropdown-toggle {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: auto !important;
+        min-width: 120px !important;
+        cursor: pointer !important;
+        text-decoration: none !important;
+        color: #374151 !important;
+    }
+
+    .tertiary-navigation .dropdown-toggle:hover {
+        color: #1f2937 !important;
+    }
+
+    .tertiary-navigation .dropdown-toggle::after {
+        margin-left: auto !important;
+        margin-right: 0 !important;
+        content: "▼" !important;
+        border: none !important;
+        font-size: 12px !important;
+    }
+
+    /* User profile section - exact match with dropdown */
+    .user-heading {
+        background-color: white !important;
+        border-radius: 16px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+        padding: 12px 16px !important;
+        margin: 24px 0 !important;
+        border: 1px solid #e5e7eb !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        min-height: 60px !important;
+        max-height: 60px !important;
+        height: 60px !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        position: relative !important;
+    }
+
+    .user-heading .userinitials {
+        background-color: #1CB0F6 !important;
+        color: white !important;
+        font-weight: 600 !important;
+        border-radius: 50% !important;
+        width: 40px !important;
+        height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 14px !important;
+        flex-shrink: 0 !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
+    .user-heading h2 {
+        color: #1CB0F6 !important;
+        font-weight: 600 !important;
+        font-size: 16px !important;
+        margin: 0 !important;
+        line-height: 1.2 !important;
+    }
+
+    /* Target the specific flex container with h4 class */
+    .d-flex.h4,
+    div.d-flex h4,
+    .d-flex-ml-2 {
+        color: #1CB0F6 !important;
+    }
+
+    /* Target the user name in flex containers */
+    .align-items-center .d-flex-ml-2,
+    .align-items-center h4,
+    div[class*="d-flex"] h4 {
+        color: #1CB0F6 !important;
+        font-weight: 600 !important;
+    }
+
+    /* More comprehensive user name targeting */
+    .path-grade-report-user h4,
+    .path-grade-report-user .h4,
+    .page-header h4,
+    .page-header .h4 {
+        color: #1CB0F6 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Target any text that might be the user name */
+    .user-report-container h4,
+    .user-report-container .h4,
+    #page-header h4,
+    #page-header .h4 {
+        color: #1CB0F6 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Broad targeting for user name elements */
+    h4:contains("Jeevan"),
+    .usertext,
+    .username,
+    [class*="user"] h4,
+    [class*="user"] .h4 {
+        color: #1CB0F6 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Force all headings in grade report to use custom blue */
+    h1, h2, h3, h4, h5, h6 {
+        color: #1CB0F6 !important;
+    }
+
+    /* Target Bootstrap heading classes */
+    .h1, .h2, .h3, .h4, .h5, .h6 {
+        color: #1CB0F6 !important;
+    }
+
+    /* Ultra-specific targeting for any remaining elements */
+    * {
+        &:not(.btn):not(.badge):not(.alert) {
+            h1, h2, h3, h4, h5, h6,
+            .h1, .h2, .h3, .h4, .h5, .h6 {
+                color: #1CB0F6 !important;
+            }
+        }
+    }
+
+    /* Target the specific anchor tag with h4 class containing user name */
+    a.h4.m-0,
+    a.h4,
+    a[class*="h4"] {
+        color: #1CB0F6 !important;
+        text-decoration: none !important;
+        font-weight: 700 !important;
+    }
+
+    a.h4.m-0:hover,
+    a.h4:hover,
+    a[class*="h4"]:hover {
+        color: #0ea5e9 !important;
+        text-decoration: underline !important;
+    }
+
+    /* Target the specific structure from dev tools */
+    .d-flex-ml-2 a,
+    .align-items-center a.h4,
+    div[class*="d-flex"] a[class*="h4"] {
+        color: #1CB0F6 !important;
+        font-weight: 700 !important;
+    }
+}
+
 .path-grade-report-user .user-grade {
     border: none;
 
     &.generaltable {
+        /* Remove spacing between table rows */
+        border-collapse: collapse !important;
+        border-spacing: 0 !important;
+        margin: 0 !important;
+        
         .levelodd {
-            background-color: $table-accent-bg;
+            background-color: white !important;
         }
 
         .leveleven {
-            background-color: $table-bg;
+            background-color: white !important;
+        }
+
+        /* Ensure all table rows have white background */
+        tr {
+            background-color: white !important;
+        }
+
+        /* Specific targeting for category headers like NeoBankX */
+        tr.category,
+        tr[class*="category"],
+        .category {
+            background-color: white !important;
+        }
+
+        /* Override any blue backgrounds */
+        tbody tr,
+        thead tr {
+            background-color: white !important;
+        }
+
+        /* Change link colors to custom blue */
+        a {
+            color: #1CB0F6 !important;
+            text-decoration: none !important;
+        }
+
+        a:hover {
+            color: #0ea5e9 !important;
+            text-decoration: underline !important;
+        }
+
+        /* Target grade item links specifically */
+        .column-itemname a,
+        td a {
+            color: #1CB0F6 !important;
+            font-weight: 500 !important;
+        }
+
+        .column-itemname a:hover,
+        td a:hover {
+            color: #0ea5e9 !important;
+            text-decoration: underline !important;
+        }
+
+        /* Remove margins and padding that create spacing */
+        tr {
+            margin: 0 !important;
+            padding: 0 !important;
+            border-spacing: 0 !important;
+        }
+
+        td, th {
+            margin: 0 !important;
+            border-spacing: 0 !important;
+            vertical-align: middle !important;
+        }
+
+        /* Ensure no gaps between cells */
+        tbody tr {
+            border-top: 1px solid #dee2e6 !important;
+        }
+
+        tbody tr:first-child {
+            border-top: none !important;
+        }
+
+        /* Make table headers black text */
+        thead th,
+        thead td,
+        .table-header,
+        th {
+            color: #000000 !important;
+            font-weight: 600 !important;
+        }
+
+        /* Specific targeting for grade table headers */
+        th[scope="col"],
+        .generaltable th,
+        .table th {
+            color: #000000 !important;
+            font-weight: 600 !important;
         }
     }
 

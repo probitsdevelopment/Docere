@@ -17,7 +17,56 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title('Assessment Interface');
 $PAGE->set_heading('Student Assessment');
 
-echo $OUTPUT->header();
+// Handle assessment submission (POST)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['q1'], $_POST['q2'], $_POST['q3'])) {
+    global $DB, $USER;
+    $answers = [
+        'q1' => $_POST['q1'],
+        'q2' => $_POST['q2'],
+        'q3' => $_POST['q3']
+    ];
+    $score = 0;
+    if ($answers['q1'] === 'a') $score++;
+    if ($answers['q2'] === 'b') $score++;
+    if ($answers['q3'] === 'a') $score++;
+
+    // Example question and detail IDs (replace with real IDs as needed)
+    $question_ids = [1, 2, 3];
+    $detail_ids = [1, 2, 3];
+    $correct_answers = ['a', 'b', 'a'];
+
+    // Insert each detail's marks
+    foreach ($question_ids as $i => $qid) {
+        $DB->insert_record('student_assessment_details', [
+            'student_id' => $USER->id,
+            'question_id' => $qid,
+            'questiondetail_id' => $detail_ids[$i],
+            'marks' => ($answers['q'.($i+1)] === $correct_answers[$i]) ? 1 : 0,
+            'time_taken' => null
+        ]);
+    }
+
+    // Save total
+    $DB->insert_record('student_assessment_totals', [
+        'student_id' => $USER->id,
+        'question_id' => 1, // Or assessment id if you have it
+        'submission_date' => date('Y-m-d'),
+        'submission_time' => date('H:i:s'),
+        'total_marks' => $score
+    ]);
+    // Show result page
+    echo $OUTPUT->header();
+    ?>
+    <div class="assessment-container">
+        <h2>Assessment Complete!</h2>
+        <p>Your Score: <?php echo $score; ?>/3 (<?php echo round($score/3*100); ?>%)</p>
+        <p>Thank you for completing the assessment. Your results have been recorded.</p>
+        <a href="/local/orgadmin/student_dashboard.php" class="back-btn">Back to Dashboard</a>
+    </div>
+    <?php
+    echo $OUTPUT->footer();
+    exit;
+}
 ?>
 
 <style>

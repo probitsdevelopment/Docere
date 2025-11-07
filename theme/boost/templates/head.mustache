@@ -23,5 +23,79 @@
     <title>{{{ output.page_title }}}</title>
     <link rel="shortcut icon" href="{{{ output.favicon }}}" />
     {{{ output.standard_head_html }}}
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+                    /* Quick overrides: force course and My courses pages to use a white page
+                         background and make the Course overview block/card visually elevated.
+                         Scoped to page-specific body classes so other layouts are unaffected. */
+                    body.pagelayout-course,
+                    body.page-mycourses,
+                    body#page-my-index,
+                    body.pagelayout-mycourses,
+                    body.pagelayout-my-index {
+                        background: #F9FAFB !important;
+                    }
+
+            /* Ensure the main page containers on course pages are white. */
+                    body.pagelayout-course #page,
+                    body.pagelayout-course #page-content,
+                    body.pagelayout-course #region-main-box,
+                    body.pagelayout-course #region-main,
+                    body.pagelayout-course .container-fluid,
+                    /* Also apply to My courses page wrappers */
+                    body.page-mycourses #page,
+                    body#page-my-index #page,
+                    body.page-mycourses #page-content,
+                    body#page-my-index #page-content,
+                    body.page-mycourses #region-main-box,
+                    body#page-my-index #region-main-box,
+                    body.page-mycourses #region-main,
+                    body#page-my-index #region-main,
+                    body.page-mycourses .container-fluid,
+                    body#page-my-index .container-fluid {
+                background:#F9FAFB !important;
+            }
+
+            /* Make course content boxes and cards white with a subtle shadow. */
+                    body.pagelayout-course #region-main .box,
+                    body.pagelayout-course #region-main .card,
+                    body.pagelayout-course #region-main .coursebox,
+                    /* My courses block variants */
+                    body.page-mycourses #region-main .box,
+                    body#page-my-index #region-main .box,
+                    body.page-mycourses #region-main .card,
+                    body#page-my-index #region-main .card,
+                    body.page-mycourses #region-main .coursebox,
+                    body#page-my-index #region-main .coursebox,
+                    body.pagelayout-course .block-myoverview,
+                    body.pagelayout-course .block_myoverview,
+                    body.pagelayout-course .block-myoverview .card,
+                    body.pagelayout-course .block_myoverview .card {
+                background: #F9FAFB !important;
+                border-radius: 12px !important;
+                                /* remove the thin inner border for a cleaner white card */
+                                border: none !important;
+                box-shadow: 0 12px 30px rgba(2,6,23,.06) !important;
+            }
+
+            /* Hide small horizontal rules under Course overview that create a line. */
+                    body.pagelayout-course .block-myoverview hr,
+                    body.pagelayout-course .block_myoverview hr,
+                    body.pagelayout-course #region-main hr,
+                    /* My courses hr variants */
+                    body.page-mycourses .block-myoverview hr,
+                    body#page-my-index .block-myoverview hr,
+                    body.page-mycourses #region-main hr,
+                    body#page-my-index #region-main hr {
+                display: none !important;
+            }
+
+            /* Slight lift on hover for cards in course context */
+            body.pagelayout-course #region-main .card:hover,
+            body.pagelayout-course .block-myoverview .card:hover,
+            body.pagelayout-course .block_myoverview .card:hover {
+                transform: translateY(-4px);
+                transition: transform .15s ease-out;
+            }
+        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>

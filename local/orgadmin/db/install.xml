@@ -1,0 +1,129 @@
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/orgadmin/db" VERSION="2025100700" COMMENT="Schema for assessments and custom question storage">
+  <TABLES>
+
+    <TABLE NAME="orgadmin_assessments" COMMENT="Teacher-created assessments">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="organization_id" TYPE="int" LENGTH="10" NOTNULL="false"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="true"/>
+        <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="false"/>
+        <FIELD NAME="total_marks" TYPE="int" LENGTH="10" NOTNULL="false"/>
+        <FIELD NAME="pass_percentage" TYPE="int" LENGTH="3" NOTNULL="false"/>
+        <FIELD NAME="language" TYPE="char" LENGTH="10" NOTNULL="false"/>
+        <FIELD NAME="instructions" TYPE="text" NOTNULL="false"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="draft"/>
+        <FIELD NAME="question_file" TYPE="char" LENGTH="255" NOTNULL="false"/>
+        <FIELD NAME="rejection_reason" TYPE="text" NOTNULL="false"/>
+        <FIELD NAME="allow_multiple_attempts" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0"/>
+        <FIELD NAME="send_email_notifications" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="idx_status" UNIQUE="false" FIELDS="status"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_questions" COMMENT="Trainer-authored questions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="assessment_id" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="qid" TYPE="char" LENGTH="50" NOTNULL="true"/>
+        <FIELD NAME="qtitle" TYPE="char" LENGTH="255" NOTNULL="true"/>
+        <FIELD NAME="expectation" TYPE="text" NOTNULL="true"/>
+        <FIELD NAME="programming_language" TYPE="char" LENGTH="50" NOTNULL="true"/>
+        <FIELD NAME="max_marks" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="uniq_qid" TYPE="unique" FIELDS="qid"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_assessment_id" UNIQUE="false" FIELDS="assessment_id"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_question_details" COMMENT="Per-question criteria">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="qdetailid" TYPE="char" LENGTH="50" NOTNULL="false"/>
+        <FIELD NAME="qdetailtitle" TYPE="char" LENGTH="255" NOTNULL="true"/>
+        <FIELD NAME="max_marks" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="question_id" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_details_question" UNIQUE="false" FIELDS="question_id"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_question_scores" COMMENT="Scores per criterion per attempt per user">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="question_id" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="detail_id" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="marks" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="attempt_no" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="uniq_one_score_per_attempt" TYPE="unique" FIELDS="question_id,detail_id,userid,attempt_no"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_scores_lookup" UNIQUE="false" FIELDS="question_id,userid,attempt_no"/>
+        <INDEX NAME="idx_scores_detail" UNIQUE="false" FIELDS="detail_id"/>
+      </INDEXES>
+    </TABLE>
+
+  </TABLES>
+    <TABLE NAME="student_assessment_details" COMMENT="Stores each student's marks for each question detail (criterion)">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="student_id" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="question_id" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="questiondetail_id" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="marks" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="time_taken" TYPE="int" LENGTH="10" NOTNULL="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_student_id" UNIQUE="false" FIELDS="student_id"/>
+        <INDEX NAME="idx_question_id" UNIQUE="false" FIELDS="question_id"/>
+        <INDEX NAME="idx_questiondetail_id" UNIQUE="false" FIELDS="questiondetail_id"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="student_assessment_totals" COMMENT="Stores the total marks for a student for a question (assessment submission)">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="student_id" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="question_id" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="submission_date" TYPE="char" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="submission_time" TYPE="char" LENGTH="8" NOTNULL="true"/>
+        <FIELD NAME="total_marks" TYPE="int" LENGTH="10" NOTNULL="true"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_student_id" UNIQUE="false" FIELDS="student_id"/>
+        <INDEX NAME="idx_question_id" UNIQUE="false" FIELDS="question_id"/>
+      </INDEXES>
+    </TABLE>
+</XMLDB>

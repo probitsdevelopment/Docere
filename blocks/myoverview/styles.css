@@ -1,5 +1,404 @@
+/* Figma-style progress bar for course cards */
+.dashboard-card-footer .progress-text {
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: #3a3a3a;
+    margin-bottom: 0.25rem;
+}
+.dashboard-card-footer .progress-bar-figma {
+    position: relative;
+    width: 95%;
+    height: 8px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    margin: 0 auto 0.5rem auto;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+.dashboard-card-footer .progress-bar-figma .progress-dot {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    background: #2ee46b;
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 2px solid #fff;
+}
+.dashboard-card-footer .progress-bar-figma .progress-inner {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: #2ee46b;
+    border-radius: 8px;
+    z-index: 1;
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+}
+.dashboard-card-footer .progress-bar-figma .progress-bg {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border-radius: 8px;
+    z-index: 0;
+}
+/* Remove border from the main course overview container */
+.block-myoverview {
+    border: none !important;
+    box-shadow: none !important;
+}
+/* Remove box shadow from card-body container for a flat look */
+.card-body.p-3 {
+    box-shadow: none !important;
+}
+/* Absolutely force hide Course overview heading on dashboard */
+body.path-my h5[id^="instance-"][class*="card-title"][class*="d-inline"],
+body#page-my-index h5[id^="instance-"][class*="card-title"][class*="d-inline"],
+#region-main .block-myoverview h5.card-title.d-inline,
+#region-main .block_myoverview h5.card-title.d-inline {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/* Force hide the 'Course overview' heading using id and class for maximum specificity */
+#region-main .block-myoverview h5.card-title.d-inline,
+#region-main .block_myoverview h5.card-title.d-inline,
+h5[id^="instance-"][class*="card-title"][class*="d-inline"] {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/* Hide the 'Course overview' heading by targeting the specific h5 element */
+.block-myoverview h5.card-title.d-inline {
+    display: none !important;
+}
+/* Hide the 'Course overview' heading in the myoverview block */
+.block-myoverview .course-overview-heading,
+.block-myoverview h2, /* fallback for heading element */
+.block-myoverview .block-title {
+    display: none !important;
+}
+/* Flexbox filter bar for tabs and controls */
+.myoverview-filterbar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 0;
+}
+.myoverview-filterbar-left {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.myoverview-filterbar-right {
+    flex: 0 0 auto;
+    margin-left: auto;
+    gap: 0.5rem;
+}
+/* Ensure search and sort controls are tight and right-aligned */
+.myoverview-filterbar-right > * {
+    margin-left: 0.5rem;
+}
+.myoverview-filterbar-right > *:first-child {
+    margin-left: 0;
+}
+/* Horizontal tab-style filter for myoverview grouping selector */
+.myoverview-grouping-tabs {
+    gap: 1.5rem;
+    border-bottom: 1.5px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+}
+.myoverview-grouping-tab {
+    color: #6b7280;
+    font-weight: 500;
+    font-size: 1rem;
+    background: none;
+    border: none;
+    border-radius: 0;
+    border-bottom: 2.5px solid transparent;
+    margin-bottom: -1.5px;
+    padding: 0.5rem 0.75rem 0.75rem 0.75rem;
+    transition: color 0.2s, border-color 0.2s;
+    outline: none;
+}
+.myoverview-grouping-tab[aria-current="true"] {
+    color: #1CB0F6;
+    border-bottom: 2.5px solid #1CB0F6;
+    background: none;
+    font-weight: 600;
+}
+
+/* Remove blue from tabs that have .active but not aria-current="true" (JS or legacy class) */
+.myoverview-grouping-tab.active:not([aria-current="true"]) {
+    color: #6b7280;
+    border-bottom: 2.5px solid transparent;
+    background: none;
+    font-weight: 500;
+}
+.myoverview-grouping-tab:hover,
+.myoverview-grouping-tab:focus {
+    color: #1CB0F6;
+    text-decoration: none;
+}
 /* Hide the first dropdown-divider if no filter option element is listed before it.
    This can happen for some subset configurations of the block_myoverview course filter. */
 .block_myoverview button#groupingdropdown + .dropdown-menu li:first-of-type.dropdown-divider:first-of-type {
     display: none;
 }
+
+/* Style dropdown menu items to use accent color on hover */
+.block_myoverview .dropdown-menu li a.dropdown-item:hover,
+.block_myoverview .dropdown-menu li a.dropdown-item:focus,
+.block_myoverview .dropdown-menu li a.dropdown-item:active,
+.block_myoverview .dropdown-menu li[role="menuitem"]:hover,
+.block_myoverview .dropdown-menu li[role="menuitem"]:focus,
+.block_myoverview .dropdown-menu li[role="menuitem"]:active,
+.block_myoverview button[data-filter="grouping"]:hover + .dropdown-menu li,
+.block_myoverview [data-filter="grouping"] .dropdown-item:hover,
+.block_myoverview [data-filter="grouping"] .dropdown-item:focus,
+.block_myoverview [data-filter="grouping"] .dropdown-item:active {
+    background-color: #5FC6F8 !important;
+    color: #ffffff !important;
+}
+
+/* Also target the specific data-filter attribute seen in the developer tools */
+.block_myoverview [data-filter="grouping"] .dropdown-menu li:hover,
+.block_myoverview [data-filter="grouping"] .dropdown-menu a:hover {
+    background-color: #5FC6F8 !important;
+    color: #ffffff !important;
+}
+
+/* Make the myoverview area visually stand out: white background and subtle shadow. */
+.block-myoverview {
+    background-color: #ffffff; /* white background for the course overview block */
+    border-radius: 8px;
+    padding: 1rem 1.25rem; /* more breathing room so the heading isn't touching the edge */
+    box-shadow: none !important; /* Ensure no box shadow is applied */
+}
+
+/* Remove the thin rule that appears at the top of the block (the <hr class="mt-0"/>) */
+.block-myoverview > hr.mt-0 {
+    display: none;
+}
+
+/* Ensure inner container uses transparent background so card styling shows through */
+.block-myoverview .container-fluid {
+    background: transparent;
+}
+
+/* Slightly lift course cards on hover to emphasise them */
+.block-myoverview .card:hover {
+    transform: translateY(-4px);
+    box-shadow: none !important;
+    transition: transform 0.18s ease;
+}
+
+/* Increase and nudge the Course overview heading inside the block */
+.block-myoverview .block_title,
+.block-myoverview .block-title,
+.block-myoverview h2,
+.block-myoverview .course-overview-heading {
+    font-size: 1.2rem;
+    font-weight: 600;
+    /* nudge the title a little left so it lines up better with surrounding content */
+    margin: 0 0 0.75rem 0.6rem;
+    padding-top: 0.25rem;
+    color: #111827;
+}
+
+/* Also target h5 headings specifically (some templates use h5 for block titles) */
+.block-myoverview h5,
+.block-myoverview .h5 {
+    /* slightly reduced left margin so h5 aligns with the updated block title position */
+    margin-left: 0.9rem !important;
+}
+
+/* Position the My courses page header */
+.path-my .page-header-headings h2 {
+    position: relative; /* establish positioning context */
+    margin: 0.5rem 0 1.5rem; /* vertical spacing */
+    padding: 0.5rem 0; /* vertical padding */
+    font-size: 1.75rem !important; /* larger, more prominent size */
+    font-weight: 500 !important; /* medium weight for better readability */
+    color: #111827 !important; /* consistent dark color */
+    line-height: 1.2 !important; /* proper line height */
+    letter-spacing: -0.01em; /* slight negative tracking for headings */
+}
+
+/* Stronger override for the inline h5 used by the myoverview block title when rendered
+   (matches elements like h5#instance-5-header.card-title.d-inline shown in DevTools).
+   Use translateX to shift left and reduce left margin as fallback. */
+.block-myoverview h5.card-title.d-inline,
+.block-myoverview h5[id^="instance-"] .card-title.d-inline,
+.block-myoverview h5[id^="instance-"]{
+    display: inline-block !important;
+    transform: translateX(20px) !important; /* move right by 20px */
+    margin-left: 0.2rem !important; /* fallback for older browsers */
+}
+
+/* Also target the DOM class used in the page: block_myoverview (underscore). */
+.block_myoverview h5.card-title.d-inline,
+.block_myoverview h5[id^="instance-"] {
+    display: inline-block !important;
+    transform: translateX(20px) !important; /* move right by 20px */
+    margin-left: 0.1rem !important;
+}
+
+/* Force-move the exact heading element when present: use position+left to guarantee movement
+   even if other transform rules or display settings interfere. Targets h5 elements whose id
+   starts with 'instance-' and have class 'card-title'. */
+.block_myoverview h5[id^="instance-"][class*="card-title"],
+.block-myoverview h5[id^="instance-"][class*="card-title"] {
+    position: relative !important;
+    left: 20px !important; /* move right by 20px */
+    display: inline-block !important;
+}
+
+/* Remove any larger outer box-shadow that might be applied by theme-level rules
+   targeting #region-main or .box on course/mycourses pages. Keep shadows on
+   the individual small cards only. */
+body.page-mycourses #region-main .box,
+body#page-my-index #region-main .box,
+body.page-mycourses #region-main .card,
+body#page-my-index #region-main .card,
+.block-myoverview {
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Reduce size of course cards and adjust internal spacing for a tighter layout */
+.block-myoverview .card {
+    max-width: 360px; /* smaller card width */
+    min-width: 280px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.block-myoverview .card .card-body {
+    padding: 0.6rem 0.9rem; /* tighter padding */
+}
+
+.block-myoverview .card .card-img-top,
+.block-myoverview .card .courseimage img {
+    max-height: 110px; /* reduce image height */
+    width: 100%;
+    object-fit: cover;
+}
+
+/* Make card titles black and slightly smaller to match reduced card size */
+.block-myoverview .card .card-title,
+.block-myoverview .card .coursename,
+.block-myoverview .card .course-title {
+    color: #000000 !important;
+    font-size: 1rem !important;
+    margin-bottom: 0.35rem !important;
+}
+
+/* Ensure links inside the card title are black (override theme link color) */
+.block-myoverview .card .w-100.text-truncate a,
+.block-myoverview .card .card-title a,
+.block-myoverview .card .coursename a,
+.block-myoverview .card .course-title a {
+    color: #000000 !important;
+    text-decoration: none !important;
+}
+.block-myoverview .card .w-100.text-truncate a:hover,
+.block-myoverview .card .card-title a:hover,
+.block-myoverview .card .coursename a:hover,
+.block-myoverview .card .course-title a:hover,
+.block-myoverview .card .w-100.text-truncate a:focus {
+    color: #000000 !important;
+    text-decoration: underline !important;
+}
+
+/* Responsive: stack cards on small viewports and reduce max-width */
+@media (max-width: 768px) {
+    .block-myoverview .card { max-width: 100% !important; min-width: 0; }
+    .block-myoverview .card .card-img-top { max-height: 90px; }
+}
+
+/* When filter controls are active (All / Sort by / Card) make card titles the accent color */
+/* Use :has() where available (modern browsers) to detect an active/pressed button inside the block */
+.block-myoverview:has(.d-flex .btn.active) .card .card-title a,
+.block-myoverview:has(.d-flex .dropdown-toggle[aria-pressed="true"]) .card .card-title a,
+.block-myoverview:has(.d-flex .btn:focus) .card .card-title a {
+    color: #5FC6F8 !important;
+}
+
+/* Fallback rules: if a control is focused/active and the browser doesn't support :has(),
+   the user will at least see the focused button in accent color. For broad support we also
+   style card titles when a control has .active class present (common in bootstrap JS). */
+.block-myoverview .d-flex .btn.active ~ .card .card-title a,
+.block-myoverview .d-flex .btn.active + .row .card .card-title a {
+    color: #5FC6F8 !important;
+}
+
+/* Make dropdown toggle / filter buttons show the accent color when active/open/focused */
+.block-myoverview .dropdown.show > .btn,
+.block-myoverview .dropdown .btn[aria-expanded="true"],
+.block-myoverview .d-flex .btn.active,
+.block-myoverview .d-flex .btn:focus,
+.block-myoverview .d-flex .btn:active {
+    background: #5FC6F8 !important;
+    color: #ffffff !important;
+    border-color: #49b6e6 !important;
+}
+
+/* For outline variant buttons ensure the icon/caret is visible on accent background */
+.block-myoverview .dropdown.show > .btn .caret,
+.block-myoverview .d-flex .btn .caret {
+    border-top-color: #ffffff !important;
+}
+
+/* Also target block_myoverview DOM class (underscore) and outline variants to force accent color
+   on hover/focus/active/show so it overrides theme defaults which show grey on hover. */
+.block_myoverview .dropdown.show > .btn,
+.block_myoverview .dropdown .btn[aria-expanded="true"],
+.block_myoverview .d-flex .btn.active,
+.block_myoverview .d-flex .btn:focus,
+.block_myoverview .d-flex .btn:active,
+.block_myoverview .d-flex .btn:hover,
+.block_myoverview .dropdown .btn:hover,
+.block_myoverview .btn-outline-secondary:hover,
+.block_myoverview .btn-outline-secondary:focus,
+.block_myoverview .btn-outline-secondary.active,
+.block_myoverview .btn-outline-secondary[aria-expanded="true"] {
+    background: #5FC6F8 !important;
+    color: #ffffff !important;
+    border-color: #5fc6f8 !important;
+}
+
+.block_myoverview .dropdown.show > .btn .caret,
+.block_myoverview .d-flex .btn .caret,
+.block_myoverview .btn-outline-secondary .caret {
+    border-top-color: #ffffff !important;
+}
+
+/* Tidy up the card footer so it blends with the block */
+.block-myoverview .dashboard-card-footer {
+    background: transparent;
+    border-top: none;
+}
+
+/* Ensure course pages show a white background for the main content area. This is
+   applied when the myoverview block CSS is loaded (i.e. on pages where the block is present).
+   Use high specificity and !important to override theme defaults if necessary. */
+body.pagelayout-course #region-main,
+body.pagelayout-course #region-main-box,
+body.pagelayout-course .region-main-content,
+body.pagelayout-course #page,
+body.pagelayout-course .container,
+body.pagelayout-course .page-content {
+    background: #ffffff !important;
+}
+
+/* If there's a thin separator under the course overview, hide common hr elements in this area. */
+body.pagelayout-course hr { display: none; }
+

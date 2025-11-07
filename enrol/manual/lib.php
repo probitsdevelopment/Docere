@@ -658,8 +658,16 @@ function enrol_manual_output_fragment_enrol_users_form($args) {
     $args = (object) $args;
     $context = $args->context;
     $o = '';
-
-    require_capability('enrol/manual:enrol', $context);
+    // When rendering as a fragment (AJAX) avoid calling require_capability() as
+    // it may invoke redirect() which throws a redirecterrordetected exception
+    // and results in the modal error. Use a non-redirecting check and return
+    // a friendly notification if the user is not permitted to enrol users.
+    global $OUTPUT;
+    if (!isloggedin() || isguestuser() || !has_capability('enrol/manual:enrol', $context)) {
+        return $OUTPUT->notification(get_string('accessdenied', 'error'), 'notifyproblem');
+    }
+    // User has permission - continue to render the form.
+    
     $mform = new enrol_manual_enrol_users_form(null, $args);
 
     ob_start();

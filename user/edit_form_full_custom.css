@@ -1,0 +1,93 @@
+/* Custom UI for all sections of user edit form */
+.mform {
+    background: #f8f9fb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding: 32px 24px 24px 24px;
+    margin-bottom: 32px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.mform .fheader {
+    font-size: 1.3em;
+    font-weight: 700;
+    margin-bottom: 24px;
+    background: none;
+    border: none;
+    padding: 0;
+}
+.mform .form-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 16px;
+}
+.mform .form-group > .form-item {
+    flex: 1 1 45%;
+    min-width: 220px;
+}
+.mform textarea,
+.mform select,
+.mform input[type="text"],
+.mform input[type="email"] {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 15px;
+    background: #fff;
+    margin-top: 6px;
+    margin-bottom: 0;
+    box-sizing: border-box;
+}
+.mform textarea {
+    min-height: 80px;
+    flex-basis: 100%;
+}
+.mform label {
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 4px;
+    display: block;
+}
+.mform .form-item {
+    margin-bottom: 0;
+}
+.mform .form-inline {
+    display: flex;
+    gap: 16px;
+}
+.mform .form-group .form-item-full {
+    flex-basis: 100%;
+}
+.mform .form-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 24px;
+}
+.mform .form-buttons input[type="submit"],
+.mform .form-buttons input[type="button"] {
+    background: #1cb0f6;
+    color: #fff;
+    border-radius: 8px;
+    border: none;
+    padding: 10px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.mform .form-buttons input[type="submit"]:hover,
+.mform .form-buttons input[type="button"]:hover {
+    background: #139ad6;
+}
+@media (max-width: 700px) {
+    .mform .form-group {
+        flex-direction: column;
+        gap: 16px 0;
+    }
+    .mform .form-group > .form-item {
+        min-width: 100%;
+    }
+}

@@ -39,108 +39,49 @@
     }
 }}
 {{#displaygroupingselector}}
-<div class="dropdown mb-1 mr-1">
-    <button id="groupingdropdown" type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="{{#str}} aria:groupingdropdown, block_myoverview {{/str}}">
-        <span data-active-item-text>
-            {{#allincludinghidden}}{{#str}} allincludinghidden, block_myoverview {{/str}}{{/allincludinghidden}}
-            {{#all}}{{#str}} all, block_myoverview {{/str}}{{/all}}
-            {{#inprogress}}{{#str}} inprogress, block_myoverview {{/str}}{{/inprogress}}
-            {{#future}}{{#str}} future, block_myoverview {{/str}}{{/future}}
-            {{#past}}{{#str}} past, block_myoverview {{/str}}{{/past}}
-            {{#favourites}}{{#str}} favourites, block_myoverview {{/str}}{{/favourites}}
-            {{#hidden}}{{#str}} hiddencourses, block_myoverview {{/str}}{{/hidden}}
-            {{selectedcustomfield}}
-        </span>
+<div class="myoverview-grouping-tabs d-flex mb-1 mr-1" role="tablist">
+    {{#displaygroupingallincludinghidden}}
+    <button type="button" class="btn btn-link myoverview-grouping-tab{{#allincludinghidden}} active{{/allincludinghidden}}" data-filter="grouping" data-value="allincludinghidden" data-pref="allincludinghidden" aria-label="{{#str}} aria:allcoursesincludinghidden, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="tab" {{#allincludinghidden}}aria-current="true"{{/allincludinghidden}}>
+        {{#str}} allincludinghidden, block_myoverview {{/str}}
     </button>
-    <ul class="dropdown-menu" role="menu" data-show-active-item data-skip-active-class="true" data-active-item-text aria-labelledby="groupingdropdown">
-        {{#displaygroupingallincludinghidden}}
-        <li>
-            <a class="dropdown-item" href="#" data-filter="grouping" data-value="allincludinghidden" data-pref="allincludinghidden" aria-label="{{#str}} aria:allcoursesincludinghidden, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="menuitem" {{#allincludinghidden}}aria-current="true"{{/allincludinghidden}}>
-                {{#str}} allincludinghidden, block_myoverview {{/str}}
-            </a>
-        </li>
-        {{/displaygroupingallincludinghidden}}
-        {{#displaygroupingall}}
-        <li class="dropdown-divider" role="presentation">
-            <span class="filler">&nbsp;</span>
-        </li>
-        <li>
-            <a class="dropdown-item" href="#" data-filter="grouping" data-value="all" data-pref="all" aria-label="{{#str}} aria:allcourses, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="menuitem" {{#all}}aria-current="true"{{/all}}>
-                {{#str}} all, block_myoverview {{/str}}
-            </a>
-        </li>
-        {{/displaygroupingall}}
-        {{#displaygroupinginprogress}}
-        <li class="dropdown-divider" role="presentation">
-            <span class="filler">&nbsp;</span>
-        </li>
-        <li>
-            <a class="dropdown-item" href="#" data-filter="grouping" data-value="inprogress" data-pref="inprogress" aria-label="{{#str}} aria:inprogress, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="menuitem" {{#inprogress}}aria-current="true"{{/inprogress}}>
-                {{#str}} inprogress, block_myoverview {{/str}}
-            </a>
-        </li>
-        {{/displaygroupinginprogress}}
-        {{#displaygroupingfuture}}
-            {{^displaygroupinginprogress}}
-            <li class="dropdown-divider" role="presentation">
-                <span class="filler">&nbsp;</span>
-            </li>
-            {{/displaygroupinginprogress}}
-        <li>
-            <a class="dropdown-item" href="#" data-filter="grouping" data-value="future" data-pref="future" aria-label="{{#str}} aria:future, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="menuitem" {{#future}}aria-current="true"{{/future}}>
-                {{#str}} future, block_myoverview {{/str}}
-            </a>
-        </li>
-        {{/displaygroupingfuture}}
-        {{#displaygroupingpast}}
-            {{^displaygroupinginprogress}}
-                {{^displaygroupingfuture}}
-                <li class="dropdown-divider" role="presentation">
-                    <span class="filler">&nbsp;</span>
-                </li>
-                {{/displaygroupingfuture}}
-            {{/displaygroupinginprogress}}
-        <li>
-            <a class="dropdown-item" href="#" data-filter="grouping" data-value="past" data-pref="past" aria-label="{{#str}} aria:past, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="menuitem" {{#past}}aria-current="true"{{/past}}>
-                {{#str}} past, block_myoverview {{/str}}
-            </a>
-        </li>
-        {{/displaygroupingpast}}
-        {{#displaygroupingcustomfield}}
-            <li class="dropdown-divider" role="presentation">
-                <span class="filler">&nbsp;</span>
-            </li>
-            {{#customfieldvalues}}
-                <li>
-                    <a class="dropdown-item" href="#" data-filter="grouping"
-                       data-value="customfield" data-pref="customfield" data-customfieldvalue="{{value}}"
-                       aria-label="{{#str}}aria:customfield, block_myoverview, {{name}}{{/str}}"
-                       aria-controls="courses-view-{{uniqid}}" role="menuitem" {{#active}}aria-current="true"{{/active}}>
-                        {{name}}
-                    </a>
-                </li>
-            {{/customfieldvalues}}
-        {{/displaygroupingcustomfield}}
-        {{#displaygroupingfavourites}}
-        <li class="dropdown-divider" role="presentation">
-            <span class="filler">&nbsp;</span>
-        </li>
-        <li>
-            <a class="dropdown-item" href="#" data-filter="grouping" data-value="favourites"  data-pref="favourites" aria-label="{{#str}} aria:favourites, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="menuitem" {{#favourites}}aria-current="true"{{/favourites}}>
-                {{#str}} favourites, block_myoverview {{/str}}
-            </a>
-        {{/displaygroupingfavourites}}
-        {{#displaygroupinghidden}}
-        <li class="dropdown-divider" role="presentation">
-            <span class="filler">&nbsp;</span>
-        </li>
-        <li>
-            <a class="dropdown-item" href="#" data-filter="grouping" data-value="hidden"  data-pref="hidden" aria-label="{{#str}} aria:hiddencourses, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="menuitem" {{#hidden}}aria-current="true"{{/hidden}}>
-                {{#str}} hiddencourses, block_myoverview {{/str}}
-            </a>
-        </li>
-        {{/displaygroupinghidden}}
-    </ul>
+    {{/displaygroupingallincludinghidden}}
+    {{#displaygroupingall}}
+    <button type="button" class="btn btn-link myoverview-grouping-tab" data-filter="grouping" data-value="all" data-pref="all" aria-label="{{#str}} aria:allcourses, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="tab" {{#all}}aria-current="true"{{/all}}>
+        {{#str}} all, block_myoverview {{/str}}
+    </button>
+    {{/displaygroupingall}}
+    {{#displaygroupinginprogress}}
+    <button type="button" class="btn btn-link myoverview-grouping-tab" data-filter="grouping" data-value="inprogress" data-pref="inprogress" aria-label="{{#str}} aria:inprogress, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="tab" {{#inprogress}}aria-current="true"{{/inprogress}}>
+        {{#str}} inprogress, block_myoverview {{/str}}
+    </button>
+    {{/displaygroupinginprogress}}
+    {{#displaygroupingfuture}}
+    <button type="button" class="btn btn-link myoverview-grouping-tab" data-filter="grouping" data-value="future" data-pref="future" aria-label="{{#str}} aria:future, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="tab" {{#future}}aria-current="true"{{/future}}>
+        {{#str}} future, block_myoverview {{/str}}
+    </button>
+    {{/displaygroupingfuture}}
+    {{#displaygroupingpast}}
+    <button type="button" class="btn btn-link myoverview-grouping-tab" data-filter="grouping" data-value="past" data-pref="past" aria-label="{{#str}} aria:past, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="tab" {{#past}}aria-current="true"{{/past}}>
+        {{#str}} past, block_myoverview {{/str}}
+    </button>
+    {{/displaygroupingpast}}
+    {{#displaygroupingcustomfield}}
+        {{#customfieldvalues}}
+    <button type="button" class="btn btn-link myoverview-grouping-tab" data-filter="grouping" data-value="customfield" data-pref="customfield" data-customfieldvalue="{{value}}" aria-label="{{#str}}aria:customfield, block_myoverview, {{name}}{{/str}}" aria-controls="courses-view-{{uniqid}}" role="tab" {{#active}}aria-current="true"{{/active}}>
+            {{name}}
+        </button>
+        {{/customfieldvalues}}
+    {{/displaygroupingcustomfield}}
+    {{#displaygroupingfavourites}}
+    <button type="button" class="btn btn-link myoverview-grouping-tab" data-filter="grouping" data-value="favourites" data-pref="favourites" aria-label="{{#str}} aria:favourites, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="tab" {{#favourites}}aria-current="true"{{/favourites}}>
+        {{#str}} favourites, block_myoverview {{/str}}
+    </button>
+    {{/displaygroupingfavourites}}
+    {{#displaygroupinghidden}}
+    <button type="button" class="btn btn-link myoverview-grouping-tab" data-filter="grouping" data-value="hidden" data-pref="hidden" aria-label="{{#str}} aria:hiddencourses, block_myoverview {{/str}}" aria-controls="courses-view-{{uniqid}}" role="tab" {{#hidden}}aria-current="true"{{/hidden}}>
+        {{#str}} hiddencourses, block_myoverview {{/str}}
+    </button>
+    {{/displaygroupinghidden}}
 </div>
 {{/displaygroupingselector}}
 {{^displaygroupingselector}}

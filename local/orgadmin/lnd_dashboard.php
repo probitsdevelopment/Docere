@@ -760,10 +760,16 @@ try {
 
     if ($lnd_organization_id !== null) {
         // Get all pending assessments first
-        $all_pending = $DB->get_records('orgadmin_assessments', ['status' => 'pending_review']);
+        $all_pending = get_pending_assessments_for_lnd();
         $direct_assessments = [];
 
         foreach ($all_pending as $assessment) {
+            // Get the actual assessment object from database for proper access
+            $assessment_obj = $DB->get_record('orgadmin_assessments', ['id' => $assessment['id']]);
+            if (!$assessment_obj) {
+                continue; // Skip if assessment not found
+            }
+
             // Determine the trainer's actual organization
             $trainer_org = $DB->get_record_sql("
                 SELECT DISTINCT cc.id as category_id, cc.name as category_name
@@ -774,18 +780,18 @@ try {
                 WHERE ra.userid = ? AND ctx.contextlevel = 40 AND r.shortname = 'editingteacher'
                 ORDER BY cc.id ASC
                 LIMIT 1
-            ", [$assessment->userid]);
+            ", [$assessment_obj->userid]);
 
             $trainer_org_id = $trainer_org ? $trainer_org->category_id : 0;
 
             // Filter based on L&D organization scope
             if ($lnd_organization_id === 0) {
                 // Site L&D - can see all assessments
-                $direct_assessments[] = $assessment;
+                $direct_assessments[] = $assessment_obj;
             } else {
                 // Organization L&D - only see assessments from their organization AND site trainers
                 if ($trainer_org_id === $lnd_organization_id || $trainer_org_id === 0) {
-                    $direct_assessments[] = $assessment;
+                    $direct_assessments[] = $assessment_obj;
                 }
             }
         }
@@ -855,7 +861,7 @@ if (empty($lndAssessments)) {
 
     // Try to get assessments directly without role restrictions
     try {
-        $all_pending = $DB->get_records('orgadmin_assessments', ['status' => 'pending_review']);
+        $all_pending = get_pending_assessments_for_lnd();
         if (!empty($all_pending)) {
             error_log('LND Dashboard: Found ' . count($all_pending) . ' pending assessments via direct query');
             $lndAssessments = []; // Reset array
@@ -893,20 +899,10 @@ if (empty($lndAssessments)) {
     }
 }
 
-// Last resort: Add test data if still nothing
+// No fallback test data - show empty state if no assessments
 if (empty($lndAssessments)) {
-    error_log('LND Dashboard: Still no assessments - adding test data');
-    $lndAssessments = [
-        [
-            'id' => 'test1',
-            'title' => 'Test Assessment (No DB Data)',
-            'creator' => 'System (Test)',
-            'questions' => 1,
-            'time' => 45,
-            'students' => 0,
-            'organization_id' => 0
-        ]
-    ];
+    error_log('LND Dashboard: No assessments found for this L&D user');
+    $lndAssessments = [];
 }
 
 // Debug output for assessments - Make it visible for troubleshooting
@@ -988,7 +984,7 @@ foreach ($lndAssessments as $index => $assessment) {
     echo html_writer::span('Approve');
     echo html_writer::end_tag('button');
     
-    echo html_writer::start_tag('button', ['class' => 'lnd-action-btn reject', 'onclick' => 'rejectAssessment("' . $assessment['id'] . '")']);
+    echo html_writer::start_tag('button', ['class' => 'lnd-action-btn reject', 'onclick' => 'rejectAssessmentNew("' . $assessment['id'] . '")']);
     echo html_writer::tag('i', 'close', ['class' => 'material-icons', 'style' => 'font-size: 14px; margin-right: 4px;']);
     echo html_writer::span('Reject');
     echo html_writer::end_tag('button');
@@ -1203,9 +1199,9 @@ function approveAssessment(assessmentId) {
         // AJAX call to approve assessment and change status to "published"
         var formData = new FormData();
         formData.append('action', 'approve');
-        formData.append('assessment_id', assessmentId);
+        formData.append('assessment_id', parseInt(assessmentId));
 
-        fetch('/local/orgadmin/assessment_handler.php', {
+        fetch(M.cfg.wwwroot + '/local/orgadmin/assessment_handler.php', {
             method: 'POST',
             body: formData
         })
@@ -1227,34 +1223,52 @@ function approveAssessment(assessmentId) {
     }
 }
 
-function rejectAssessment(assessmentId) {
-    const reason = prompt("✗ Reject Assessment\n\nPlease provide a reason for rejection:");
-    if (reason) {
-        // AJAX call to reject assessment with reason
-        var formData = new FormData();
-        formData.append('action', 'reject');
-        formData.append('assessment_id', assessmentId);
-        formData.append('reason', reason);
+function rejectAssessmentNew(assessmentId) {
+    if (confirm("✗ Reject this assessment?\n\nThis action cannot be undone.")) {
+        console.log('NEW FORM-BASED REJECT: ' + assessmentId); // Debug marker
+        // Create a hidden form and submit it
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = M.cfg.wwwroot + '/local/orgadmin/assessment_handler.php';
 
-        fetch('/local/orgadmin/assessment_handler.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert("Assessment " + assessmentId + " has been rejected.\n\nReason: " + reason + "\n\n• Creator will be notified\n• Assessment returned for revision");
+        // Add CSRF token for Moodle security
+        var sesskey = document.createElement('input');
+        sesskey.type = 'hidden';
+        sesskey.name = 'sesskey';
+        sesskey.value = M.cfg.sesskey;
+        form.appendChild(sesskey);
 
-                // Reload the page to update the assessment lists
-                location.reload();
-            } else {
-                alert('Error rejecting assessment: ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Rejection error:', error);
-            alert('An error occurred while rejecting the assessment. Please try again.');
-        });
+        // Add action
+        var actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'reject';
+        form.appendChild(actionInput);
+
+        // Add assessment ID
+        var idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'assessment_id';
+        idInput.value = assessmentId;
+        form.appendChild(idInput);
+
+        // Add default reason (optional)
+        var reasonInput = document.createElement('input');
+        reasonInput.type = 'hidden';
+        reasonInput.name = 'reason';
+        reasonInput.value = 'Rejected by L&D';
+        form.appendChild(reasonInput);
+
+        // Add return URL
+        var returnInput = document.createElement('input');
+        returnInput.type = 'hidden';
+        returnInput.name = 'return_url';
+        returnInput.value = window.location.href;
+        form.appendChild(returnInput);
+
+        // Submit form
+        document.body.appendChild(form);
+        form.submit();
     }
 }
 
@@ -1290,6 +1304,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
     console.log("Pending assessments displayed on load");
 });
+
+// Cache-busting check
+console.log("LND Dashboard JS Version: <?php echo time(); ?> - New reject function should be active");
+if (typeof rejectAssessmentNew !== 'function') {
+    console.error("rejectAssessmentNew function not found - cache issue!");
+} else {
+    console.log("✓ rejectAssessmentNew function loaded successfully");
+}
 </script>
 <?php
 

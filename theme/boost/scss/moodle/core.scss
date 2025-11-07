@@ -388,6 +388,10 @@ img.activityicon {
 }
 
 img.uihint {
+// Make first column cells in participants table body white
+.userlist table#participants tbody th {
+    background-color: white !important;
+}
     cursor: help;
 }
 
@@ -2034,6 +2038,105 @@ img#persona_signin {
     }
 }
 
+/* My courses page header styling */
+body.page-mycourses #page-header h2,
+body.page-mycourses .page-header-headings h2,
+body.page-mycourses .page-context-header h2,
+body.pagelayout-mycourses #page-header h2,
+body.pagelayout-mycourses .page-header-headings h2,
+body.pagelayout-mycourses .page-context-header h2,
+.path-my #page-header h2,
+.path-my .page-header-headings h2,
+.path-my .page-context-header h2 {
+    color: #1CB0F6 !important;
+    font-weight: 600 !important;
+}
+
+/* Apply filters button styling - change to blue on participants page */
+.path-user button[data-filteraction="apply"],
+.path-user .filter-group button.btn-primary,
+body.path-user button[data-filteraction="apply"],
+body.path-user .filter-group button.btn-primary {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+    color: white !important;
+}
+
+.path-user button[data-filteraction="apply"]:hover,
+.path-user .filter-group button.btn-primary:hover,
+body.path-user button[data-filteraction="apply"]:hover,
+body.path-user .filter-group button.btn-primary:hover {
+    background-color: #0ea5e9 !important;
+    border-color: #0ea5e9 !important;
+    color: white !important;
+}
+
+/* Course page header styling */
+body.pagelayout-course #page-header h1,
+body.pagelayout-course .page-header-headings h1,
+body.pagelayout-course .page-context-header h1,
+.path-course #page-header h1,
+.path-course .page-header-headings h1,
+.path-course .page-context-header h1,
+.course-content h1,
+.course-header h1 {
+    color: #1CB0F6 !important;
+    font-weight: bold !important;
+}
+
+/* Course buttons styling - Mark as done and other course buttons */
+body.pagelayout-course .btn-primary,
+body.pagelayout-course button.btn-primary,
+body.pagelayout-course input[type="submit"].btn-primary,
+.path-course .btn-primary,
+.path-course button.btn-primary,
+.path-course input[type="submit"].btn-primary,
+.course-content .btn-primary,
+.activity .btn-primary,
+.section .btn-primary,
+button[data-action="complete"],
+button[data-action="mark-complete"],
+.completion-manual-enabled button,
+.completion-manual-enabled input[type="submit"],
+body.pagelayout-course .btn-success,
+body.pagelayout-course button.btn-success,
+.path-course .btn-success,
+.path-course button.btn-success {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+    color: white !important;
+    border-radius: 8px !important;
+    padding: 8px 16px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+}
+
+/* Course buttons hover effects */
+body.pagelayout-course .btn-primary:hover,
+body.pagelayout-course button.btn-primary:hover,
+body.pagelayout-course input[type="submit"].btn-primary:hover,
+.path-course .btn-primary:hover,
+.path-course button.btn-primary:hover,
+.path-course input[type="submit"].btn-primary:hover,
+.course-content .btn-primary:hover,
+.activity .btn-primary:hover,
+.section .btn-primary:hover,
+button[data-action="complete"]:hover,
+button[data-action="mark-complete"]:hover,
+.completion-manual-enabled button:hover,
+.completion-manual-enabled input[type="submit"]:hover,
+body.pagelayout-course .btn-success:hover,
+body.pagelayout-course button.btn-success:hover,
+.path-course .btn-success:hover,
+.path-course button.btn-success:hover {
+    background-color: #0ea5e9 !important;
+    border-color: #0ea5e9 !important;
+    color: white !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(28, 176, 246, 0.3) !important;
+}
+
 /** Navbar logo. */
 nav.navbar .logo img {
     max-height: 35px;
@@ -3081,4 +3184,786 @@ blockquote {
         white-space: normal;
     }
 
+}
+
+/* Mark as done button styling - HIGHEST PRIORITY - Based on developer tools */
+div[data-region="completion-manual"] button[data-action="toggle-manual-completion"],
+button.btn.btn-outline-secondary[data-action="toggle-manual-completion"],
+.btn-outline-secondary.btn-sm.text-nowrap[data-action="toggle-manual-completion"],
+div[data-region="completion-manual"] .btn.btn-outline-secondary.btn-sm {
+    background-color: #58CC02 !important;
+    border-color: #58CC02 !important;
+    color: white !important;
+    border-radius: 8px !important;
+    padding: 8px 16px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    border: 1px solid #58CC02 !important;
+    text-decoration: none !important;
+}
+
+/* Mark as done button hover effects - HIGHEST PRIORITY */
+div[data-region="completion-manual"] button[data-action="toggle-manual-completion"]:hover,
+button.btn.btn-outline-secondary[data-action="toggle-manual-completion"]:hover,
+.btn-outline-secondary.btn-sm.text-nowrap[data-action="toggle-manual-completion"]:hover,
+div[data-region="completion-manual"] .btn.btn-outline-secondary.btn-sm:hover {
+    background-color: #4fb802 !important;
+    border-color: #4fb802 !important;
+    color: white !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(79, 184, 2, 0.3) !important;
+}
+
+/* Reports Page Styling - Beautiful Modern Design */
+body.pagelayout-incourse #page-content h2:contains("Reports"),
+body.pagelayout-incourse #region-main h2:contains("Reports") {
+    color: #1CB0F6 !important;
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 2rem !important;
+    text-align: center !important;
+    padding-bottom: 1rem !important;
+    border-bottom: 3px solid #1CB0F6 !important;
+}
+
+/* Reports Container Styling - Centered (Only for Reports Pages) */
+body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid:has(ul.list-unstyled) {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+    border-radius: 12px !important;
+    padding: 1.25rem !important;
+    margin: 1.5rem auto !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+    max-width: 650px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Reports Row Container - Force Center (Only for Reports Pages) */
+body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid:has(ul.list-unstyled) .row {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    margin: 0 !important;
+}
+
+/* Reports Column Container - Force Center (Only for Reports Pages) */
+body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid:has(ul.list-unstyled) .row .col-12 {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+/* Reports List Styling - Vertical List Layout (Only for Reports Pages) */
+body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid .row ul.list-unstyled {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 500px !important;
+    list-style: none !important;
+}
+
+/* Clean Vertical List Items */
+
+/* Clean Vertical List - All Items Same Width and Alignment */
+body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid ul.list-unstyled li {
+    background: white !important;
+    border: 1px solid #e9ecef !important;
+    border-radius: 8px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    display: block !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.3s ease !important;
+}
+
+body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid ul.list-unstyled li a {
+    color: #495057 !important;
+    font-weight: 500 !important;
+    padding: 16px 20px !important;
+    display: block !important;
+    text-decoration: none !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    font-size: 14px !important;
+}
+
+body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid ul.list-unstyled li:hover {
+    background: #f8f9fa !important;
+    border-color: #1CB0F6 !important;
+    box-shadow: 0 4px 12px rgba(28, 176, 246, 0.1) !important;
+}
+
+body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid ul.list-unstyled li a:hover {
+    color: #1CB0F6 !important;
+    text-decoration: none !important;
+}
+
+/* Responsive Design (Only for Reports Pages) */
+@media (max-width: 768px) {
+    body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid:has(ul.list-unstyled) {
+        margin: 1rem !important;
+        padding: 1.5rem !important;
+    }
+    
+    body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid .row ul.list-unstyled {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    body.pagelayout-incourse #page-content h2:contains("Reports"),
+    body.pagelayout-incourse #region-main h2:contains("Reports") {
+        font-size: 2rem !important;
+    }
+}
+
+/* Remove grey background from participants page container */
+body.path-user .tertiary-navigation,
+body.path-user .tertiary-navigation .card,
+body.path-user .card:has(.tertiary-navigation),
+body.path-user #region-main .card,
+body.path-user #region-main .tertiary-navigation {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Reset participants page layout to remove container styling */
+body.path-user #region-main {
+    background: transparent !important;
+}
+
+body.path-user .tertiary-navigation .row {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* MODERN GRADE REPORT TABLE STYLING */
+/* Clean, professional design for gradebook tables */
+
+/* Grade report table styling */
+.path-grade-report .generaltable,
+.path-grade-report-user .generaltable,
+.path-grade-report-grader .gradeparent table,
+.grade-report-table,
+table.grade-report,
+.gradereporttable {
+    background: white !important;
+    border: 1px solid #e1e5e9 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    margin: 1.5rem 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    overflow: hidden !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    table-layout: auto !important;
+}
+
+/* Grade table header styling */
+.path-grade-report .generaltable th,
+.path-grade-report-user .generaltable th,
+.path-grade-report-grader .gradeparent table th,
+.grade-report-table th,
+table.grade-report th,
+.gradereporttable th {
+    // background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+    border-bottom: 2px solid #e1e5e9 !important;
+    border-right: 1px solid #e8ecf0 !important;
+    border-left: none !important;
+    border-top: none !important;
+    padding: 16px 20px !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    color: #4a5568 !important;
+    text-align: left !important;
+    letter-spacing: 0.025em !important;
+    text-transform: none !important;
+    vertical-align: middle !important;
+}
+
+/* First header column */
+.path-grade-report .generaltable th:first-child,
+.path-grade-report-user .generaltable th:first-child,
+.path-grade-report-grader .gradeparent table th:first-child {
+    border-top-left-radius: 12px !important;
+    padding-left: 24px !important;
+}
+
+/* Last header column - reduced padding */
+.path-grade-report .generaltable th:last-child,
+.path-grade-report-user .generaltable th:last-child,
+.path-grade-report-grader .gradeparent table th:last-child {
+    border-right: none !important;
+    border-top-right-radius: 12px !important;
+    padding-right: 16px !important;
+}
+
+/* Grade table body rows */
+.path-grade-report .generaltable tbody tr,
+.path-grade-report-user .generaltable tbody tr,
+.path-grade-report-grader .gradeparent table tbody tr {
+    border-bottom: 1px solid #f4f6f8 !important;
+    transition: all 0.2s ease !important;
+    background-color: white !important;
+}
+
+/* Alternating row colors */
+.path-grade-report .generaltable tbody tr:nth-child(even),
+.path-grade-report-user .generaltable tbody tr:nth-child(even),
+.path-grade-report-grader .gradeparent table tbody tr:nth-child(even) {
+    background-color: #fafbfc !important;
+}
+
+/* Grade table cells */
+.path-grade-report .generaltable td,
+.path-grade-report-user .generaltable td,
+.path-grade-report-grader .gradeparent table td,
+.path-grade-report .generaltable .cell,
+.path-grade-report-grader .gradeparent .cell {
+    padding: 16px 20px !important;
+    border-right: 1px solid #f4f6f8 !important;
+    border-left: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    font-size: 0.875rem !important;
+    color: #2d3748 !important;
+    vertical-align: middle !important;
+    line-height: 1.5 !important;
+    background-color: inherit !important;
+}
+
+/* First cell in each row */
+.path-grade-report .generaltable td:first-child,
+.path-grade-report-user .generaltable td:first-child,
+.path-grade-report-grader .gradeparent table td:first-child {
+    padding-left: 24px !important;
+    font-weight: 500 !important;
+}
+
+/* Last cell in each row - reduced padding */
+.path-grade-report .generaltable td:last-child,
+.path-grade-report-user .generaltable td:last-child,
+.path-grade-report-grader .gradeparent table td:last-child {
+    border-right: none !important;
+    padding-right: 16px !important;
+}
+
+/* Enhanced hover effect for grade rows */
+.path-grade-report .generaltable tbody tr:hover,
+.path-grade-report-user .generaltable tbody tr:hover,
+.path-grade-report-grader .gradeparent table tbody tr:hover {
+    background-color: #f0f9ff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.path-grade-report .generaltable tbody tr:hover td,
+.path-grade-report-user .generaltable tbody tr:hover td,
+.path-grade-report-grader .gradeparent table tbody tr:hover td,
+.path-grade-report-grader .gradeparent table tbody tr:hover .cell {
+    color: #1a202c !important;
+    background-color: inherit !important;
+}
+
+/* Grade values styling - make them stand out */
+.path-grade-report .generaltable .grade,
+.path-grade-report-grader .gradeparent .grade,
+.gradevalue,
+.finalgrade {
+    font-weight: 600 !important;
+    color: #1CB0F6 !important;
+    background-color: transparent !important;
+}
+
+/* Student name links */
+.path-grade-report .generaltable a[href*="/user/"],
+.path-grade-report-user .generaltable a[href*="/user/"],
+.path-grade-report-grader .gradeparent table a[href*="/user/"] {
+    color: #2d3748 !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+}
+
+.path-grade-report .generaltable a[href*="/user/"]:hover,
+.path-grade-report-user .generaltable a[href*="/user/"]:hover,
+.path-grade-report-grader .gradeparent table a[href*="/user/"]:hover {
+    color: #1CB0F6 !important;
+}
+
+/* Email links in grade report */
+.path-grade-report .generaltable a[href*="mailto"],
+.path-grade-report-user .generaltable a[href*="mailto"],
+.path-grade-report-grader .gradeparent table a[href*="mailto"] {
+    color: #1CB0F6 !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+}
+
+.path-grade-report .generaltable a[href*="mailto"]:hover,
+.path-grade-report-user .generaltable a[href*="mailto"]:hover,
+.path-grade-report-grader .gradeparent table a[href*="mailto"]:hover {
+    color: #0ea5e9 !important;
+    text-decoration: underline !important;
+}
+
+/* Course total column highlighting */
+.path-grade-report .generaltable .course-total,
+.path-grade-report-grader .gradeparent .course-total,
+.coursetotal,
+th[class*="course"] {
+    background-color: #f0f9ff !important;
+    font-weight: 600 !important;
+}
+
+/* Grade report specific user initials */
+.path-grade-report .userinitials,
+.path-grade-report-user .userinitials,
+.path-grade-report-grader .userinitials {
+    background-color: white !important;
+    border: 1px solid #e5e7eb !important;
+    color: #374151 !important;
+}
+
+/* Action icons in grade report */
+.path-grade-report .action-icon,
+.path-grade-report-user .action-icon,
+.path-grade-report-grader .action-icon {
+    padding: 6px !important;
+    margin: 0 2px !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+    opacity: 0.7 !important;
+}
+
+.path-grade-report .action-icon:hover,
+.path-grade-report-user .action-icon:hover,
+.path-grade-report-grader .action-icon:hover {
+    background-color: #f7fafc !important;
+    opacity: 1 !important;
+}
+
+/* Grade report overall average row */
+.path-grade-report .overallrow,
+.path-grade-report-grader .overallrow,
+.averagerow,
+.lastrow {
+    background-color: #f8fafc !important;
+    font-weight: 600 !important;
+    border-top: 2px solid #e1e5e9 !important;
+}
+
+/* Hide default gray striping */
+.path-grade-report .table-striped tbody tr:nth-of-type(odd),
+.path-grade-report-user .table-striped tbody tr:nth-of-type(odd),
+.path-grade-report-grader .table-striped tbody tr:nth-of-type(odd) {
+    background-color: white !important;
+}
+
+.path-grade-report .table-striped tbody tr:nth-of-type(even),
+.path-grade-report-user .table-striped tbody tr:nth-of-type(even),
+.path-grade-report-grader .table-striped tbody tr:nth-of-type(even) {
+    background-color: #fafbfc !important;
+}
+
+/* Remove extra spacing and ensure proper table container fit */
+.path-grade-report .region-main-box,
+.path-grade-report-user .region-main-box,
+.path-grade-report-grader .region-main-box,
+.path-grade-report #region-main,
+.path-grade-report-user #region-main,
+.path-grade-report-grader #region-main {
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Grade report table container */
+.path-grade-report .generaltable-wrapper,
+.path-grade-report-user .generaltable-wrapper,
+.path-grade-report-grader .generaltable-wrapper,
+.path-grade-report .table-responsive,
+.path-grade-report-user .table-responsive,
+.path-grade-report-grader .table-responsive {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow-x: auto !important;
+}
+
+/* Specific grade report page layout adjustments */
+.path-grade-report-user .tertiary-navigation,
+.path-grade-report .tertiary-navigation,
+.path-grade-report-grader .tertiary-navigation {
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* AGGRESSIVE WHITESPACE REMOVAL FOR GRADE REPORT */
+/* Remove all right-side spacing from grade report pages */
+
+/* Main container adjustments */
+.path-grade-report #page,
+.path-grade-report-user #page,
+.path-grade-report-grader #page,
+.path-grade-report .container-fluid,
+.path-grade-report-user .container-fluid,
+.path-grade-report-grader .container-fluid {
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+    max-width: 100% !important;
+}
+
+/* Content area adjustments */
+.path-grade-report #page-content,
+.path-grade-report-user #page-content,
+.path-grade-report-grader #page-content,
+.path-grade-report .main-inner,
+.path-grade-report-user .main-inner,
+.path-grade-report-grader .main-inner {
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+    max-width: none !important;
+}
+
+/* Region main adjustments */
+.path-grade-report #region-main,
+.path-grade-report-user #region-main,
+.path-grade-report-grader #region-main {
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+}
+
+/* Adjust Bootstrap container padding for proper fit */
+.path-grade-report .container,
+.path-grade-report-user .container,
+.path-grade-report-grader .container,
+.path-grade-report .container-fluid,
+.path-grade-report-user .container-fluid,
+.path-grade-report-grader .container-fluid {
+    padding-right: 15px !important;
+    padding-left: 15px !important;
+    max-width: none !important;
+}
+
+/* Table wrapper and responsive container */
+.path-grade-report .table-responsive,
+.path-grade-report-user .table-responsive,
+.path-grade-report-grader .table-responsive,
+.path-grade-report .no-overflow,
+.path-grade-report-user .no-overflow,
+.path-grade-report-grader .no-overflow {
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+}
+
+/* Card containers in grade report */
+.path-grade-report .card,
+.path-grade-report-user .card,
+.path-grade-report-grader .card {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+
+/* Grade report table - proper width fitting */
+.path-grade-report .generaltable,
+.path-grade-report-user .generaltable,
+.path-grade-report-grader .gradeparent table {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 8px !important;
+    box-sizing: border-box !important;
+}
+
+/* Body and HTML adjustments for grade report pages */
+/* Grade report body adjustments */
+body.path-grade-report,
+body.path-grade-report-user,
+body.path-grade-report-grader {
+    overflow-x: auto !important;
+}
+
+/* Grade report table container wrapper */
+.path-grade-report .generaltable-wrapper,
+.path-grade-report-user .generaltable-wrapper,
+.path-grade-report-grader .generaltable-wrapper {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+}
+
+/* Ensure grade report content fits properly */
+.path-grade-report #page-wrapper,
+.path-grade-report-user #page-wrapper,
+.path-grade-report-grader #page-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Remove drawer spacing if present */
+.path-grade-report.drawer-open-left #page-wrapper,
+.path-grade-report-user.drawer-open-left #page-wrapper,
+.path-grade-report-grader.drawer-open-left #page-wrapper {
+    margin-left: 0 !important;
+}
+
+/* Force table to use full available space */
+.path-grade-report .generaltable td:last-child,
+.path-grade-report-user .generaltable td:last-child,
+.path-grade-report-grader .gradeparent table td:last-child {
+    padding-right: 8px !important;
+    width: auto !important;
+}
+
+.path-grade-report .generaltable th:last-child,
+.path-grade-report-user .generaltable th:last-child,
+.path-grade-report-grader .gradeparent table th:last-child {
+    padding-right: 8px !important;
+    width: auto !important;
+}
+
+/* SPECIFIC FIX FOR GRADER REPORT TABLE WHITESPACE */
+/* Target the exact table structure seen in developer tools */
+
+/* Grader report specific table fixes */
+.path-grade-report-grader table#user-grades,
+.path-grade-report-grader .gradereport-grader-table,
+table.gradereport-grader-table,
+#user-grades.gradereport-grader-table {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-collapse: separate !important;
+    table-layout: fixed !important;
+}
+
+/* Grader report container fixes */
+.path-grade-report-grader .gradeparent,
+.path-grade-report-grader .no-overflow,
+.gradeparent {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+}
+
+/* Remove extra spacing from grader report page wrapper */
+.path-grade-report-grader #region-main-box,
+.path-grade-report-grader .region-main-box {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+}
+
+/* Fix for grader report tbody and cells */
+.path-grade-report-grader tbody,
+.path-grade-report-grader .gradeparent tbody,
+table.gradereport-grader-table tbody {
+    width: 100% !important;
+}
+
+/* Ensure no extra width on grader table cells */
+.path-grade-report-grader .gradeparent table .cell,
+.path-grade-report-grader table#user-grades .cell,
+.gradereport-grader-table .cell {
+    padding-right: 4px !important;
+    padding-left: 4px !important;
+    box-sizing: border-box !important;
+}
+
+/* Last cell in grader report should have minimal padding */
+.path-grade-report-grader .gradeparent table .cell:last-child,
+.path-grade-report-grader table#user-grades .cell:last-child,
+.gradereport-grader-table .cell:last-child {
+    padding-right: 2px !important;
+}
+
+/* Remove any fixed widths from grader report containers */
+.path-grade-report-grader .maincalendar,
+.path-grade-report-grader .block_calendar_upcoming {
+    display: none !important;
+}
+
+/* Grader report main content area adjustments */
+.path-grade-report-grader #page-content,
+.path-grade-report-grader .main-inner {
+    padding-right: 0 !important;
+    padding-left: 15px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* GRADE REPORT PAGE HEADER FONT COLOR STYLING */
+/* Apply custom blue font color to headers in grade report pages only */
+
+/* Grade report page headers - all heading levels */
+.path-grade-report #page-header h1,
+.path-grade-report #page-header h2,
+.path-grade-report #page-header h3,
+.path-grade-report .page-header-headings h1,
+.path-grade-report .page-header-headings h2,
+.path-grade-report .page-header-headings h3,
+.path-grade-report .page-context-header h1,
+.path-grade-report .page-context-header h2,
+.path-grade-report .page-context-header h3,
+.path-grade-report-user #page-header h1,
+.path-grade-report-user #page-header h2,
+.path-grade-report-user #page-header h3,
+.path-grade-report-user .page-header-headings h1,
+.path-grade-report-user .page-header-headings h2,
+.path-grade-report-user .page-header-headings h3,
+.path-grade-report-user .page-context-header h1,
+.path-grade-report-user .page-context-header h2,
+.path-grade-report-user .page-context-header h3,
+.path-grade-report-grader #page-header h1,
+.path-grade-report-grader #page-header h2,
+.path-grade-report-grader #page-header h3,
+.path-grade-report-grader .page-header-headings h1,
+.path-grade-report-grader .page-header-headings h2,
+.path-grade-report-grader .page-header-headings h3,
+.path-grade-report-grader .page-context-header h1,
+.path-grade-report-grader .page-context-header h2,
+.path-grade-report-grader .page-context-header h3 {
+    color: #1CB0F6 !important;
+}
+
+/* ===== Hide Dashboard from Primary Navigation ===== */
+/* This hides the "Dashboard" link from the navbar */
+.primary-navigation .navigation [data-key="myhome"],
+.primary-navigation [data-key="myhome"],
+nav.moremenu [data-key="myhome"],
+#primary-navigation [data-key="myhome"] {
+    display: none !important;
+}
+
+/* ===== Quiz Question Number Styling ===== */
+/* Question number box - Grey background */
+#page-mod-quiz-attempt .que .info,
+#page-mod-quiz-review .que .info,
+#page-mod-quiz-summary .que .info,
+body#page-mod-quiz-attempt .que .info,
+body#page-mod-quiz-review .que .info,
+body#page-mod-quiz-summary .que .info {
+    background-color: #e5e7eb !important;
+    border: 1px solid #d1d5db !important;
+    padding: 0.75rem !important;
+    border-radius: 8px !important;
+}
+
+/* Question heading - "Question" text in BLACK */
+#page-mod-quiz-attempt .que .info h3.no,
+#page-mod-quiz-review .que .info h3.no,
+#page-mod-quiz-summary .que .info h3.no,
+body#page-mod-quiz-attempt .que .info h3.no,
+body#page-mod-quiz-review .que .info h3.no,
+body#page-mod-quiz-summary .que .info h3.no,
+.que .info h3.no {
+    color: #1e293b !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+}
+
+/* Question number (large number) "1" in BLACK - Reduced size */
+#page-mod-quiz-attempt .que .info span.qno,
+#page-mod-quiz-review .que .info span.qno,
+#page-mod-quiz-summary .que .info span.qno,
+body#page-mod-quiz-attempt .que .info span.qno,
+body#page-mod-quiz-review .que .info span.qno,
+body#page-mod-quiz-summary .que .info span.qno,
+.que .info span.qno {
+    color: #1e293b !important;
+    font-weight: 700 !important;
+    font-size: 1.2em !important;
+}
+
+/* Status text divs - "Marked out of 1.00" in BLUE */
+#page-mod-quiz-attempt .que .info > div:not(.questionflag):not(.editquestion),
+#page-mod-quiz-review .que .info > div:not(.questionflag):not(.editquestion),
+#page-mod-quiz-summary .que .info > div:not(.questionflag):not(.editquestion),
+body#page-mod-quiz-attempt .que .info > div:not(.questionflag):not(.editquestion),
+body#page-mod-quiz-review .que .info > div:not(.questionflag):not(.editquestion),
+body#page-mod-quiz-summary .que .info > div:not(.questionflag):not(.editquestion) {
+    color: #1CB0F6 !important;
+    font-weight: 500 !important;
+    font-size: 0.9em !important;
+    margin-top: 0.5em !important;
+}
+
+/* Flag question link and Edit question link - in BLUE */
+#page-mod-quiz-attempt .que .info .questionflag,
+#page-mod-quiz-review .que .info .questionflag,
+#page-mod-quiz-summary .que .info .questionflag,
+#page-mod-quiz-attempt .que .info .editquestion,
+#page-mod-quiz-review .que .info .editquestion,
+#page-mod-quiz-summary .que .info .editquestion,
+body#page-mod-quiz-attempt .que .info .questionflag,
+body#page-mod-quiz-review .que .info .questionflag,
+body#page-mod-quiz-summary .que .info .questionflag,
+body#page-mod-quiz-attempt .que .info .editquestion,
+body#page-mod-quiz-review .que .info .editquestion,
+body#page-mod-quiz-summary .que .info .editquestion {
+    margin-top: 0.5em !important;
+}
+
+#page-mod-quiz-attempt .que .info .questionflag a,
+#page-mod-quiz-review .que .info .questionflag a,
+#page-mod-quiz-summary .que .info .questionflag a,
+#page-mod-quiz-attempt .que .info .editquestion a,
+#page-mod-quiz-review .que .info .editquestion a,
+#page-mod-quiz-summary .que .info .editquestion a,
+body#page-mod-quiz-attempt .que .info .questionflag a,
+body#page-mod-quiz-review .que .info .questionflag a,
+body#page-mod-quiz-summary .que .info .questionflag a,
+body#page-mod-quiz-attempt .que .info .editquestion a,
+body#page-mod-quiz-review .que .info .editquestion a,
+body#page-mod-quiz-summary .que .info .editquestion a {
+    color: #1CB0F6 !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.3em !important;
+}
+
+#page-mod-quiz-attempt .que .info .questionflag a:hover,
+#page-mod-quiz-review .que .info .questionflag a:hover,
+#page-mod-quiz-summary .que .info .questionflag a:hover,
+#page-mod-quiz-attempt .que .info .editquestion a:hover,
+#page-mod-quiz-review .que .info .editquestion a:hover,
+#page-mod-quiz-summary .que .info .editquestion a:hover {
+    color: #0ea5e9 !important;
+    text-decoration: underline !important;
+}
+
+/* Icons inside info box - make them visible */
+#page-mod-quiz-attempt .que .info img,
+#page-mod-quiz-review .que .info img,
+#page-mod-quiz-summary .que .info img,
+#page-mod-quiz-attempt .que .info .icon,
+#page-mod-quiz-review .que .info .icon,
+#page-mod-quiz-summary .que .info .icon {
+    opacity: 0.8 !important;
+    filter: none !important;
 }

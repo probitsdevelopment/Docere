@@ -1,0 +1,211 @@
+/* Hide the entire section if the header has hide-section class */
+fieldset > .hide-section, fieldset > .hide-section ~ * {
+    display: none !important;
+}
+/* Hide the header and all following siblings until the next header */
+/* Collapsible header background grey, form section white */
+fieldset.collapsible > .collapsible-actions {
+    background: #f8f9fb !important;
+    border-radius: 12px 12px 0 0;
+    padding: 18px 24px;
+}
+fieldset.collapsible {
+    background: #fff !important;
+}
+/* Force light grey background for collapsible fieldsets, override other CSS */
+.mform fieldset.collapsible,
+.mform .collapsible {
+    background: #fff !important;
+    border-radius: 12px;
+}
+/* Apply light grey background to collapsible fieldsets */
+fieldset.collapsible {
+    background: #f8f9fb !important;
+    border-radius: 12px;
+}
+/* Override grey backgrounds from other CSS files */
+.user-edit-header,
+.mform .collapsible {
+    background: #fff !important;
+}
+/* Set the background color of the user edit form area to white */
+body, .mform, .user-edit-header, body.limitedwidth #region-main, body.limitedwidth .container {
+    background: #fff !important;
+}
+/* Move only the Select a country field and box to the right, and add spacing between label and box */
+#id_country {
+    margin-left: 3rem !important;
+}
+label[for="id_country"] {
+    margin-right: 1.2rem !important;
+}
+/* Move only the Email visibility select box to the right */
+#id_maildisplay {
+    margin-left: 5.5rem !important;
+}
+.custom-flex-row {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+.custom-flex-label-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+}
+.custom-flex-label-input label {
+    min-width: 120px;
+    text-align: right;
+}
+/* Custom flex row for first/last name beside each other with labels beside inputs */
+.custom-flex-row {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+.custom-flex-label-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+.custom-flex-label-input label {
+    min-width: 90px;
+    text-align: right;
+}
+/* Custom flex row for first/last name beside each other with labels beside inputs */
+.custom-flex-row {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+.custom-flex-label-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+.custom-flex-label-input label {
+    min-width: 90px;
+    text-align: right;
+}
+.mform .fitem {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.mform .fitem .fitemtitle {
+    min-width: 180px;
+    text-align: right;
+    margin-bottom: 0;
+    padding-right: 8px;
+}
+.mform .fitem .felement {
+    flex: 1 1 0;
+    margin-bottom: 0;
+}
+.mform label {
+    display: flex;
+    align-items: baseline;
+    gap: 2px !important;
+    margin-bottom: 4px !important;
+}
+.mform .icon, .mform .iconhelp, .mform .fa, .mform .helplink, .mform .error {
+    margin-left: 2px !important;
+    margin-right: 0 !important;
+    vertical-align: baseline !important;
+}
+.mform .form-group > div {
+    margin-bottom: 8px !important;
+}
+.mform input, .mform select, .mform textarea {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+html, body {
+    overflow-x: hidden !important;
+}
+html, body {
+    overflow-x: hidden !important;
+    /* Allow vertical scrolling and normal height */
+body.limitedwidth .container,
+body.limitedwidth #region-main,
+.mform,
+.user-edit-header {
+    /* Remove forced max-height and overflow-y hidden */
+}
+body.limitedwidth .container,
+body.limitedwidth #region-main,
+.mform,
+.user-edit-header {
+    max-width: 1200px !important;
+    width: 100%;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+}
+html, body {
+    overflow: hidden !important;
+    height: 100vh !important;
+}
+body.limitedwidth .container,
+body.limitedwidth #region-main {
+    max-width: none !important;
+    width: 80vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+}
+/* Ensure parent container allows full width for the form */
+#region-main {
+    max-width: none !important;
+    width: 80vw !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    position: relative !important;
+    left: 0 !important;
+}
+.mform {
+    max-width: 1100px !important;
+    width: 100%;
+           margin-left: -120px !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    position: relative !important;
+    left: 0 !important;
+}
+.user-edit-header {
+    max-width: none !important;
+    width: 100vw !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    position: relative !important;
+    left: 0 !important;
+}
+body .container {
+    max-width: none !important;
+    width: 100vw !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    position: relative !important;
+    left: 0 !important;
+}

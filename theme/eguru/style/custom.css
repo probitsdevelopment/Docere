@@ -1,3 +1,62 @@
 /* Custom CSS Settings
 -------------------------*/
 [[setting:customcss]]
+
+/* Force course pages to use white background for main content area */
+body.pagelayout-course,
+body.pagelayout-course #page,
+body.pagelayout-course #region-main-box,
+body.pagelayout-course #region-main,
+body.pagelayout-course .region-main-content,
+body.pagelayout-course .page-content,
+body.pagelayout-course .main-inner,
+body.pagelayout-course .container,
+body.pagelayout-course .region-main {
+	background: #F9FAFB !important;
+	color: #222222;
+}
+
+/* Remove thin separators/horizontal rules on course pages */
+body.pagelayout-course hr,
+body.pagelayout-course .separator,
+body.pagelayout-course .page-content hr {
+	display: none !important;
+}
+
+/* If the theme wraps the main area in other containers, ensure they are white too */
+body.pagelayout-course .page-wrapper,
+body.pagelayout-course .page-content .container {
+	background: #F9FAFB !important;
+}
+
+/* Additional overrides to ensure no off-white band remains around the course area. */
+body.pagelayout-course,
+body.pagelayout-course #page,
+body.pagelayout-course #page-wrapper,
+body.pagelayout-course #page-content,
+body.pagelayout-course #page-content .page,
+body.pagelayout-course #region-main-box,
+body.pagelayout-course #region-main,
+body.pagelayout-course .main-inner,
+body.pagelayout-course .region-main-content,
+body.pagelayout-course .page-content .container-fluid,
+body.pagelayout-course .container-fluid,
+body.pagelayout-course .course-content,
+body.pagelayout-course .block-myoverview {
+	background: #F9FAFB !important;
+}
+
+/* Some themes use an inner wrapper with padding and a different background color. Target that too. */
+body.pagelayout-course .page-content > .container,
+body.pagelayout-course .page-content > .container-fluid,
+body.pagelayout-course .region-main .container,
+body.pagelayout-course .region-main .container-fluid {
+	background: transparent !important; /* let the outer white show through */
+}
+
+/* If there is a card-like white panel already, ensure surrounding area uses same white. */
+body.pagelayout-course .card,
+body.pagelayout-course .card-body,
+body.pagelayout-course .block {
+	background: transparent !important;
+}

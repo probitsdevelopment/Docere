@@ -60,6 +60,7 @@ class user_edit_form extends moodleform {
             unset($user->country);
         }
 
+
         // Accessibility: "Required" is bad legend text.
         $strgeneral  = get_string('general');
         $strrequired = get_string('required');
@@ -69,14 +70,76 @@ class user_edit_form extends moodleform {
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'course', $COURSE->id);
         $mform->setType('course', PARAM_INT);
+        // No additional hidden fields needed here - the form continues with the general section header below
 
-        // Print the required moodle fields first.
-        $mform->addElement('header', 'moodle', $strgeneral);
+    // General section header
+    $mform->addElement('header', 'moodle', $strgeneral);
 
-        // Shared fields.
-        useredit_shared_definition($mform, $editoroptions, $filemanageroptions, $user);
+    // Grouped fields: First/Last name
+    $mform->addElement("html", "<div class='custom-flex-row'>");
+    $mform->addElement("html", "<div class='custom-flex-label-input'><label for='id_firstname'>" . get_string('firstname') . "</label>");
+    $mform->addElement('text', 'firstname', '', 'maxlength="100" size="30"');
+    $mform->addRule('firstname', get_string('missingfirstname', 'core'), 'required', null, 'client');
+    $mform->setType('firstname', PARAM_NOTAGS);
+    $mform->addElement("html", "</div>");
+    $mform->addElement("html", "<div class='custom-flex-label-input'><label for='id_lastname'>" . get_string('lastname') . "</label>");
+    $mform->addElement('text', 'lastname', '', 'maxlength="100" size="30"');
+    $mform->addRule('lastname', get_string('missinglastname', 'core'), 'required', null, 'client');
+    $mform->setType('lastname', PARAM_NOTAGS);
+    $mform->addElement("html", "</div>");
+    $mform->addElement("html", "</div>");
 
-        // Extra settigs.
+    // Grouped fields: Email address / Email visibility
+    $mform->addElement("html", "<div class='custom-flex-row'>");
+    $mform->addElement("html", "<div class='custom-flex-label-input'><label for='id_email'>" . get_string('email') . "</label>");
+    $mform->addElement('text', 'email', '', 'maxlength="100" size="30"');
+    $mform->addRule('email', get_string('required'), 'required', null, 'client');
+    $mform->setType('email', PARAM_RAW_TRIMMED);
+    $mform->addElement("html", "</div>");
+    $mform->addElement("html", "<div class='custom-flex-label-input'><label for='id_maildisplay'>" . get_string('emaildisplay') . "</label>");
+    $choices = array(
+        '0' => get_string('emaildisplayno'),
+        '1' => get_string('emaildisplayyes'),
+        '2' => get_string('emaildisplaycourse')
+    );
+    $mform->addElement('select', 'maildisplay', '', $choices);
+    $mform->addElement("html", "</div>");
+    $mform->addElement("html", "</div>");
+
+    // Grouped fields: City/town / Select a country
+    $mform->addElement("html", "<div class='custom-flex-row'>");
+    $mform->addElement("html", "<div class='custom-flex-label-input'><label for='id_city'>" . get_string('city') . "</label>");
+    $mform->addElement('text', 'city', '', 'maxlength="120" size="21"');
+    $mform->setType('city', PARAM_TEXT);
+    $mform->addElement("html", "</div>");
+    $mform->addElement("html", "<div class='custom-flex-label-input'><label for='id_country'>" . get_string('selectacountry') . "</label>");
+    $countries = get_string_manager()->get_list_of_countries();
+    $countries = array('' => get_string('selectacountry') . '...') + $countries;
+    $mform->addElement('select', 'country', '', $countries);
+    if (!empty($CFG->country)) {
+        $mform->setDefault('country', core_user::get_property_default('country'));
+    }
+    $mform->addElement("html", "</div>");
+    $mform->addElement("html", "</div>");
+        // Add shared fields (picture, description, timezone, etc.) but skip optional fields
+        // so the optional section stays hidden while picture and other shared elements are shown.
+        useredit_shared_definition($mform, $editoroptions, $filemanageroptions, $user,
+            array('firstname', 'lastname', 'email', 'maildisplay', 'city', 'country',
+                  'idnumber', 'institution', 'department', 'phone1', 'phone2', 'address'));
+
+        // Remove any remaining optional fields if present.
+        foreach (['department', 'phone1', 'phone2', 'address'] as $field) {
+            if ($mform->elementExists($field)) {
+                $mform->removeElement($field);
+            }
+        }
+
+        // Remove/hide the optional section header if it is present.
+        if ($mform->elementExists('moodle_optional')) {
+            $mform->removeElement('moodle_optional');
+        }
+
+        // Extra settings.
         if (!empty($CFG->disableuserimages) || $usernotfullysetup) {
             $mform->removeElement('deletepicture');
             $mform->removeElement('imagefile');
@@ -86,19 +149,12 @@ class user_edit_form extends moodleform {
         // If the user isn't fully set up, let them know that they will be able to change
         // their profile picture once their profile is complete.
         if ($usernotfullysetup) {
-            $userpicturewarning = $mform->createElement('warning', 'userpicturewarning', 'notifymessage', get_string('newpictureusernotsetup'));
+            // Show a static warning message using addElement (supported type).
+            $mform->addElement('static', 'userpicturewarning', '', get_string('newpictureusernotsetup'));
             $enabledusernamefields = useredit_get_enabled_name_fields();
-            if ($mform->elementExists('moodle_additional_names')) {
-                $mform->insertElementBefore($userpicturewarning, 'moodle_additional_names');
-            } else if ($mform->elementExists('moodle_interests')) {
-                $mform->insertElementBefore($userpicturewarning, 'moodle_interests');
-            } else {
-                $mform->insertElementBefore($userpicturewarning, 'moodle_optional');
-            }
-
+            // No need to manually insert, static element will appear in order added.
             // This is expected to exist when the form is submitted.
-            $imagefile = $mform->createElement('hidden', 'imagefile');
-            $mform->insertElementBefore($imagefile, 'userpicturewarning');
+            $mform->addElement('hidden', 'imagefile');
         }
 
         // Next the customisable profile fields.
@@ -139,8 +195,7 @@ class user_edit_form extends moodleform {
             } else {
                 $imagevalue = get_string('none');
             }
-            $imageelement = $mform->getElement('currentpicture');
-            $imageelement->setValue($imagevalue);
+            // Remove setValue on static element, value should be set when adding the element in editlib.php
 
             if ($mform->elementExists('deletepicture') && !$hasuploadedpicture) {
                 $mform->removeElement('deletepicture');
