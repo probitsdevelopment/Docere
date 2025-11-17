@@ -1,5 +1,21 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
+require_once(__DIR__ . '/role_detector.php');
+
+require_login();
+
+$PAGE->set_url(new moodle_url('/local/orgadmin/stakeholder_dashboard.php'));
+$PAGE->set_context(context_system::instance());
+$PAGE->set_pagelayout('standard');
+$PAGE->set_title('Stakeholder Dashboard');
+$PAGE->set_heading('Stakeholder Dashboard');
+
+// Verify user should access stakeholder dashboard
+if (!orgadmin_role_detector::should_show_stakeholder_dashboard()) {
+    redirect(new moodle_url('/my'), 'Access denied. You do not have permission to access the stakeholder dashboard.');
+    exit;
+}
+
 // Fetch org students' assessment scores for custom assessments (not quizzes)
 function get_org_student_assessment_scores($assessment_id) {
     global $DB;
@@ -33,8 +49,15 @@ $assessment_id = isset($_GET['assessment']) ? intval($_GET['assessment']) : 0;
 
 // Detect stakeholder's organization category
 $orgcatid = 0;
+$organization_name = 'Your Organization';
 if (!empty($USER->id)) {
     $orgcatid = $DB->get_field_sql('SELECT ctx.instanceid FROM {role_assignments} ra JOIN {context} ctx ON ctx.id = ra.contextid WHERE ra.userid = ? AND ctx.contextlevel = 40 LIMIT 1', [$USER->id]);
+    if ($orgcatid) {
+        $category = $DB->get_record('course_categories', ['id' => $orgcatid], 'name');
+        if ($category) {
+            $organization_name = $category->name;
+        }
+    }
 }
 // Fetch only courses for stakeholder's organization
 if ($orgcatid) {
