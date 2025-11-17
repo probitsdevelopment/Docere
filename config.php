@@ -7,9 +7,9 @@ $CFG = new stdClass();
 $CFG->dbtype    = 'mariadb';
 $CFG->dblibrary = 'native';
 $CFG->dbhost    = '127.0.0.1';
-$CFG->dbname    = 'u165158232_moodledb';
-$CFG->dbuser    = 'u165158232_probitsin';
-$CFG->dbpass    = 'Secret%^&567';
+$CFG->dbname    = 'u165158232_moodledatabase';
+$CFG->dbuser    = 'u165158232_probitstech';
+$CFG->dbpass    = 'Keys345#$%';
 $CFG->prefix    = 'mdl_';
 $CFG->dboptions = array (
   'dbpersist' => 0,
@@ -18,7 +18,7 @@ $CFG->dboptions = array (
   'dbcollation' => 'utf8mb4_general_ci',
 );
 
-$CFG->wwwroot   = 'http://test.docere.pro';
+$CFG->wwwroot   = 'https://test.docere.pro';
 $CFG->dataroot  = '/home/u165158232/domains/docere.pro/data';
 $CFG->admin     = 'admin';
 
