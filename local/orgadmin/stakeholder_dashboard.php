@@ -948,11 +948,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function viewCourseHeatmap(courseId) {
-    window.location.href = `stakeholder_dashboard.php?courseid=${courseId}`;
+    window.location.href = '<?php echo $CFG->wwwroot; ?>/local/orgadmin/stakeholder_dashboard.php?courseid=' + courseId;
 }
 
 function viewAssessment(assessmentId, courseId) {
-    window.location.href = `stakeholder_dashboard.php?courseid=${courseId}&assessment=${assessmentId}`;
+    window.location.href = '<?php echo $CFG->wwwroot; ?>/local/orgadmin/stakeholder_dashboard.php?courseid=' + courseId + '&assessment=' + assessmentId;
 }
 
 function showStudentDetails(studentId, studentName) {
