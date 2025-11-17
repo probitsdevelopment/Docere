@@ -1,5 +1,24 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
+require_once(__DIR__ . '/role_detector.php');
+
+// Require login
+require_login();
+
+// Set up page
+$PAGE->set_url(new moodle_url('/local/orgadmin/stakeholder_dashboard.php'));
+$PAGE->set_context(context_system::instance());
+$PAGE->set_pagelayout('mydashboard');
+$PAGE->set_title('Stakeholder Dashboard');
+$PAGE->set_heading('');
+
+// Verify user should access stakeholder dashboard
+if (!orgadmin_role_detector::should_show_stakeholder_dashboard()) {
+    // Redirect non-stakeholder users to appropriate dashboard
+    $dashboardurl = orgadmin_role_detector::get_dashboard_url();
+    redirect($dashboardurl);
+}
+
 // Fetch org students' assessment scores for custom assessments (not quizzes)
 function get_org_student_assessment_scores($assessment_id) {
     global $DB;
@@ -21,8 +40,6 @@ function get_org_student_assessment_scores($assessment_id) {
     return $result;
 }
 
-
-
 $perpage = 10;
 
 global $DB;
@@ -33,8 +50,16 @@ $assessment_id = isset($_GET['assessment']) ? intval($_GET['assessment']) : 0;
 
 // Detect stakeholder's organization category
 $orgcatid = 0;
+$organization_name = 'Organization';
 if (!empty($USER->id)) {
     $orgcatid = $DB->get_field_sql('SELECT ctx.instanceid FROM {role_assignments} ra JOIN {context} ctx ON ctx.id = ra.contextid WHERE ra.userid = ? AND ctx.contextlevel = 40 LIMIT 1', [$USER->id]);
+    // Get organization name from category
+    if ($orgcatid) {
+        $category = $DB->get_record('course_categories', ['id' => $orgcatid], 'name');
+        if ($category) {
+            $organization_name = $category->name;
+        }
+    }
 }
 // Fetch only courses for stakeholder's organization
 if ($orgcatid) {
