@@ -67,6 +67,7 @@ function local_orgadmin_require_flag_assets(): void {
     $is_blocks_page = (strpos($current_url, '/blocks/') !== false);
     $is_calendar_page = (strpos($current_url, '/calendar/') !== false);
     $is_user_page = (strpos($current_url, '/user/') !== false);
+    $is_enrol_page = (strpos($current_url, '/enrol/') !== false);
 
     // Don't redirect during AJAX requests (like enrollment modals)
     $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
@@ -83,7 +84,7 @@ function local_orgadmin_require_flag_assets(): void {
     if (($is_my_index || $is_site_index) &&
         !$is_dashboard_page && !$is_course_page && !$is_my_courses &&
         !$is_mod_page && !$is_admin_page && !$is_blocks_page &&
-        !$is_calendar_page && !$is_user_page && !$is_ajax && !$is_enrollment_ajax) {
+        !$is_calendar_page && !$is_user_page && !$is_enrol_page && !$is_ajax && !$is_enrollment_ajax) {
 
         // Check for admin first (highest priority)
         if (orgadmin_role_detector::should_show_admin_dashboard()) {
