@@ -306,5 +306,4 @@ echo html_writer::div($enrolbuttonsout, 'd-flex justify-content-end', [
     'data-region' => 'wrapper',
     'data-table-uniqueid' => $participanttable->uniqueid,
 ]);
-
 echo $OUTPUT->footer();
