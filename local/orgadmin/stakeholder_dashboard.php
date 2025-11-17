@@ -589,7 +589,7 @@ body {
 
             // Handler for overall heatmap button
             function viewOverallHeatmap(courseid) {
-                window.location.href = '?courseid=' + courseid + '&overall=1';
+                window.location.href = '<?php echo $CFG->wwwroot; ?>/local/orgadmin/stakeholder_dashboard.php?courseid=' + courseid + '&overall=1';
             }
             </script>
         </div>
@@ -618,9 +618,9 @@ body {
                     var val = this.value;
                     var courseid = <?php echo json_encode($courseid); ?>;
                     if (val === 'all') {
-                        window.location.href = '?courseid=' + courseid + '&overall=1';
+                        window.location.href = '<?php echo $CFG->wwwroot; ?>/local/orgadmin/stakeholder_dashboard.php?courseid=' + courseid + '&overall=1';
                     } else {
-                        window.location.href = '?courseid=' + courseid + '&assessment=' + val;
+                        window.location.href = '<?php echo $CFG->wwwroot; ?>/local/orgadmin/stakeholder_dashboard.php?courseid=' + courseid + '&assessment=' + val;
                     }
                 });
                 </script>
@@ -653,9 +653,9 @@ body {
                     var val = this.value;
                     var courseid = <?php echo json_encode($courseid); ?>;
                     if (val === 'all') {
-                        window.location.href = '?courseid=' + courseid;
+                        window.location.href = '<?php echo $CFG->wwwroot; ?>/local/orgadmin/stakeholder_dashboard.php?courseid=' + courseid;
                     } else {
-                        window.location.href = '?courseid=' + courseid + '&assessment=' + val;
+                        window.location.href = '<?php echo $CFG->wwwroot; ?>/local/orgadmin/stakeholder_dashboard.php?courseid=' + courseid + '&assessment=' + val;
                     }
                 });
                 </script>
@@ -751,9 +751,9 @@ body {
                     var val = this.value;
                     var courseid = <?php echo json_encode($courseid); ?>;
                     if (val === 'all') {
-                        window.location.href = '?courseid=' + courseid;
+                        window.location.href = '<?php echo $CFG->wwwroot; ?>/local/orgadmin/stakeholder_dashboard.php?courseid=' + courseid;
                     } else {
-                        window.location.href = '?courseid=' + courseid + '&assessment=' + val;
+                        window.location.href = '<?php echo $CFG->wwwroot; ?>/local/orgadmin/stakeholder_dashboard.php?courseid=' + courseid + '&assessment=' + val;
                     }
                 });
                 </script>
@@ -948,11 +948,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function viewCourseHeatmap(courseId) {
-    window.location.href = `stakeholder_dashboard.php?courseid=${courseId}`;
+    window.location.href = '<?php echo $CFG->wwwroot; ?>/local/orgadmin/stakeholder_dashboard.php?courseid=' + courseId;
 }
 
 function viewAssessment(assessmentId, courseId) {
-    window.location.href = `stakeholder_dashboard.php?courseid=${courseId}&assessment=${assessmentId}`;
+    window.location.href = '<?php echo $CFG->wwwroot; ?>/local/orgadmin/stakeholder_dashboard.php?courseid=' + courseId + '&assessment=' + assessmentId;
 }
 
 function showStudentDetails(studentId, studentName) {
