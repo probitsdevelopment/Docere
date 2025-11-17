@@ -5,33 +5,33 @@ fieldset > .hide-section, fieldset > .hide-section ~ * {
 /* Hide the header and all following siblings until the next header */
 /* Collapsible header background grey, form section white */
 fieldset.collapsible > .collapsible-actions {
-    background: #f8f9fb !important;
+    background: transparent !important;
     border-radius: 12px 12px 0 0;
     padding: 18px 24px;
 }
 fieldset.collapsible {
-    background: #fff !important;
+    background: transparent !important;
 }
 /* Force light grey background for collapsible fieldsets, override other CSS */
-.mform fieldset.collapsible,
+/* .mform fieldset.collapsible,
 .mform .collapsible {
-    background: #fff !important;
+    background: #F9FAFB !important;
     border-radius: 12px;
-}
+} */
 /* Apply light grey background to collapsible fieldsets */
 fieldset.collapsible {
-    background: #f8f9fb !important;
+    background: transparent !important;
     border-radius: 12px;
 }
 /* Override grey backgrounds from other CSS files */
 .user-edit-header,
 .mform .collapsible {
-    background: #fff !important;
+    background: transparent !important;
 }
 /* Set the background color of the user edit form area to white */
-body, .mform, .user-edit-header, body.limitedwidth #region-main, body.limitedwidth .container {
-    background: #fff !important;
-}
+/* body, .mform, .user-edit-header, body.limitedwidth #region-main, body.limitedwidth .container {
+    background: #F9FAFB !important;
+} */
 /* Move only the Select a country field and box to the right, and add spacing between label and box */
 #id_country {
     margin-left: 3rem !important;
@@ -139,7 +139,7 @@ html, body {
 body.limitedwidth .container,
 body.limitedwidth #region-main,
 .mform,
-.user-edit-header {
+.user-edit-header {}
     /* Remove forced max-height and overflow-y hidden */
 }
 body.limitedwidth .container,

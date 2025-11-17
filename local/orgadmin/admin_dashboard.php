@@ -22,7 +22,7 @@ if (!orgadmin_role_detector::should_show_admin_dashboard()) {
 $search = optional_param('search', '', PARAM_TEXT);
 $role_filter = optional_param('role', 'all', PARAM_TEXT);
 $page = optional_param('page', 0, PARAM_INT);
-$perpage = 10;
+$perpage = 50; // Show 50 users per page
 
 // Get real data from Moodle system
 $statistics = orgadmin_role_detector::get_admin_statistics();
@@ -44,7 +44,7 @@ echo html_writer::start_tag('style');
 echo '
 /* Reset and base styles */
 html, body {
-    background-color: #ffffff !important;
+    background-color: #F9FAFB !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0 !important;
     padding: 0 !important;
@@ -67,7 +67,7 @@ html, body {
 .admin-container {
     width: 100%;
     padding: 20px 30px;
-    background: #ffffff;
+    background: #F9FAFB;
     min-height: calc(100vh - 70px);
 }
 
@@ -82,7 +82,10 @@ html, body {
     min-height: 156px !important;
     max-height: 156px !important;
     overflow: hidden;
-    border: 3px solid #149EDF;
+    border-top: 1px solid #149EDF;
+    border-left: 1px solid #149EDF;
+    border-right: 1px solid #149EDF;
+    border-bottom: 5px solid #149EDF;
 }
 
 .admin-welcome-content {
@@ -278,8 +281,6 @@ html, body {
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     border: 1px solid #e2e8f0;
-    overflow: hidden;
-    max-height: 500px;
 }
 
 .admin-user-table-container {
@@ -722,14 +723,16 @@ echo html_writer::end_tag('tbody');
 echo html_writer::end_tag('table');
 echo html_writer::end_div(); // End user table container
 
-// Pagination
+// Pagination - Always show
+echo html_writer::start_div('admin-pagination');
+
+// Pagination info - Always show
+$start = ($user_data['current_page'] * $user_data['per_page']) + 1;
+$end = min(($user_data['current_page'] + 1) * $user_data['per_page'], $user_data['total_count']);
+echo html_writer::div("Showing $start to $end of {$user_data['total_count']} results", 'admin-pagination-info');
+
+// Pagination controls - Only show if more than 1 page
 if ($user_data['total_pages'] > 1) {
-    echo html_writer::start_div('admin-pagination');
-    
-    // Pagination info
-    $start = ($user_data['current_page'] * $user_data['per_page']) + 1;
-    $end = min(($user_data['current_page'] + 1) * $user_data['per_page'], $user_data['total_count']);
-    echo html_writer::div("Showing $start to $end of {$user_data['total_count']} results", 'admin-pagination-info');
     
     // Pagination controls
     echo html_writer::start_div('admin-pagination-controls');
@@ -778,8 +781,9 @@ if ($user_data['total_pages'] > 1) {
     );
     
     echo html_writer::end_div(); // End pagination controls
-    echo html_writer::end_div(); // End pagination
 }
+
+echo html_writer::end_div(); // End pagination
 
 echo html_writer::end_div(); // End user directory
 

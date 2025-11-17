@@ -51,7 +51,11 @@
 
 .mform fieldset {
     margin-bottom: $spacer * 0.5;
-    border-bottom: $border-width solid $table-border-color;
+    border: 1px solid #E0E1E2 !important;
+    box-shadow: none !important;
+    border-radius: 8px;
+    padding: 1.5rem;
+    background: #F9FAFB;
 }
 
 #adminsettings .form-control[size] {
@@ -457,15 +461,18 @@ textarea[data-auto-rows] {
 .collapsemenu {
     .collapseall {
         display: block;
+        color: red;
     }
 
     .expandall {
         display: none;
+        color: red;
     }
 
     &.collapsed {
         .collapseall {
             display: none;
+            color: red;
         }
 
         .expandall {
@@ -499,4 +506,38 @@ textarea[data-auto-rows] {
             }
         }
     }
+}
+
+.custom-flex-row {
+  display: flex;
+  gap: 3rem;
+  margin-bottom: 1rem;
+  align-items: flex-start;
+}
+.custom-flex-label-input {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.custom-flex-label-input label {
+  margin-bottom: 0.5rem;
+  margin-right: 0;
+  font-weight: 500;
+  white-space: nowrap;
+  min-width: 140px;
+}
+.custom-flex-label-input input,
+.custom-flex-label-input select,
+.custom-flex-label-input .autocomplete {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.mform {
+  max-width: 1200px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }

@@ -99,7 +99,7 @@ html, body {
     max-width: none;
     margin: 0;
     padding: 20px 40px 0px;
-    background-color: #ffffff;
+    background-color: #F9FAFB;
     height: calc(100vh - 70px);
     overflow-x: hidden;
     overflow-y: hidden;
@@ -109,10 +109,10 @@ html, body {
 .welcome-section {
     background: #CDEBFA;
     border-radius: 20px;
-    border-top: 2px solid #1CB0F6;
-    border-bottom: 4px solid #1CB0F6;
-    border-left: 2px solid #1CB0F6;
-    border-right: 2px solid #1CB0F6;
+    border-top: 1px solid #149EDF;
+    border-left: 1px solid #149EDF;
+    border-right: 1px solid #149EDF;
+    border-bottom: 5px solid #149EDF;
     color: #2d3436;
     padding: 20px 30px;
     margin-bottom: 50px;

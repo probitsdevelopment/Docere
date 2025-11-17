@@ -118,9 +118,13 @@ function send_assessment_notifications($assessment, $students) {
 
     $emails_sent = 0;
 
-    // Get assessment creator details
+    // Get L&D user details (currently logged in user who is approving)
+    $lnd_user = $USER;
+    $lnd_name = $lnd_user->firstname . ' ' . $lnd_user->lastname;
+    
+    // Get assessment creator details for reference
     $creator = $DB->get_record('user', ['id' => $assessment->userid], 'firstname, lastname, email');
-    $creator_name = $creator ? $creator->firstname . ' ' . $creator->lastname : 'System';
+    $creator_name = $creator ? $creator->firstname . ' ' . $creator->lastname : 'Unknown Trainer';
 
     foreach ($students as $student_data) {
         try {
@@ -150,14 +154,16 @@ function send_assessment_notifications($assessment, $students) {
             if (!empty($assessment->instructions)) {
                 $message .= "\nInstructions:\n{$assessment->instructions}\n";
             }
-
+            
+            $message .= "\nThis assessment was created by: {$creator_name}\n";
+            $message .= "Approved and assigned by: {$lnd_name}\n";
             $message .= "\nPlease log in to the learning platform to take your assessment.\n\n";
             $message .= "Best regards,\n";
-            $message .= "{$creator_name}\n";
+            $message .= "{$lnd_name}\n";
             $message .= "Learning & Development Team";
 
-            // Send email
-            $success = email_to_user($student, $creator, $subject, $message);
+            // Send email from L&D user (not from trainer/creator)
+            $success = email_to_user($student, $lnd_user, $subject, $message);
 
             if ($success) {
                 $emails_sent++;
@@ -674,6 +680,12 @@ try {
                 throw new Exception('Failed to update assessment');
             }
 
+            // Re-fetch assessment to get updated data including settings
+            $assessment = $DB->get_record('orgadmin_assessments', ['id' => $assessment_id]);
+            if (!$assessment) {
+                throw new Exception('Failed to retrieve updated assessment');
+            }
+
             // Parse selected students
             $students = [];
             if (!empty($selected_students)) {
@@ -684,10 +696,22 @@ try {
                 }
             }
 
+            error_log('Parsed ' . count($students) . ' students for email notification');
+            error_log('Email notifications enabled: ' . ($send_email_notifications ? 'YES' : 'NO'));
+
             // Send email notifications if enabled
             $emails_sent = 0;
             if ($send_email_notifications && !empty($students)) {
+                error_log('Attempting to send emails to ' . count($students) . ' students');
                 $emails_sent = send_assessment_notifications($assessment, $students);
+                error_log('Emails sent: ' . $emails_sent);
+            } else {
+                if (!$send_email_notifications) {
+                    error_log('Email notifications disabled - skipping emails');
+                }
+                if (empty($students)) {
+                    error_log('No students selected - skipping emails');
+                }
             }
 
             error_log('Assessment approved successfully. Email notifications: ' . ($send_email_notifications ? 'enabled' : 'disabled') . ', Emails sent: ' . $emails_sent);

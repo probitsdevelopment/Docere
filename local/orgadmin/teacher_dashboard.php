@@ -245,6 +245,10 @@ body {
 .teacher-welcome {
     background: #CDEBFA;
     border-radius: 16px;
+    border-top: 1px solid #149EDF;
+    border-left: 1px solid #149EDF;
+    border-right: 1px solid #149EDF;
+    border-bottom: 5px solid #149EDF;
     padding: 30px;
     color: #2d3748;
     margin: 0 0 30px;

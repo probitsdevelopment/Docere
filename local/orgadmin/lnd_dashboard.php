@@ -34,7 +34,7 @@ echo html_writer::start_tag('style');
 echo '
 /* Reset and base styles for full width */
 html, body {
-    background-color: #ffffff !important;
+    background-color: #F9FAFB !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0 !important;
     padding: 0 !important;
@@ -100,7 +100,7 @@ html, body {
     max-width: none;
     margin: 0;
     padding: 15px 30px;
-    background: #ffffff;
+    background: #F9FAFB;
     height: calc(100vh - 70px);
     overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;

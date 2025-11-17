@@ -1,3 +1,18 @@
+#page-mod-quiz-view .quizinfo {
+    border: 1.5px solid #E7E9ED!important;
+    border-radius: 12px !important;
+    background: #fff !important;
+    padding: 24px 32px 24px 32px !important;
+    margin-bottom: 32px !important;
+    /* Removed flexbox properties for default block layout */
+}
+#page-mod-quiz-view #region-main {
+    border: 2px solid #E7E9ED !important;
+    border-radius: 16px !important;
+    /* box-shadow: 0 2px 8px rgba(68, 178, 231, 0.08) !important; */
+    padding: 32px 32px 24px 32px !important;
+    margin-top: 24px !important;
+}
 /** Bits that can appear on any page. */
 .path-mod-quiz .statedetails {
     display: block;
@@ -363,8 +378,13 @@ body.path-mod-quiz table tbody tr.gradedattempt > td {
 }
 
 #page-mod-quiz-edit .section .activity .actions .version-selection {
-    width: 8em;
-    padding: 0;
+    border: 1.5px solid #E7E9ED !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    padding: 0.5em 1.2em !important;
+    font-size: 1em !important;
+    min-width: 8em;
 }
 
 @media print {
@@ -595,11 +615,19 @@ table.quizreviewsummary td.cell {
 }
 
 #page-mod-quiz-edit .slotnumber {
-    background-color: #d3d3d3;
-    text-align: center;
-    margin: 0.1em 0.5em;
-    min-width: 2em;
-    display: inline-block;
+    background-color: #A9C6D4 !important;
+    border: 2px solid #1CB0F6 !important;
+    color: #222 !important;
+    border-radius: 50% !important;
+    width: 36px !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    margin: 0.5em auto !important;
+    box-shadow: none !important;
 }
 
 #page-mod-quiz-edit .section-heading {
@@ -674,7 +702,7 @@ table.quizreviewsummary td.cell {
 }
 
 #page-mod-quiz-edit ul.slots li.section .content {
-    background-color: #fafafa;
+    background-color: #fff !important;
     padding: 1px 0;
 }
 
@@ -685,15 +713,15 @@ table.quizreviewsummary td.cell {
 }
 
 #page-mod-quiz-edit ul.slots li.section li.activity {
-    background: #e6e6e6;
+    background: #fff !important;
     margin: 3px 0;
     padding: 0.2em;
     position: relative;
 }
 
-#page-mod-quiz-edit ul.slots li.section li.activity.page {
+/* #page-mod-quiz-edit ul.slots li.section li.activity.page {
     background: transparent;
-}
+} */
 
 #page-mod-quiz-edit ul.slots li.section li.activity.page h4 {
     display: inline;
@@ -762,6 +790,7 @@ table.quizreviewsummary td.cell {
     min-width: 5.45em;
 }
 
+/* Figma-style button/icon backgrounds */
 #page-mod-quiz-edit ul.slots li.section li.activity .edit_icon,
 #page-mod-quiz-edit ul.slots li.section li.activity a.preview,
 #page-mod-quiz-edit ul.slots li.section li.activity .editing_delete,
@@ -864,7 +893,7 @@ table.quizreviewsummary td.cell {
 #page-mod-quiz-edit .section .activity .actions {
     position: inherit;
     white-space: nowrap;
-    background: #e6e6e6;
+    background: #fff;
     padding: 0.1em 0;
 }
 
@@ -1227,10 +1256,10 @@ table#categoryquestions {
 /* Main question container */
 #page-mod-quiz-attempt .que {
     background: #ffffff !important;
-    border: 1px solid #e1e7ec !important;
-    border-radius: 8px !important;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
-    margin: 12px 0 !important;
+    border: 2px solid #e1e7ec !important;
+    border-radius: 16px !important;
+    box-shadow: none !important;
+    margin: 16px 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
     transition: all 0.3s ease !important;
@@ -1244,29 +1273,37 @@ table#categoryquestions {
 
 /* Question sidebar (left panel) */
 #page-mod-quiz-attempt .que .info {
+    
     background: transparent !important;
     color: #333 !important;
-    border: 1px solid #ddd !important;
-    border-radius: 8px 0 0 8px !important;
-    float: left !important;
-    width: 140px !important;
-    padding: 12px !important;
-    margin: 0 !important;
-    min-height: 100px !important;
+    border: none !important;
+    border-radius: 8px !important;
+    float: none !important;
+    width: 80% !important;
+    max-width: 600px !important;
+    margin: 16px auto 16px auto !important;
+    /* min-height: unset !important; */
     display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
+        /* min-height: 80px !important; */
+         
+    flex-direction: row !important;
+    justify-content: flex-start !important;
     align-items: center !important;
-    text-align: center !important;
+    text-align: left !important;
+    
+   
 }
 
 /* Question number styling */
 #page-mod-quiz-attempt .que .info h3.no {
-    color: white !important;
-    font-size: 18px !important;
+    /* Figma-style: number and text in a row, left aligned */
+    margin-right: 8px !important;
+    color: #222 !important;
+    font-size: 20px !important;
     font-weight: 700 !important;
-    margin: 0 0 4px 0 !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    margin: 0 !important;
+    text-shadow: none !important;
+    text-align: left !important;
 }
 
 #page-mod-quiz-attempt .que .info .state {
@@ -1395,4 +1432,14 @@ table#categoryquestions {
     #page-mod-quiz-attempt .que .info h3.no {
         font-size: 16px !important;
     }
+}
+
+/* Add margin below the start attempt button to separate it from the quiz info box */
+.quizstartbuttondiv {
+    margin-bottom: 16px !important;
+}
+
+/* Set background color of quiz question rows to white */
+.path-mod-quiz-edit .quizquestions .slot {
+    background: #fff !important;
 }

@@ -21,6 +21,9 @@ if (!orgadmin_role_detector::should_show_lnd_dashboard()) {
 // Get assessment ID from URL parameter
 $assessmentid = optional_param('id', 0, PARAM_INT);
 
+// Get list status filter from URL parameter (pending, approved, completed)
+$liststatus = optional_param('liststatus', 'pending', PARAM_ALPHA);
+
 // Get real assessment data from database
 function get_assessment_for_review($id) {
     global $DB;
@@ -694,6 +697,25 @@ html, body {
     color: #d63031;
 }
 
+.status-badge.approved,
+.status-badge.active,
+.status-badge.published {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.completed {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.no-assessments-message {
+    text-align: center;
+    padding: 40px;
+    color: #7f8c8d;
+    font-size: 1.1em;
+}
+
 .assessment-card-meta {
     display: flex;
     gap: 20px;
@@ -803,7 +825,7 @@ echo html_writer::tag('label', 'Allow multiple attempts', ['for' => 'multiple-at
 echo html_writer::end_div();
 
 echo html_writer::start_div('checkbox-item');
-echo html_writer::empty_tag('input', ['type' => 'checkbox', 'id' => 'email-notifications', 'name' => 'send_email_notifications', 'value' => '1']);
+echo html_writer::empty_tag('input', ['type' => 'checkbox', 'id' => 'email-notifications', 'name' => 'send_email_notifications', 'value' => '1', 'checked' => true]);
 echo html_writer::tag('label', 'Send email notifications to students', ['for' => 'email-notifications']);
 echo html_writer::end_div();
 echo html_writer::end_div();
@@ -975,9 +997,9 @@ echo html_writer::start_div('assessment-list-section');
 echo html_writer::start_div('list-header');
 
 echo html_writer::start_div('list-tabs');
-echo html_writer::tag('button', 'Pending', ['class' => 'list-tab-btn active', 'onclick' => 'switchListTab("pending")']);
-echo html_writer::tag('button', 'Approved', ['class' => 'list-tab-btn', 'onclick' => 'switchListTab("approved")']);
-echo html_writer::tag('button', 'Completed Assessment', ['class' => 'list-tab-btn', 'onclick' => 'switchListTab("completed")']);
+echo html_writer::tag('button', 'Pending', ['class' => 'list-tab-btn' . ($liststatus === 'pending' ? ' active' : ''), 'onclick' => 'switchListTab("pending")']);
+echo html_writer::tag('button', 'Approved', ['class' => 'list-tab-btn' . ($liststatus === 'approved' ? ' active' : ''), 'onclick' => 'switchListTab("approved")']);
+echo html_writer::tag('button', 'Completed Assessment', ['class' => 'list-tab-btn' . ($liststatus === 'completed' ? ' active' : ''), 'onclick' => 'switchListTab("completed")']);
 echo html_writer::end_div();
 
 echo html_writer::end_div();
@@ -985,18 +1007,36 @@ echo html_writer::end_div();
 echo html_writer::start_div('assessment-list', ['id' => 'assessment-list']);
 
 // Get real assessment list data from database
-function get_real_assessment_list() {
+function get_real_assessment_list($status = 'all') {
     global $DB;
 
     try {
-        // Get all pending assessments from database
-        $assessments = $DB->get_records('orgadmin_assessments', ['status' => 'pending_review']);
+        // Build query based on status
+        $params = [];
+        $sql = "SELECT * FROM {orgadmin_assessments}";
+        
+        if ($status === 'pending') {
+            $sql .= " WHERE status = :status";
+            $params['status'] = 'pending_review';
+        } else if ($status === 'approved') {
+            $sql .= " WHERE status IN ('approved', 'active', 'published')";
+        } else if ($status === 'completed') {
+            $sql .= " WHERE status = 'completed'";
+        }
+        
+        // Order by most recent first (timemodified or id DESC)
+        $sql .= " ORDER BY timemodified DESC, id DESC";
+        
+        $assessments = $DB->get_records_sql($sql, $params);
         $listAssessments = [];
 
         foreach ($assessments as $assessment) {
             // Get user info
             $user = $DB->get_record('user', ['id' => $assessment->userid], 'firstname, lastname');
             $creator_name = $user ? $user->firstname . ' ' . $user->lastname : 'Unknown User';
+            
+            // Count assigned students for this assessment
+            $student_count = $DB->count_records('orgadmin_student_assessments', ['assessment_id' => $assessment->id]);
 
             $listAssessments[] = [
                 'id' => $assessment->id,
@@ -1004,7 +1044,8 @@ function get_real_assessment_list() {
                 'creator' => $creator_name,
                 'questions' => 1, // Default for now since we don't store question count
                 'time' => $assessment->duration ?: 45,
-                'students' => 0 // Default for now since we don't track this yet
+                'students' => $student_count,
+                'status' => $assessment->status
             ];
         }
 
@@ -1016,34 +1057,50 @@ function get_real_assessment_list() {
     }
 }
 
-$listAssessments = get_real_assessment_list();
+$listAssessments = get_real_assessment_list($liststatus);
 
 // Assessment cards
-foreach ($listAssessments as $index => $assessment) {
-    echo html_writer::start_div('assessment-card');
-    echo html_writer::start_div('assessment-row');
-    
-    echo html_writer::start_div('assessment-info');
-    echo html_writer::start_div('assessment-card-title');
-    echo html_writer::span($assessment['title'], '');
-    echo html_writer::span('Pending', 'status-badge pending');
-    echo html_writer::end_div();
-    
-    echo html_writer::start_div('assessment-card-meta');
-    echo html_writer::span('👤 Created By: ' . $assessment['creator'], '');
-    echo html_writer::span('❓ ' . $assessment['questions'] . ' Questions', '');
-    echo html_writer::span('⏱️ ' . $assessment['time'] . ' mins', '');
-    echo html_writer::span('👥 ' . $assessment['students'] . ' Students', '');
-    echo html_writer::end_div();
-    echo html_writer::end_div();
-    
-    echo html_writer::start_div('card-actions');
-    echo html_writer::tag('button', '👁️ View', ['class' => 'card-action-btn view', 'onclick' => 'viewAssessment("' . $assessment['id'] . '")']);
-    echo html_writer::tag('button', '✓ Approve', ['class' => 'card-action-btn approve', 'onclick' => 'approveAssessment("' . $assessment['id'] . '")']);
-    echo html_writer::end_div();
-    
-    echo html_writer::end_div();
-    echo html_writer::end_div();
+if (empty($listAssessments)) {
+    echo html_writer::div('No ' . $liststatus . ' assessments found.', 'no-assessments-message');
+} else {
+    foreach ($listAssessments as $index => $assessment) {
+        echo html_writer::start_div('assessment-card');
+        echo html_writer::start_div('assessment-row');
+        
+        echo html_writer::start_div('assessment-info');
+        echo html_writer::start_div('assessment-card-title');
+        echo html_writer::span($assessment['title'], '');
+        
+        // Show appropriate status badge
+        $status_label = ucfirst($assessment['status']);
+        $badge_class = 'status-badge ' . strtolower($assessment['status']);
+        if (in_array($assessment['status'], ['approved', 'active', 'published'])) {
+            $status_label = 'Approved';
+            $badge_class = 'status-badge approved';
+        }
+        echo html_writer::span($status_label, $badge_class);
+        echo html_writer::end_div();
+        
+        echo html_writer::start_div('assessment-card-meta');
+        echo html_writer::span('👤 Created By: ' . $assessment['creator'], '');
+        echo html_writer::span('❓ ' . $assessment['questions'] . ' Questions', '');
+        echo html_writer::span('⏱️ ' . $assessment['time'] . ' mins', '');
+        echo html_writer::span('👥 ' . $assessment['students'] . ' Students', '');
+        echo html_writer::end_div();
+        echo html_writer::end_div();
+        
+        echo html_writer::start_div('card-actions');
+        echo html_writer::tag('button', '👁️ View', ['class' => 'card-action-btn view', 'onclick' => 'viewAssessment("' . $assessment['id'] . '")']);
+        
+        // Show approve button only for pending assessments
+        if ($assessment['status'] === 'pending_review') {
+            echo html_writer::tag('button', '✓ Approve', ['class' => 'card-action-btn approve', 'onclick' => 'approveAssessment("' . $assessment['id'] . '")']);
+        }
+        echo html_writer::end_div();
+        
+        echo html_writer::end_div();
+        echo html_writer::end_div();
+    }
 }
 
 echo html_writer::end_div();
@@ -1071,16 +1128,10 @@ function switchStudentTab(tab) {
 
 // Tab switching for assessment list
 function switchListTab(tab) {
-    document.querySelectorAll(".list-tab-btn").forEach(btn => {
-        btn.classList.remove("active");
-    });
-    event.target.classList.add("active");
-    
-    if (tab === "approved") {
-        alert("Approved assessments would be shown here");
-    } else if (tab === "completed") {
-        alert("Completed assessments would be shown here");
-    }
+    // Reload page with the new status parameter
+    var currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set(\'liststatus\', tab);
+    window.location.href = currentUrl.toString();
 }
 
 // Student management functions
@@ -1185,57 +1236,57 @@ function approveAndAssign() {
     }
 
     // Get assessment settings
-    const allowMultipleAttempts = document.getElementById('multiple-attempts').checked ? 1 : 0;
-    const sendEmailNotifications = document.getElementById('email-notifications').checked ? 1 : 0;
+    const allowMultipleAttempts = document.getElementById(\'multiple-attempts\').checked ? 1 : 0;
+    const sendEmailNotifications = document.getElementById(\'email-notifications\').checked ? 1 : 0;
 
     // Get assessment ID from URL
     const urlParams = new URLSearchParams(window.location.search);
-    const assessmentId = urlParams.get('id');
+    const assessmentId = urlParams.get(\'id\');
 
     if (!assessmentId) {
-        alert('Error: Assessment ID not found');
+        alert(\'Error: Assessment ID not found\');
         return;
     }
 
-    if (confirm(`✓ Approve and assign this assessment to ${selectedCount} selected students?\\n\\nSettings:\\n• Multiple attempts: ${allowMultipleAttempts ? 'Enabled' : 'Disabled'}\\n• Email notifications: ${sendEmailNotifications ? 'Enabled' : 'Disabled'}`)) {
+    if (confirm(`✓ Approve and assign this assessment to ${selectedCount} selected students?\\n\\nSettings:\\n• Multiple attempts: ${allowMultipleAttempts ? \'Enabled\' : \'Disabled\'}\\n• Email notifications: ${sendEmailNotifications ? \'Enabled\' : \'Disabled\'}`)) {
 
         // Create form data
         const formData = new FormData();
-        formData.append('action', 'approve_and_assign');
-        formData.append('assessment_id', assessmentId);
-        formData.append('allow_multiple_attempts', allowMultipleAttempts);
-        formData.append('send_email_notifications', sendEmailNotifications);
-        formData.append('sesskey', M.cfg.sesskey);
+        formData.append(\'action\', \'approve_and_assign\');
+        formData.append(\'assessment_id\', assessmentId);
+        formData.append(\'allow_multiple_attempts\', allowMultipleAttempts);
+        formData.append(\'send_email_notifications\', sendEmailNotifications);
+        formData.append(\'sesskey\', M.cfg.sesskey);
 
         // Collect selected students
         const selectedStudents = Array.from(document.querySelectorAll("#selected-list .student-card")).map(card => {
             return {
                 id: card.dataset.studentId,
-                name: card.querySelector('.student-name').textContent,
-                email: card.querySelector('.student-email').textContent
+                name: card.querySelector(\'.student-name\').textContent,
+                email: card.querySelector(\'.student-email\').textContent
             };
         });
-        formData.append('selected_students', JSON.stringify(selectedStudents));
+        formData.append(\'selected_students\', JSON.stringify(selectedStudents));
 
         // Submit to assessment handler
-        fetch(M.cfg.wwwroot + '/local/orgadmin/assessment_handler.php', {
-            method: 'POST',
+        fetch(M.cfg.wwwroot + \'/local/orgadmin/assessment_handler.php\', {
+            method: \'POST\',
             body: formData
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(`Assessment approved and assigned successfully!\\n\\n• ${selectedCount} students assigned\\n• Settings applied\\n• ${sendEmailNotifications ? 'Email notifications sent' : 'No email notifications sent'}`);
+                alert(`Assessment approved and assigned successfully!\\n\\n• ${selectedCount} students assigned\\n• Settings applied\\n• ${sendEmailNotifications ? \'Email notifications sent\' : \'No email notifications sent\'}`);
 
                 // Redirect back to LND dashboard
-                window.location.href = M.cfg.wwwroot + '/local/orgadmin/lnd_dashboard.php';
+                window.location.href = M.cfg.wwwroot + \'/local/orgadmin/lnd_dashboard.php\';
             } else {
-                alert('Error: ' + (data.error || 'Unknown error occurred'));
+                alert(\'Error: \' + (data.error || \'Unknown error occurred\'));
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('Error submitting assessment approval');
+            console.error(\'Error:\', error);
+            alert(\'Error submitting assessment approval\');
         });
     }
 }

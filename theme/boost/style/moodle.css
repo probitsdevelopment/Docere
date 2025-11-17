@@ -5411,30 +5411,30 @@ fieldset:disabled a.btn {
 }
 
 .btn-secondary {
-  color: #1d2125;
-  background-color: #ced4da;
-  border-color: #ced4da;
+  color: #fff !important;
+  background-color: #58CC02 !important;
+  border-color: #58CC02 !important ;
 }
 .btn-secondary:hover {
-  color: #1d2125;
-  background-color: #b8c1ca;
-  border-color: #b1bbc4;
+  color: #fff !important;
+  background-color: #4BAF00 !important;
+  border-color: #4BAF00 !important;
 }
 .btn-secondary:focus, .btn-secondary.focus {
-  color: #1d2125;
-  background-color: #b8c1ca;
-  border-color: #b1bbc4;
+  color: #fff !important;
+  background-color: #58CC02 !important;
+  border-color: #58CC02 !important;
   box-shadow: 0 0 0 0.2rem rgba(179, 185, 191, 0.5);
 }
 .btn-secondary.disabled, .btn-secondary:disabled {
-  color: #1d2125;
-  background-color: #ced4da;
-  border-color: #ced4da;
+  color: #fff !important;
+  background-color: #58CC02;
+  border-color: #58CC02;
 }
 .btn-secondary:not(:disabled):not(.disabled):active, .btn-secondary:not(:disabled):not(.disabled).active, .show > .btn-secondary.dropdown-toggle {
-  color: #1d2125;
-  background-color: #b1bbc4;
-  border-color: #aab4bf;
+  color: #fff !important;
+  background-color: #58CC02 !important;
+  border-color: #58CC02 !important;
 }
 .btn-secondary:not(:disabled):not(.disabled):active:focus, .btn-secondary:not(:disabled):not(.disabled).active:focus, .show > .btn-secondary.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(179, 185, 191, 0.5);
@@ -9576,6 +9576,7 @@ button.bg-dark:focus {
 
 .align-items-start {
   align-items: flex-start !important;
+  background-color: #fff  !important;
 }
 
 .align-items-end {
@@ -14826,7 +14827,7 @@ body.pagelayout-course .page-context-header h1,
 .path-course .page-context-header h1,
 .course-content h1,
 .course-header h1 {
-  color: #1CB0F6 !important;
+  color: #000000 !important;
   font-weight: bold !important;
 }
 
@@ -17472,6 +17473,7 @@ table.gradereport-grader-table tbody {
 
 .block .block-cards .course-info-container {
   padding: 0.8rem;
+  background-color: #fff !important;
 }
 .block .block-cards .progress {
   height: 0.5rem;
@@ -29122,7 +29124,7 @@ body {
   border-color: #6a737b;
 }
 .btn-outline-secondary:focus, .btn-outline-secondary.focus {
-  box-shadow: 0 0 0 0.2rem rgba(106, 115, 123, 0.5);
+  box-shadow: 0 0 0 0.2rem #5FC6F8;
 }
 .btn-outline-secondary.disabled, .btn-outline-secondary:disabled {
   color: #6a737b;
@@ -29134,7 +29136,7 @@ body {
   border-color: #6a737b;
 }
 .btn-outline-secondary:not(:disabled):not(.disabled):active:focus, .btn-outline-secondary:not(:disabled):not(.disabled).active:focus, .show > .btn-outline-secondary.dropdown-toggle:focus {
-  box-shadow: 0 0 0 0.2rem rgba(106, 115, 123, 0.5);
+  box-shadow: 0 0 0 0.2rem #5FC6F8
 }
 
 .btn-outline-info {

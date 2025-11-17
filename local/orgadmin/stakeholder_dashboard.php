@@ -127,7 +127,7 @@ body {
 .stakeholder-container {
     max-width: 1400px;
     margin: -60px auto 0;
-    padding: 20px;
+    padding: 20px 20px 20px;
     min-height: 100vh;
 }
 

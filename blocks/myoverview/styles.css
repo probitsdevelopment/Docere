@@ -112,17 +112,17 @@ h5[id^="instance-"][class*="card-title"][class*="d-inline"] {
 /* Horizontal tab-style filter for myoverview grouping selector */
 .myoverview-grouping-tabs {
     gap: 1.5rem;
-    border-bottom: 1.5px solid #e5e7eb;
+    border-bottom: none;
     margin-bottom: 1.5rem;
 }
 .myoverview-grouping-tab {
     color: #6b7280;
-    font-weight: 500;
+    font-weight: 400 !important;
     font-size: 1rem;
     background: none;
     border: none;
     border-radius: 0;
-    border-bottom: 2.5px solid transparent;
+    border-bottom: none;
     margin-bottom: -1.5px;
     padding: 0.5rem 0.75rem 0.75rem 0.75rem;
     transition: color 0.2s, border-color 0.2s;
@@ -130,17 +130,17 @@ h5[id^="instance-"][class*="card-title"][class*="d-inline"] {
 }
 .myoverview-grouping-tab[aria-current="true"] {
     color: #1CB0F6;
-    border-bottom: 2.5px solid #1CB0F6;
+    border-bottom: none;
     background: none;
-    font-weight: 600;
+    font-weight: 400 !important;
 }
 
 /* Remove blue from tabs that have .active but not aria-current="true" (JS or legacy class) */
 .myoverview-grouping-tab.active:not([aria-current="true"]) {
     color: #6b7280;
-    border-bottom: 2.5px solid transparent;
+    border-bottom: none;
     background: none;
-    font-weight: 500;
+    font-weight: 400 !important;
 }
 .myoverview-grouping-tab:hover,
 .myoverview-grouping-tab:focus {
@@ -165,22 +165,22 @@ h5[id^="instance-"][class*="card-title"][class*="d-inline"] {
 .block_myoverview [data-filter="grouping"] .dropdown-item:focus,
 .block_myoverview [data-filter="grouping"] .dropdown-item:active {
     background-color: #5FC6F8 !important;
-    color: #ffffff !important;
+    color: #F9FAFB !important;
 }
 
 /* Also target the specific data-filter attribute seen in the developer tools */
 .block_myoverview [data-filter="grouping"] .dropdown-menu li:hover,
 .block_myoverview [data-filter="grouping"] .dropdown-menu a:hover {
     background-color: #5FC6F8 !important;
-    color: #ffffff !important;
+    color: #F9FAFB !important;
 }
 
 /* Make the myoverview area visually stand out: white background and subtle shadow. */
 .block-myoverview {
-    background-color: #ffffff; /* white background for the course overview block */
+    background-color: #F9FAFB; /* white background for the course overview block */
     border-radius: 8px;
     padding: 1rem 1.25rem; /* more breathing room so the heading isn't touching the edge */
-    box-shadow: none !important; /* Ensure no box shadow is applied */
+     /* Ensure no box shadow is applied */
 }
 
 /* Remove the thin rule that appears at the top of the block (the <hr class="mt-0"/>) */
@@ -269,8 +269,8 @@ body#page-my-index #region-main .box,
 body.page-mycourses #region-main .card,
 body#page-my-index #region-main .card,
 .block-myoverview {
-    box-shadow: none !important;
-    border: none !important;
+    /* box-shadow: none !important;
+    border: none !important; */
 }
 
 /* Reduce size of course cards and adjust internal spacing for a tighter layout */
@@ -283,6 +283,7 @@ body#page-my-index #region-main .card,
 
 .block-myoverview .card .card-body {
     padding: 0.6rem 0.9rem; /* tighter padding */
+    background-color: #fff !important;
 }
 
 .block-myoverview .card .card-img-top,

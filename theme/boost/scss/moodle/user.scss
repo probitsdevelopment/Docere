@@ -16,6 +16,9 @@
 
 .userprofile .profile_tree {
     column-count: 2;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 32px !important;
 }
 
 // This rule overrides the automatic no-overflow on the participants table. It kills the auto-complete.
@@ -893,7 +896,6 @@ div.userinitials.bg-dark {
 /* Catchall for any element containing user initials */
 [class*="initials"],
 [class*="user-avatar"],
-[class*="avatar"],
 .userpicture [class*="bg-"],
 .userpicture .userinitials,
 td .userpicture .userinitials,
@@ -916,28 +918,41 @@ a .userinitials,
     justify-content: flex-end !important;
     border-bottom: none !important;
     background-color: transparent !important;
-}
+    
+} -----
 
 .secondary-navigation .navigation .nav-tabs .nav-item .nav-link {
     color: #000000 !important;
-    border: none !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 8px;
     border-bottom: none !important;
     background-color: transparent !important;
+    padding: 6px 20px !important;
+    line-height: 1.2 !important;
+    min-height: auto !important;
 }
+
+
 
 .secondary-navigation .navigation .nav-tabs .nav-item .nav-link:hover,
 .secondary-navigation .navigation .nav-tabs .nav-item .nav-link:focus {
     color: #1CB0F6 !important;
-    border: none !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 8px !important;
     border-bottom: none !important;
     background-color: transparent !important;
+    padding: 6px 20px !important;
+    line-height: 1.2 !important;
 }
 
 .secondary-navigation .navigation .nav-tabs .nav-item .nav-link.active {
-    color: #000000 !important;
+    color: #fff !important;
     border: none !important;
+    border-radius: 8px !important;
     border-bottom: none !important;
-    background-color: transparent !important;
+    background-color: #1CB0F6!important;
+    padding: 6px 20px !important;
+    line-height: 1.2 !important;
 }
 
 /* Remove any gray backgrounds from secondary navigation */
@@ -954,4 +969,21 @@ a .userinitials,
 th, thead th, table th, .generaltable th, .generaltable thead th, .generaltable.generalbox th, .generaltable.generalbox thead th {
     background: none !important;
     background-color: $table-head-bg !important;
+}
+
+/* Card style for each profile section using .node_category.card */
+section.node_category.card {
+    background: #fff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+    padding: 24px 32px !important;
+    margin-bottom: 24px !important;
+    border: 1px solid #f0f2f5 !important;
+}
+
+@media (max-width: 768px) {
+    .profile_tree {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
 }

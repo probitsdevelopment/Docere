@@ -1,6 +1,6 @@
 /* Custom UI for all sections of user edit form */
 .mform {
-    background: #f8f9fb;
+    background: #f9fafb;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     padding: 32px 24px 24px 24px;
@@ -35,7 +35,7 @@
     border-radius: 8px;
     padding: 12px;
     font-size: 15px;
-    background: #fff;
+    background: #F9FAFB;
     margin-top: 6px;
     margin-bottom: 0;
     box-sizing: border-box;
@@ -69,7 +69,7 @@
 .mform .form-buttons input[type="submit"],
 .mform .form-buttons input[type="button"] {
     background: #1cb0f6;
-    color: #fff;
+    color: #F9FAFB;
     border-radius: 8px;
     border: none;
     padding: 10px 24px;
