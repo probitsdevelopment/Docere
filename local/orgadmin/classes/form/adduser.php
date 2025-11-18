@@ -20,19 +20,19 @@ class adduser extends \moodleform {
         $mform->addRule('roleid', get_string('err_role_required', 'local_orgadmin'), 'required', null, 'client');
 
         // Email (lookup key)
-        $mform->addElement('text', 'email', get_string('f_email', 'local_orgadmin'), ['size' => 50]);
+        $mform->addElement('text', 'email', get_string('f_email', 'local_orgadmin'), ['size' => 30]);
         $mform->setType('email', PARAM_EMAIL);
         $mform->addRule('email', get_string('err_email_required', 'local_orgadmin'), 'required', null, 'client');
 
         // First/Last
-        $mform->addElement('text', 'firstname', get_string('f_firstname', 'local_orgadmin'), ['size' => 24]);
+        $mform->addElement('text', 'firstname', get_string('f_firstname', 'local_orgadmin'), ['size' => 30]);
         $mform->setType('firstname', PARAM_NOTAGS);
 
-        $mform->addElement('text', 'lastname', get_string('f_lastname', 'local_orgadmin'), ['size' => 24]);
+        $mform->addElement('text', 'lastname', get_string('f_lastname', 'local_orgadmin'), ['size' => 30]);
         $mform->setType('lastname', PARAM_NOTAGS);
 
         // Username (REQUIRED)
-        $mform->addElement('text', 'username', get_string('f_username', 'local_orgadmin'), ['size' => 32]);
+        $mform->addElement('text', 'username', get_string('f_username', 'local_orgadmin'), ['size' => 30]);
         $mform->setType('username', PARAM_USERNAME);
         $mform->addRule('username', get_string('required'), 'required', null, 'client');
 
