@@ -56,4 +56,71 @@ class adduser extends \moodleform {
 
         $this->add_action_buttons(true, get_string('btn_submit', 'local_orgadmin'));
     }
+
+    /**
+     * Custom validation to ensure email is valid and properly formatted with real domain
+     */
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        // Validate email format
+        if (!empty($data['email'])) {
+            $email = trim(strtolower($data['email']));
+            
+            // Basic format validation using PHP's filter
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors['email'] = 'Invalid email format. Please enter a valid email address.';
+                return $errors;
+            }
+            
+            // Additional check: ensure email has a valid domain structure
+            if (strpos($email, '@') !== false) {
+                list($local, $domain) = explode('@', $email, 2);
+                
+                // Check if domain has at least one dot (e.g., example.com)
+                if (strpos($domain, '.') === false) {
+                    $errors['email'] = 'Email must have a valid domain (e.g., user@example.com)';
+                    return $errors;
+                }
+                
+                // Check domain is not just a TLD or invalid
+                $domainparts = explode('.', $domain);
+                if (count($domainparts) < 2 || strlen($domainparts[0]) < 2) {
+                    $errors['email'] = 'Email domain is invalid. Please use a proper domain (e.g., user@company.com)';
+                    return $errors;
+                }
+                
+                // Check TLD (last part) is at least 2 characters
+                $tld = end($domainparts);
+                if (strlen($tld) < 2) {
+                    $errors['email'] = 'Email domain extension is invalid.';
+                    return $errors;
+                }
+                
+                // Reject common dummy/test domains
+                $dummydomains = ['test.com', 'test', 'example', 'dummy.com', 'fake.com', 'invalid.com', 
+                                'temp.com', 'temporary.com', 'sample.com', 'demo.com'];
+                foreach ($dummydomains as $dummy) {
+                    if (stripos($email, '@' . $dummy) !== false || stripos($domain, $dummy) !== false) {
+                        $errors['email'] = 'Please use a valid working email address, not a test/dummy email.';
+                        return $errors;
+                    }
+                }
+                
+                // Check if domain has valid DNS records (MX or A record)
+                // This verifies the domain actually exists
+                if (function_exists('checkdnsrr') && function_exists('dns_get_record')) {
+                    $hasMX = checkdnsrr($domain, 'MX');
+                    $hasA = checkdnsrr($domain, 'A');
+                    
+                    if (!$hasMX && !$hasA) {
+                        $errors['email'] = 'Email domain does not exist or cannot receive emails. Please use a valid working email address.';
+                        return $errors;
+                    }
+                }
+            }
+        }
+
+        return $errors;
+    }
 }

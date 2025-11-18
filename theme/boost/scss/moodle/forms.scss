@@ -51,11 +51,16 @@
 
 .mform fieldset {
     margin-bottom: $spacer * 0.5;
-    border: 1px solid #E0E1E2 !important;
+    // border: 1px solid #E0E1E2 !important;
     box-shadow: none !important;
     border-radius: 8px;
     padding: 1.5rem;
     background: #F9FAFB;
+}
+
+// Target only specific fieldsets by class for course settings
+.mform fieldset.clearfix.collapsible {
+    border: 1px solid #E0E1E2 !important;
 }
 
 #adminsettings .form-control[size] {
