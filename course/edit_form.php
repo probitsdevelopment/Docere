@@ -21,13 +21,6 @@ class course_edit_form extends moodleform {
         $mform    = $this->_form;
         $PAGE->requires->js_call_amd('core_course/formatchooser', 'init');
 
-        // Add General section header
-        $mform->addElement('header', 'general', get_string('general', 'form'));
-        global $CFG, $PAGE;
-
-        $mform    = $this->_form;
-        $PAGE->requires->js_call_amd('core_course/formatchooser', 'init');
-
         $course        = $this->_customdata['course']; // this contains the data of this form
         $category      = $this->_customdata['category'];
         $editoroptions = $this->_customdata['editoroptions'];
@@ -50,83 +43,84 @@ class course_edit_form extends moodleform {
         $this->course  = $course;
         $this->context = $context;
 
-            // Custom flex row for Course full name and Course short name
-            $mform->addElement('html', "<div class='custom-flex-row'>");
-            $mform->addElement('html', "<div class='custom-flex-label-input'><label for='id_fullname'>" . get_string('fullnamecourse') . "</label>");
-            $mform->addElement('text', 'fullname', '', 'maxlength="254" size="30"');
-            $mform->addHelpButton('fullname', 'fullnamecourse');
-            $mform->addRule('fullname', get_string('missingfullname'), 'required', null, 'client');
-            $mform->setType('fullname', PARAM_TEXT);
-            if (!empty($course->id) and !has_capability('moodle/course:changefullname', $coursecontext)) {
-                $mform->hardFreeze('fullname');
-                $mform->setConstant('fullname', $course->fullname);
-            }
-            $mform->addElement('html', "</div>");
-            $mform->addElement('html', "<div class='custom-flex-label-input'><label for='id_shortname'>" . get_string('shortnamecourse') . "</label>");
-            $mform->addElement('text', 'shortname', '', 'maxlength="100" size="20"');
-            $mform->addHelpButton('shortname', 'shortnamecourse');
-            $mform->addRule('shortname', get_string('missingshortname'), 'required', null, 'client');
-            $mform->setType('shortname', PARAM_TEXT);
-            if (!empty($course->id) and !has_capability('moodle/course:changeshortname', $coursecontext)) {
-                $mform->hardFreeze('shortname');
-                $mform->setConstant('shortname', $course->shortname);
-            }
-            $mform->addElement('html', "</div>");
-            $mform->addElement('html', "</div>");
+        // Form definition with new course defaults.
+        $mform->addElement('header','general', get_string('general', 'form'));
 
-            // Custom flex row for Course category and Course visibility
-            $mform->addElement('html', "<div class='custom-flex-row'>");
-            $mform->addElement('html', "<div class='custom-flex-label-input'><label for='id_category'>" . get_string('coursecategory') . "</label>");
-            if (empty($course->id)) {
-                if (has_capability('moodle/course:create', $categorycontext)) {
-                    $displaylist = core_course_category::make_categories_list('moodle/course:create');
-                    $mform->addElement('autocomplete', 'category', '', $displaylist);
-                    $mform->addRule('category', null, 'required', null, 'client');
-                    $mform->addHelpButton('category', 'coursecategory');
-                    $mform->setDefault('category', $category->id);
-                } else {
-                    $mform->addElement('hidden', 'category', null);
-                    $mform->setType('category', PARAM_INT);
-                    $mform->setConstant('category', $category->id);
-                }
+        $mform->addElement('hidden', 'returnto', null);
+        $mform->setType('returnto', PARAM_ALPHANUM);
+        $mform->setConstant('returnto', $returnto);
+
+        $mform->addElement('hidden', 'returnurl', null);
+        $mform->setType('returnurl', PARAM_LOCALURL);
+        $mform->setConstant('returnurl', $returnurl);
+
+        $mform->addElement('text','fullname', get_string('fullnamecourse'),'maxlength="254" size="50"');
+        $mform->addHelpButton('fullname', 'fullnamecourse');
+        $mform->addRule('fullname', get_string('missingfullname'), 'required', null, 'client');
+        $mform->setType('fullname', PARAM_TEXT);
+        if (!empty($course->id) and !has_capability('moodle/course:changefullname', $coursecontext)) {
+            $mform->hardFreeze('fullname');
+            $mform->setConstant('fullname', $course->fullname);
+        }
+
+        $mform->addElement('text', 'shortname', get_string('shortnamecourse'), 'maxlength="100" size="20"');
+        $mform->addHelpButton('shortname', 'shortnamecourse');
+        $mform->addRule('shortname', get_string('missingshortname'), 'required', null, 'client');
+        $mform->setType('shortname', PARAM_TEXT);
+        if (!empty($course->id) and !has_capability('moodle/course:changeshortname', $coursecontext)) {
+            $mform->hardFreeze('shortname');
+            $mform->setConstant('shortname', $course->shortname);
+        }
+
+        // Verify permissions to change course category or keep current.
+        if (empty($course->id)) {
+            if (has_capability('moodle/course:create', $categorycontext)) {
+                $displaylist = core_course_category::make_categories_list('moodle/course:create');
+                $mform->addElement('autocomplete', 'category', get_string('coursecategory'), $displaylist);
+                $mform->addRule('category', null, 'required', null, 'client');
+                $mform->addHelpButton('category', 'coursecategory');
+                $mform->setDefault('category', $category->id);
             } else {
-                if (has_capability('moodle/course:changecategory', $coursecontext)) {
-                    $displaylist = core_course_category::make_categories_list('moodle/course:changecategory');
-                    if (!isset($displaylist[$course->category])) {
-                        //always keep current
-                        $displaylist[$course->category] = core_course_category::get($course->category, MUST_EXIST, true)
-                            ->get_formatted_name();
-                    }
-                    $mform->addElement('autocomplete', 'category', '', $displaylist);
-                    $mform->addRule('category', null, 'required', null, 'client');
-                    $mform->addHelpButton('category', 'coursecategory');
-                } else {
-                    $mform->addElement('hidden', 'category', null);
-                    $mform->setType('category', PARAM_INT);
-                    $mform->setConstant('category', $course->category);
-                }
+                $mform->addElement('hidden', 'category', null);
+                $mform->setType('category', PARAM_INT);
+                $mform->setConstant('category', $category->id);
             }
-            $mform->addElement('html', "</div>");
-            $mform->addElement('html', "<div class='custom-flex-label-input'><label for='id_visible'>" . get_string('coursevisibility') . "</label>");
-            $choices = array();
-            $choices['0'] = get_string('hide');
-            $choices['1'] = get_string('show');
-            $mform->addElement('select', 'visible', '', $choices);
-            $mform->addHelpButton('visible', 'coursevisibility');
-            $mform->setDefault('visible', $courseconfig->visible);
-            if (!empty($course->id)) {
-                if (!has_capability('moodle/course:visibility', $coursecontext)) {
-                    $mform->hardFreeze('visible');
-                    $mform->setConstant('visible', $course->visible);
+        } else {
+            if (has_capability('moodle/course:changecategory', $coursecontext)) {
+                $displaylist = core_course_category::make_categories_list('moodle/course:changecategory');
+                if (!isset($displaylist[$course->category])) {
+                    //always keep current
+                    $displaylist[$course->category] = core_course_category::get($course->category, MUST_EXIST, true)
+                        ->get_formatted_name();
                 }
+                $mform->addElement('autocomplete', 'category', get_string('coursecategory'), $displaylist);
+                $mform->addRule('category', null, 'required', null, 'client');
+                $mform->addHelpButton('category', 'coursecategory');
             } else {
-                if (!guess_if_creator_will_have_course_capability('moodle/course:visibility', $categorycontext)) {
-                    $mform->hardFreeze('visible');
-                    $mform->setConstant('visible', $courseconfig->visible);
-                }
+                //keep current
+                $mform->addElement('hidden', 'category', null);
+                $mform->setType('category', PARAM_INT);
+                $mform->setConstant('category', $course->category);
             }
-            $mform->addElement('html', "</div>");
-            $mform->addElement('html', "</div>");
+        }
+
+        $choices = array();
+        $choices['0'] = get_string('hide');
+        $choices['1'] = get_string('show');
+        $mform->addElement('select', 'visible', get_string('coursevisibility'), $choices);
+        $mform->addHelpButton('visible', 'coursevisibility');
+        $mform->setDefault('visible', $courseconfig->visible);
+        if (!empty($course->id)) {
+            if (!has_capability('moodle/course:visibility', $coursecontext)) {
+                $mform->hardFreeze('visible');
+                $mform->setConstant('visible', $course->visible);
+            }
+        } else {
+            if (!guess_if_creator_will_have_course_capability('moodle/course:visibility', $categorycontext)) {
+                $mform->hardFreeze('visible');
+                $mform->setConstant('visible', $courseconfig->visible);
+            }
+        }
 
         // ...existing code...
 

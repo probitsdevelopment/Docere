@@ -512,37 +512,3 @@ textarea[data-auto-rows] {
         }
     }
 }
-
-.custom-flex-row {
-  display: flex;
-  gap: 3rem;
-  margin-bottom: 1rem;
-  align-items: flex-start;
-}
-.custom-flex-label-input {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 0;
-  min-width: 0;
-}
-.custom-flex-label-input label {
-  margin-bottom: 0.5rem;
-  margin-right: 0;
-  font-weight: 500;
-  white-space: nowrap;
-  min-width: 140px;
-}
-.custom-flex-label-input input,
-.custom-flex-label-input select,
-.custom-flex-label-input .autocomplete {
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-}
-
-.mform {
-  max-width: 1200px;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
