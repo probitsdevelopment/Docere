@@ -1,10 +1,4 @@
 <IfModule mod_security.c>
-    SecRuleEngine Off
+  SecFilterEngine Off
+  SecFilterScanPOST Off
 </IfModule>
-
-# Allow access to processattempt.php
-<Files "processattempt.php">
-    <IfModule mod_security.c>
-        SecRuleEngine Off
-    </IfModule>
-</Files>
