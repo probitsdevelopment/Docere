@@ -1,0 +1,10 @@
+<IfModule mod_security.c>
+    SecRuleEngine Off
+</IfModule>
+
+# Allow access to processattempt.php
+<Files "processattempt.php">
+    <IfModule mod_security.c>
+        SecRuleEngine Off
+    </IfModule>
+</Files>
