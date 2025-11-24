@@ -46,6 +46,10 @@ $timeup        = optional_param('timeup',        0,      PARAM_BOOL); // True if
 $scrollpos     = optional_param('scrollpos',     '',     PARAM_RAW);
 $cmid          = optional_param('cmid', null, PARAM_INT);
 
+
+
+
+
 $attemptobj = quiz_create_attempt_handling_errors($attemptid, $cmid);
 
 // Set $nexturl now.
