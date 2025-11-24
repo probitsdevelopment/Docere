@@ -67,6 +67,7 @@ $font-size-xs: ($font-size-base * .75) !default;
 
 .mdl-left {
     text-align: left;
+    padding-left: 20px;
 }
     
 .mdl-right {
@@ -2048,8 +2049,8 @@ body.pagelayout-mycourses .page-context-header h2,
 .path-my #page-header h2,
 .path-my .page-header-headings h2,
 .path-my .page-context-header h2 {
-    color: #1CB0F6 !important;
-    font-weight: 600 !important;
+    color: #000 !important;
+    font-weight: 500 !important;
 }
 
 /* Apply filters button styling - change to blue on participants page */
@@ -2112,7 +2113,7 @@ body.pagelayout-course button.btn-success,
     background-color: #1CB0F6 !important;
     border-color: #1CB0F6 !important;
     color: white !important;
-    border-radius: 8px !important;
+    border-radius: 12px !important;
     padding: 8px 16px !important;
     font-weight: 600 !important;
     transition: all 0.3s ease !important;
@@ -3127,10 +3128,11 @@ body.dragging {
             font-weight: bold;
         }
     }
+
 }
 
 .initialbargroups ul {
-    -webkit-margin-start: 0; /* stylelint-disable-line */
+             -webkit-margin-start: 0; /* stylelint-disable-line */
     margin-right: -1px;
 }
 
@@ -3333,7 +3335,7 @@ body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid ul.list-unstyled l
 body.path-user .tertiary-navigation,
 body.path-user .tertiary-navigation .card,
 body.path-user .card:has(.tertiary-navigation),
-body.path-user #region-main .card,
+// body.path-user #region-main .card,
 body.path-user #region-main .tertiary-navigation {
     background-color:#F9FAFB !important;
     border: none !important;
@@ -3439,7 +3441,7 @@ table.grade-report th,
 .path-grade-report-grader .gradeparent table td,
 .path-grade-report .generaltable .cell,
 .path-grade-report-grader .gradeparent .cell {
-    padding: 16px 20px !important;
+    padding: 10px 14px !important;
     border-right: 1px solid #f4f6f8 !important;
     border-left: none !important;
     border-top: none !important;
@@ -4001,6 +4003,15 @@ body#page-mod-quiz-summary .que .info .editquestion a {
 .path-course-view .dropdown-item[href*="/badges"],
 .path-course-view .dropdown-item[data-key="competencies"] {
     display: none !important;
+}
+
+/* Make login link font white globally */
+.login.pl-2 a {
+    color: #fff !important;
+}
+
+.label.mr-2.mb-0.text-primary {
+    color: #fff !important;
 }
 
 
