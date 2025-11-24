@@ -41,7 +41,7 @@ html, body {
     overflow-x: hidden !important;
     overflow-y: hidden !important;
     height: 100vh !important;
-    margin-top: 30px !important;
+    margin-top: 25px !important;   
 }
 
 /* Override Moodle container constraints */
