@@ -41,6 +41,7 @@ html, body {
     overflow-x: hidden !important;
     overflow-y: hidden !important;
     height: 100vh !important;
+    margin-top: 30px !important;
 }
 
 /* Override Moodle container constraints */
@@ -56,6 +57,27 @@ html, body {
     margin: 0 !important;
     padding: 0 !important;
     overflow-x: hidden !important;
+}
+
+
+
+/* Style the navbar to match our design */
+.navbar {
+    background: #1CB0F6 !important;
+    border-bottom: 1px solid #e9ecef !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+}
+
+.navbar-nav .nav-link {
+    color: #fff !important;
+    font-weight: 500 !important;
+}
+
+.navbar-nav .nav-link:hover {
+ color: #000 !important;
+}
+.navbar-nav .nav-link.active {
+    color: #fff!important;
 }
 
 /* Fix double scrollbar issue */
@@ -77,22 +99,7 @@ html, body {
     display: none !important;
 }
 
-/* Style the navbar to match our design */
-.navbar {
-    background: #fff !important;
-    border-bottom: 1px solid #e9ecef !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-}
 
-.navbar-nav .nav-link {
-    color: #5a6c7d !important;
-    font-weight: 500 !important;
-}
-
-.navbar-nav .nav-link:hover,
-.navbar-nav .nav-link.active {
-    color: #007cba !important;
-}
 
 /* L&D Dashboard Styles - Compact Layout */
 .lnd-container {
