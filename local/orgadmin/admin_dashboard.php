@@ -62,6 +62,25 @@ html, body {
 .page-header-headings {
     display: none !important;
 }
+    /* Style the navbar to match our design */
+.navbar {
+    background: #1CB0F6 !important;
+    border-bottom: 1px solid #e9ecef !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+}
+
+.navbar-nav .nav-link {
+    color: #fff !important;
+    font-weight: 500 !important;
+}
+
+.navbar-nav .nav-link:hover {
+ color: #000 !important;
+}
+.navbar-nav .nav-link.active {
+    color: #fff!important;
+}
+
 
 /* Main Container */
 .admin-container {
@@ -69,11 +88,12 @@ html, body {
     padding: 20px 30px;
     background: #F9FAFB;
     min-height: calc(100vh - 70px);
+    margin-top: 30px;
 }
 
 /* Welcome Banner - Exact Screenshot Match */
 .admin-welcome-banner {
-    background: linear-gradient(135deg, #CDEBFA 0%, #A8DCFA 100%);
+    background-color: #CDEBFA;
     border-radius: 20px;
     padding: 30px;
     margin-bottom: 20px;

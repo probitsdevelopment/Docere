@@ -41,16 +41,38 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+/* Style the navbar to match our design */
+.navbar {
+    background: #1CB0F6 !important;
+    border-bottom: 1px solid #e9ecef !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+}
+
+.navbar-nav .nav-link {
+    color: #fff !important;
+    font-weight: 500 !important;
+}
+
+.navbar-nav .nav-link:hover {
+ color: #000 !important;
+}
+.navbar-nav .nav-link.active {
+    color: #fff!important;
+}
+
+
+
 .admin-container {
     max-width: 1400px;
-    margin: -60px auto 0;
+    margin: -32px auto 0;
     padding: 20px;
     min-height: 100vh;
     overflow-y: auto;
+    
 }
 
 .admin-welcome {
-    background: linear-gradient(135deg, #CDEBFA 0%, #A8DCFA 100%);
+    background-color: #CDEBFA;
     border-radius: 16px;
     padding: 30px;
     color: #2d3748;
@@ -60,7 +82,11 @@ body {
     align-items: center;
     position: relative;
     overflow: hidden;
-    border: 3px solid #1CB0F6;
+   
+    border-top: 1px solid #149EDF;
+    border-left: 1px solid #149EDF;
+    border-right: 1px solid #149EDF;
+    border-bottom: 5px solid #149EDF;
 }
 
 .admin-welcome::before {

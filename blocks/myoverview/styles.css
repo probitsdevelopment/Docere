@@ -278,7 +278,7 @@ body#page-my-index #region-main .card,
     max-width: 360px; /* smaller card width */
     min-width: 280px;
     margin-bottom: 1rem;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .block-myoverview .card .card-body {

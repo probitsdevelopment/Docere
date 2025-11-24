@@ -3059,7 +3059,7 @@
   --gray: #6a737b;
   --gray-dark: #343a40;
   --primary: #1CB0F6;
-  --secondary: #ced4da;
+  --secondary: #58CC02;
   --success: #357a32;
   --info: #008196;
   --warning: #f0ad4e;
@@ -3402,7 +3402,7 @@ template {
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
   margin-bottom: 0.5rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.2;
 }
 
@@ -7254,25 +7254,28 @@ input[type=button].btn-block {
 }
 
 .navbar-light .navbar-brand {
-  color: rgba(0, 0, 0, 0.9);
+  color: #fff
 }
 .navbar-light .navbar-brand:hover, .navbar-light .navbar-brand:focus {
   color: rgba(0, 0, 0, 0.9);
 }
 .navbar-light .navbar-nav .nav-link {
-  color: rgba(0, 0, 0, 0.6);
+  color: #fff
 }
 .navbar-light .navbar-nav .nav-link:hover, .navbar-light .navbar-nav .nav-link:focus {
-  color: rgba(0, 0, 0, 0.9);
+  color: #fff;
 }
 .navbar-light .navbar-nav .nav-link.disabled {
   color: rgba(0, 0, 0, 0.3);
+}
+.navbar-light .navbar-nav .nav-link.active {
+    color: #fff;
 }
 .navbar-light .navbar-nav .show > .nav-link,
 .navbar-light .navbar-nav .active > .nav-link,
 .navbar-light .navbar-nav .nav-link.show,
 .navbar-light .navbar-nav .nav-link.active {
-  color: rgba(0, 0, 0, 0.9);
+  color: #fff;
 }
 .navbar-light .navbar-toggler {
   color: rgba(0, 0, 0, 0.6);
@@ -7282,10 +7285,10 @@ input[type=button].btn-block {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 0.6%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 .navbar-light .navbar-text {
-  color: rgba(0, 0, 0, 0.6);
+  color: #fff;
 }
 .navbar-light .navbar-text a {
-  color: rgba(0, 0, 0, 0.9);
+  color: #fff;
 }
 .navbar-light .navbar-text a:hover, .navbar-light .navbar-text a:focus {
   color: rgba(0, 0, 0, 0.9);
@@ -9151,7 +9154,7 @@ button.bg-dark:focus {
 }
 
 .bg-white {
-  background-color: #fff !important;
+  background-color: #fff!important;
 }
 
 .bg-transparent {
@@ -14795,7 +14798,7 @@ body.pagelayout-mycourses .page-context-header h2,
 .path-my #page-header h2,
 .path-my .page-header-headings h2,
 .path-my .page-context-header h2 {
-  color: #1CB0F6 !important;
+  color: #000 !important;
   font-weight: 600 !important;
 }
 
@@ -28193,7 +28196,7 @@ div.editor_atto_toolbar button .icon {
   box-shadow: none;
   border-bottom: #dee2e6 1px solid;
   align-items: stretch;
-  height: 61px;
+  height: 75px;
 }
 .navbar.fixed-top .navbar-brand .logo {
   max-height: calc(60px - (0.25rem * 2));
@@ -28975,7 +28978,7 @@ div.editor_atto_toolbar button .icon {
 }
 .primary-navigation .navigation .nav-link {
   height: 60px;
-  color: #1d2125;
+  color: #fff !important;
   border-top: 3px solid transparent;
 }
 

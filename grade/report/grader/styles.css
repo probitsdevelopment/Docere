@@ -43,7 +43,7 @@
     padding: 4px 5px;
     vertical-align: middle;
     text-align: right;
-    white-space: nowrap;
+    /* white-space: nowrap; */
 }
 
 /**
@@ -206,4 +206,13 @@
     .path-grade-report-grader .gradeparent table {
         padding-right: 6em;
     }
+}
+
+/* Hide 'Reports' from user dropdown menu by text and class */
+.usermenu .dropdown-menu .dropdown-item:contains('Reports') {
+  display: none !important;
+}
+/* Hide by href if possible */
+.usermenu .dropdown-menu .dropdown-item[href*="reportbuilder"] {
+  display: none !important;
 }

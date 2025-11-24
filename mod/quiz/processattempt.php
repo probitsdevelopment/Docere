@@ -79,7 +79,11 @@ if (!$attemptobj->is_preview_user()) {
     $attemptobj->require_capability('mod/quiz:attempt');
 }
 
-// If the attempt is already closed, send them to the review page.
+// If the attempt is alreadyyy closed, send them to the review page.
+
+
+
+//nkn chinnu 
 if ($attemptobj->is_finished()) {
     throw new moodle_quiz_exception($attemptobj->get_quizobj(),
             'attemptalreadyclosed', null, $attemptobj->review_url());

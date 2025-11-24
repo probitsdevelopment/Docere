@@ -3,20 +3,20 @@
 .primary-navigation .navigation .nav-link:hover,
 .primary-navigation .navigation .nav-link:focus,
 .primary-navigation .navigation .nav-link:visited {
-    color: #000000 !important;
+    color: #fff !important;
     text-decoration: none;
 }
 
 /* Active primary navigation link */
 .primary-navigation .navigation .nav-link.active {
-    color: #000000 !important;
+    color: #fff !important;
     font-weight: 600;
     border-bottom-color: #dc2626;
-}
+}   
 
 /* Secondary navigation text color */
 .secondary-navigation .moremenu .nav-link {
-    color: #000000 !important;
+    color: #fff !important;
 }
 
 /* Participants page blue color override to #1CB0F6 */

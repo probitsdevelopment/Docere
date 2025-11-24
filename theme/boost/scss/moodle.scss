@@ -48,3 +48,25 @@ $breadcrumb-divider-rtl: "◀" !default;
 @import "moodle/primarynavigation";
 @import "moodle/secondarynavigation";
 @import "moodle/tertiarynavigation";
+
+// Force navbar text color to white for blue background
+.navbar, .navbar-nav .nav-link {
+  color: #fff !important;
+}
+.navbar-nav .nav-link:hover {
+ color: #000 !important;
+}
+
+.navbar-nav .nav-link {
+    color: #fff !important;
+    font-weight: 500 !important;
+}
+.navbar {
+    background: #1CB0F6 !important;
+    border-bottom: 1px solid #e9ecef !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+}
+
+h3 {
+    font-weight: 500 !important;
+}

@@ -771,8 +771,7 @@ span.userinitials {
 
 /* Target any element with user initials */
 [class*="userinitials"],
-[class*="user-initials"],
-[class*="avatar"] {
+[class*="user-initials"] {
     background-color: white !important;
     background: white !important;
 }
@@ -908,64 +907,41 @@ a .userinitials,
     color: #374151 !important;
 }
 
-/* Course navigation menu items - move to right and black text */
-.secondary-navigation .navigation {
-    border-bottom: none !important;
-    background-color: transparent !important;
-}
-
+/* Secondary nav container – remove extra spacing */
 .secondary-navigation .navigation .nav-tabs {
-    justify-content: flex-end !important;
+    justify-content: flex-end !important;  /* or flex-end if you want right aligned */
     border-bottom: none !important;
     background-color: transparent !important;
-    
-} -----
+    margin-bottom: 0 !important;
+    padding: 0 !important;
+}
 
+/* Add spacing between each tab */
+.secondary-navigation .navigation .nav-tabs .nav-item {
+    margin-right: 6px !important;  /* 👈 creates the gap */
+}
+
+/* Normal tab */
 .secondary-navigation .navigation .nav-tabs .nav-item .nav-link {
-    color: #000000 !important;
+    color: #000 !important;
     border: 1px solid #E5E7EB !important;
-    border-radius: 8px;
-    border-bottom: none !important;
-    background-color: transparent !important;
-    padding: 6px 20px !important;
-    line-height: 1.2 !important;
-    min-height: auto !important;
+    border-radius: 6px !important;
+    background: #fff !important;
+    padding: 5px 12px !important;
+    line-height: 1 !important;
+    min-height: 0 !important;
+    height: auto !important;
 }
 
-
-
-.secondary-navigation .navigation .nav-tabs .nav-item .nav-link:hover,
-.secondary-navigation .navigation .nav-tabs .nav-item .nav-link:focus {
-    color: #1CB0F6 !important;
-    border: 1px solid #E5E7EB !important;
-    border-radius: 8px !important;
-    border-bottom: none !important;
-    background-color: transparent !important;
-    padding: 6px 20px !important;
-    line-height: 1.2 !important;
-}
-
+/* Active tab */
 .secondary-navigation .navigation .nav-tabs .nav-item .nav-link.active {
     color: #fff !important;
-    border: none !important;
-    border-radius: 8px !important;
-    border-bottom: none !important;
-    background-color: #1CB0F6!important;
-    padding: 6px 20px !important;
-    line-height: 1.2 !important;
+    background: #1CB0F6 !important;
+    border: 1px solid #1CB0F6 !important;
+    border-radius: 6px !important;
+    padding: 5px 12px !important;
+    line-height: 1 !important;
 }
-
-/* Remove any gray backgrounds from secondary navigation */
-.secondary-navigation,
-.secondary-navigation .navigation,
-.secondary-navigation .moremenu,
-.moremenu .nav-tabs,
-.moremenu .nav-link.active {
-    background-color: transparent !important;
-    background: transparent !important;
-}
-
-// Ensure all table headers use the Bootstrap variable for header background
 th, thead th, table th, .generaltable th, .generaltable thead th, .generaltable.generalbox th, .generaltable.generalbox thead th {
     background: none !important;
     background-color: $table-head-bg !important;
