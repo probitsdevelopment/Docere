@@ -18,7 +18,7 @@ $CFG->dboptions = array (
   'dbcollation' => 'utf8mb4_general_ci',
 );
 
-$CFG->wwwroot   = 'http://test.docere.pro';
+$CFG->wwwroot   = 'https://test.docere.pro';
 $CFG->dataroot  = '/home/u165158232/domains/docere.pro/data';
 $CFG->admin     = 'admin';
 
