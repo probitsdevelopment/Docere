@@ -44,7 +44,15 @@ function get_course_quizzes($courseid, $orgcatid) {
     global $DB;
     $course = $DB->get_record('course', ['id' => $courseid, 'category' => $orgcatid]);
     if (!$course) { return []; }
-    $sql = "SELECT q.id, q.name, q.grade as max_grade FROM {quiz} q JOIN {course_modules} cm ON cm.instance = q.id JOIN {modules} m ON m.id = cm.module WHERE q.course = ? AND m.name = 'quiz' ORDER BY q.name";
+    $sql = "SELECT q.id, q.name, q.grade as max_grade 
+            FROM {quiz} q 
+            JOIN {course_modules} cm ON cm.instance = q.id 
+            JOIN {modules} m ON m.id = cm.module 
+            WHERE q.course = ? 
+            AND m.name = 'quiz' 
+            AND cm.deletioninprogress = 0
+            AND cm.visible = 1
+            ORDER BY q.name";
     $quizzes = $DB->get_records_sql($sql, [$courseid]);
     $result = [];
     foreach ($quizzes as $quiz) {
