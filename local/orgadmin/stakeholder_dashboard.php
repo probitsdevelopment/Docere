@@ -64,6 +64,53 @@ function get_quiz_student_scores($quizid, $courseid) {
     }
     return $result;
 }
+
+function get_overall_combined_scores($courseid) {
+    global $DB;
+    $student_scores = [];
+    
+    // Get custom assessment scores
+    $custom_sql = "SELECT t.student_id, u.firstname, u.lastname, u.email, t.total_marks
+                   FROM {student_assessment_totals} t
+                   JOIN {user} u ON u.id = t.student_id
+                   WHERE t.courseid = ?";
+    $custom_records = $DB->get_records_sql($custom_sql, [$courseid]);
+    foreach ($custom_records as $rec) {
+        $sid = $rec->student_id;
+        if (!isset($student_scores[$sid])) {
+            $student_scores[$sid] = ['id' => $sid, 'name' => $rec->firstname . ' ' . $rec->lastname, 'email' => $rec->email, 'scores' => [], 'count' => 0];
+        }
+        $student_scores[$sid]['scores'][] = (float)$rec->total_marks;
+        $student_scores[$sid]['count']++;
+    }
+    
+    // Get quiz scores
+    $quiz_sql = "SELECT qg.userid as student_id, u.firstname, u.lastname, u.email, q.grade as max_grade, qg.grade,
+                        (qg.grade / q.grade * 100) as total_marks
+                 FROM {quiz_grades} qg
+                 JOIN {user} u ON u.id = qg.userid
+                 JOIN {quiz} q ON q.id = qg.quiz
+                 WHERE q.course = ?";
+    $quiz_records = $DB->get_records_sql($quiz_sql, [$courseid]);
+    foreach ($quiz_records as $rec) {
+        $sid = $rec->student_id;
+        if (!isset($student_scores[$sid])) {
+            $student_scores[$sid] = ['id' => $sid, 'name' => $rec->firstname . ' ' . $rec->lastname, 'email' => $rec->email, 'scores' => [], 'count' => 0];
+        }
+        $student_scores[$sid]['scores'][] = (float)$rec->total_marks;
+        $student_scores[$sid]['count']++;
+    }
+    
+    // Calculate averages
+    $result = [];
+    foreach ($student_scores as $student) {
+        if ($student['count'] > 0) {
+            $avg = array_sum($student['scores']) / $student['count'];
+            $result[] = ['id' => $student['id'], 'name' => $student['name'], 'email' => $student['email'], 'total_marks' => round($avg, 1)];
+        }
+    }
+    return $result;
+}
 $perpage = 10;
 global $DB;
 $courseid = isset($_GET['courseid']) ? intval($_GET['courseid']) : 0;
@@ -129,23 +176,9 @@ if ($assessment_id && $courseid) {
     }
 }
 
-// Fetch overall heatmap data for all assessments in a course
+// Fetch overall heatmap data combining quiz and custom assessments
 if (!empty($_GET['overall']) && $courseid) {
-    $sql = "SELECT t.student_id, u.firstname, u.lastname, u.email, SUM(t.total_marks) AS overall_marks
-            FROM {student_assessment_totals} t
-            JOIN {user} u ON u.id = t.student_id
-            WHERE t.courseid = ?
-            GROUP BY t.student_id, u.firstname, u.lastname, u.email";
-    $totals = $DB->get_records_sql($sql, [$courseid]);
-    $heatmap_data = [];
-    foreach ($totals as $row) {
-        $heatmap_data[] = [
-            'id' => $row->student_id,
-            'name' => $row->firstname . ' ' . $row->lastname,
-            'email' => $row->email,
-            'total_marks' => (float)$row->overall_marks
-        ];
-    }
+    $heatmap_data = get_overall_combined_scores($courseid);
 }
 
 // ...existing code...
