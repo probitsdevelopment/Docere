@@ -40,13 +40,34 @@ function get_org_student_assessment_scores($assessment_id) {
     return $result;
 }
 
+function get_course_quizzes($courseid, $orgcatid) {
+    global $DB;
+    $course = $DB->get_record('course', ['id' => $courseid, 'category' => $orgcatid]);
+    if (!$course) { return []; }
+    $sql = "SELECT q.id, q.name, q.grade as max_grade FROM {quiz} q JOIN {course_modules} cm ON cm.instance = q.id JOIN {modules} m ON m.id = cm.module WHERE q.course = ? AND m.name = 'quiz' ORDER BY q.name";
+    $quizzes = $DB->get_records_sql($sql, [$courseid]);
+    $result = [];
+    foreach ($quizzes as $quiz) {
+        $completed = $DB->count_records_sql("SELECT COUNT(DISTINCT userid) FROM {quiz_attempts} WHERE quiz = ? AND state = 'finished'", [$quiz->id]);
+        $avg_score = $DB->get_field_sql("SELECT AVG((grade / ?) * 100) FROM {quiz_grades} WHERE quiz = ?", [$quiz->max_grade, $quiz->id]);
+        $result[] = ['id' => 'quiz_' . $quiz->id, 'quiz_id' => $quiz->id, 'type' => 'quiz', 'title' => $quiz->name, 'completed' => $completed, 'total_students' => $completed, 'avg_score' => round($avg_score ?? 0, 1)];
+    }
+    return $result;
+}
+function get_quiz_student_scores($quizid, $courseid) {
+    global $DB;
+    $sql = "SELECT qg.userid as student_id, u.firstname, u.lastname, u.email, q.grade as max_grade, qg.grade as score, (qg.grade / q.grade * 100) as total_marks FROM {quiz_grades} qg JOIN {user} u ON u.id = qg.userid JOIN {quiz} q ON q.id = qg.quiz WHERE qg.quiz = ? AND q.course = ? ORDER BY u.lastname, u.firstname";
+    $records = $DB->get_records_sql($sql, [$quizid, $courseid]);
+    $result = [];
+    foreach ($records as $row) {
+        $result[] = ['id' => $row->student_id, 'name' => $row->firstname . ' ' . $row->lastname, 'email' => $row->email, 'score' => round($row->score, 2), 'max_grade' => $row->max_grade, 'total_marks' => round($row->total_marks, 1)];
+    }
+    return $result;
+}
 $perpage = 10;
-
 global $DB;
-
-// Get courseid and assessment_id from GET parameters
 $courseid = isset($_GET['courseid']) ? intval($_GET['courseid']) : 0;
-$assessment_id = isset($_GET['assessment']) ? intval($_GET['assessment']) : 0;
+$assessment_id = isset($_GET['assessment']) ? $_GET['assessment'] : 0;
 
 // Detect stakeholder's organization category
 $orgcatid = 0;
@@ -68,7 +89,7 @@ if ($orgcatid) {
     $courses = [];
 }
 
-// Fetch all available assessments for this course
+// Fetch all available assessments AND quizzes
 $assessments = [];
 if ($courseid) {
     $assessment_records = $DB->get_records_sql('SELECT id AS question_id, qtitle FROM {local_questions} WHERE courseid = ?', [$courseid]);
@@ -76,14 +97,11 @@ if ($courseid) {
         $completed = $DB->count_records('student_assessment_totals', ['question_id' => $rec->question_id, 'courseid' => $courseid]);
         $total_students = $completed;
         $avg_score = $DB->get_field_sql('SELECT AVG(total_marks) FROM {student_assessment_totals} WHERE question_id = ? AND courseid = ?', [$rec->question_id, $courseid]);
-        $assessments[] = [
-            'id' => $rec->question_id,
-            'title' => $rec->qtitle ? $rec->qtitle : ('Assessment ' . $rec->question_id),
-            'completed' => $completed,
-            'total_students' => $total_students,
-            'avg_score' => round($avg_score, 1)
-        ];
+        $assessments[] = ['id' => $rec->question_id, 'type' => 'custom', 'title' => $rec->qtitle ? $rec->qtitle : ('Assessment ' . $rec->question_id), 'completed' => $completed, 'total_students' => $total_students, 'avg_score' => round($avg_score, 1)];
     }
+    $quizzes = get_course_quizzes($courseid, $orgcatid);
+    $assessments = array_merge($assessments, $quizzes);
+    usort($assessments, function($a, $b) { return strcmp($a['title'], $b['title']); });
 }
 
 // Set selected assessment info
@@ -95,21 +113,19 @@ foreach ($assessments as $assessment) {
     }
 }
 
-// Fetch heatmap data for selected assessment in this course
+// Fetch heatmap data
 $heatmap_data = [];
 if ($assessment_id && $courseid) {
-    $sql = "SELECT t.student_id, u.firstname, u.lastname, u.email, t.total_marks
-            FROM {student_assessment_totals} t
-            JOIN {user} u ON u.id = t.student_id
-            WHERE t.question_id = ? AND t.courseid = ?";
-    $totals = $DB->get_records_sql($sql, [$assessment_id, $courseid]);
-    foreach ($totals as $row) {
-        $heatmap_data[] = [
-            'id' => $row->student_id,
-            'name' => $row->firstname . ' ' . $row->lastname,
-            'email' => $row->email,
-            'total_marks' => (float)$row->total_marks
-        ];
+    $is_quiz = (strpos($assessment_id, 'quiz_') === 0);
+    if ($is_quiz) {
+        $quiz_id = (int)str_replace('quiz_', '', $assessment_id);
+        $heatmap_data = get_quiz_student_scores($quiz_id, $courseid);
+    } else {
+        $sql = "SELECT t.student_id, u.firstname, u.lastname, u.email, t.total_marks FROM {student_assessment_totals} t JOIN {user} u ON u.id = t.student_id WHERE t.question_id = ? AND t.courseid = ?";
+        $totals = $DB->get_records_sql($sql, [$assessment_id, $courseid]);
+        foreach ($totals as $row) {
+            $heatmap_data[] = ['id' => $row->student_id, 'name' => $row->firstname . ' ' . $row->lastname, 'email' => $row->email, 'total_marks' => (float)$row->total_marks];
+        }
     }
 }
 
@@ -710,20 +726,31 @@ body {
                         <p><strong>No Assessments Available</strong></p>
                     </div>
                 <?php else: ?>
+                    <div style="max-height:500px; overflow-y:auto;">
                     <?php foreach ($assessments as $assessment): ?>
                         <?php if (!$assessment_id || $assessment_id == $assessment['id']): ?>
                         <div class="assessment-item <?php echo ($assessment_id == $assessment['id']) ? 'active' : ''; ?>">
-                            <div class="assessment-title"><?php echo htmlspecialchars($assessment['title']); ?></div>
+                            <div class="assessment-title">
+                                <?php 
+                                if (isset($assessment['type']) && $assessment['type'] === 'quiz') {
+                                    echo '<span class="material-icons" style="font-size:14px; vertical-align:middle; margin-right:4px; color:#1CB0F6;">quiz</span>';
+                                } else {
+                                    echo '<span class="material-icons" style="font-size:14px; vertical-align:middle; margin-right:4px; color:#58CC02;">assignment</span>';
+                                }
+                                echo htmlspecialchars($assessment['title']); 
+                                ?>
+                            </div>
                             <div class="assessment-stats">
                                 <span><?php echo $assessment['completed']; ?>/<?php echo $assessment['total_students']; ?> completed</span>
                                 <span>Avg: <?php echo $assessment['avg_score']; ?>%</span>
                             </div>
-                            <button class="view-btn" onclick="viewAssessment(<?php echo $assessment['id']; ?>, <?php echo $courseid; ?>)">
+                            <button class="view-btn" onclick="viewAssessment('<?php echo $assessment['id']; ?>', <?php echo $courseid; ?>)">
                                 View Student Marks
                             </button>
                         </div>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    </div>
                 <?php endif; ?>
                 </div>
             <?php elseif ($selected_assessment && $heatmap_data): ?>
