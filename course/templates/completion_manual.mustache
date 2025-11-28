@@ -26,9 +26,94 @@
         "overallincomplete": false
     }
 }}
+<style>
+.completion-btn-circular {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: none !important;
+    outline: none !important;
+    position: relative !important;
+}
+.completion-btn-circular:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
+.completion-btn-circular::before {
+    content: "✓" !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    line-height: 1 !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+}
+.completion-btn-circular span {
+    font-size: 18px !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+    display: inline-block !important;
+    line-height: 1 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+.completion-btn-unchecked {
+    background-color: #e0e0e0 !important;
+    border: 2px solid #e0e0e0 !important;
+}
+.completion-btn-unchecked::before {
+    color: #666 !important;
+}
+.completion-btn-unchecked span {
+    color: #666 !important;
+}
+.completion-btn-unchecked:hover:not(:disabled) span,
+.completion-btn-unchecked:focus:not(:disabled) span {
+    color: #666 !important;
+}
+.completion-btn-unchecked:hover:not(:disabled),
+.completion-btn-unchecked:focus:not(:disabled) {
+    background-color: #d0d0d0 !important;
+    border-color: #d0d0d0 !important;
+    box-shadow: none !important;
+}
+.completion-btn-checked {
+    background-color: #1CB0F6 !important;
+    border: 2px solid #1CB0F6 !important;
+}
+.completion-btn-checked::before {
+    color: #ffffff !important;
+}
+button.completion-btn-checked span,
+.completion-btn-checked > span,
+.btn.completion-btn-checked span {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+.completion-btn-checked:hover:not(:disabled) span,
+.completion-btn-checked:focus:not(:disabled) span,
+button.completion-btn-checked:hover span,
+button.completion-btn-checked:focus span {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+.completion-btn-checked:hover:not(:disabled),
+.completion-btn-checked:focus:not(:disabled) {
+    background-color: #1A9BD8 !important;
+    border-color: #1A9BD8 !important;
+    box-shadow: none !important;
+}
+</style>
 {{#istrackeduser}}
     {{#overallcomplete}}
-        <button class="btn btn-success btn-sm text-nowrap" data-action="toggle-manual-completion" data-toggletype="manual:undo" data-cmid="{{cmid}}" data-activityname="{{activityname}}" data-withavailability="{{withavailability}}" {{!
+        <button class="btn btn-sm completion-btn-circular completion-btn-checked" style="background-color: #1CB0F6 !important; border: 2px solid #1CB0F6 !important; color: white !important;" data-action="toggle-manual-completion" data-toggletype="manual:undo" data-cmid="{{cmid}}" data-activityname="{{activityname}}" data-withavailability="{{withavailability}}" {{!
         }}{{#accessibledescription}}{{!
             }}title="{{.}}" {{!
             }}aria-label="{{.}}" {{!
@@ -37,11 +122,11 @@
             }}title="{{#str}}completion_manual:aria:done, course, {{activityname}} {{/str}}" {{!
             }}aria-label="{{#str}}completion_manual:aria:done, course, {{activityname}} {{/str}}" {{!
         }}{{/accessibledescription}}>
-            <i class="fa fa-check" aria-hidden="true"></i> {{#str}} completion_manual:done, core_course {{/str}}
+            <span style="color: white !important; font-size: 18px !important; font-weight: bold !important;">✓</span>
         </button>
     {{/overallcomplete}}
     {{#overallincomplete}}
-        <button class="btn btn-outline-secondary btn-sm text-nowrap" data-action="toggle-manual-completion" data-toggletype="manual:mark-done" data-cmid="{{cmid}}" data-activityname="{{activityname}}" data-withavailability="{{withavailability}}" {{!
+        <button class="btn btn-sm completion-btn-circular completion-btn-unchecked" style="background-color: #e0e0e0 !important; border: 2px solid #e0e0e0 !important;" data-action="toggle-manual-completion" data-toggletype="manual:mark-done" data-cmid="{{cmid}}" data-activityname="{{activityname}}" data-withavailability="{{withavailability}}" {{!
         }}{{#accessibledescription}}{{!
             }}title="{{.}}" {{!
             }}aria-label="{{.}}" {{!
@@ -50,13 +135,13 @@
             }}title="{{#str}}completion_manual:aria:markdone, course, {{activityname}} {{/str}}" {{!
             }}aria-label="{{#str}}completion_manual:aria:markdone, course, {{activityname}} {{/str}}" {{!
         }}{{/accessibledescription}}>
-            {{#str}} completion_manual:markdone, core_course {{/str}}
+            <span style="color: #666 !important; font-size: 18px !important; font-weight: bold !important;">✓</span>
         </button>
     {{/overallincomplete}}
 {{/istrackeduser}}
 {{^istrackeduser}}
-    <button class="btn btn-outline-secondary btn-sm text-nowrap" disabled>
-        {{#str}} completion_manual:markdone, core_course {{/str}}
+    <button class="btn btn-sm completion-btn-circular completion-btn-unchecked" disabled>
+        <span>✓</span>
     </button>
 {{/istrackeduser}}
 

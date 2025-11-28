@@ -1,0 +1,39 @@
+<style>
+/* Circular completion button - inline CSS for immediate effect */
+.completion-btn-circular {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+}
+
+.completion-btn-circular i.fa-check {
+    font-size: 16px !important;
+    color: white !important;
+}
+
+.completion-btn-unchecked {
+    background-color: #e0e0e0 !important;
+    border: 2px solid #e0e0e0 !important;
+}
+
+.completion-btn-unchecked:hover:not(:disabled) {
+    background-color: #d0d0d0 !important;
+    border-color: #d0d0d0 !important;
+}
+
+.completion-btn-checked {
+    background-color: #1CB0F6 !important;
+    border: 2px solid #1CB0F6 !important;
+}
+
+.completion-btn-checked:hover:not(:disabled) {
+    background-color: #1A9BD8 !important;
+    border-color: #1A9BD8 !important;
+}
+</style>

@@ -1,0 +1,42 @@
+/* Circular Checkmark Button for Course Completion - Custom CSS Override */
+
+/* Base circular button styling - Grey when unchecked */
+.path-course-view li.activity form.togglecompletion .btn {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    background-color: #e0e0e0 !important;
+    border: 2px solid #e0e0e0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Hover state for unchecked button */
+.path-course-view li.activity form.togglecompletion .btn:hover {
+    background-color: #d0d0d0 !important;
+    border-color: #d0d0d0 !important;
+}
+
+/* Checkmark icon styling - white color */
+.path-course-view li.activity form.togglecompletion img {
+    max-width: none !important;
+    width: 18px !important;
+    height: 18px !important;
+    filter: brightness(0) invert(1) !important;
+}
+
+/* Blue background when completion is done */
+.path-course-view li.activity.completioninfo_complete form.togglecompletion .btn {
+    background-color: #1CB0F6 !important;
+    border-color: #1CB0F6 !important;
+}
+
+/* Hover state for checked button */
+.path-course-view li.activity.completioninfo_complete form.togglecompletion .btn:hover {
+    background-color: #1A9BD8 !important;
+    border-color: #1A9BD8 !important;
+}
