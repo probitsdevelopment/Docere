@@ -15,7 +15,8 @@ $collapse-list-item-hover-border: theme-color-level('info', -9) !default;
 $thin-scroll-bg-thumb: $gray-600 !default;
 $thin-scroll-bg-hover: $gray-700 !default;
 
-$font-size-xs: ($font-size-base * .75) !default;
+$font-size-xs: (
+    $font-size-base * .75) !default;
 
 #region-main {
     overflow-y: visible;
@@ -23,6 +24,7 @@ $font-size-xs: ($font-size-base * .75) !default;
 }
 
 @include media-breakpoint-up(sm) {
+
     .context-header-settings-menu,
     .region-main-settings-menu {
         float: right;
@@ -35,6 +37,7 @@ $font-size-xs: ($font-size-base * .75) !default;
 }
 
 @include media-breakpoint-down(sm) {
+
     .context-header-settings-menu,
     .region-main-settings-menu {
         display: flex;
@@ -42,12 +45,13 @@ $font-size-xs: ($font-size-base * .75) !default;
     }
 }
 
-.context-header-settings-menu .dropdown-toggle > .icon,
-#region-main-settings-menu .dropdown-toggle > .icon {
+.context-header-settings-menu .dropdown-toggle>.icon,
+#region-main-settings-menu .dropdown-toggle>.icon {
     height: 24px;
     font-size: 24px;
     width: auto;
 }
+
 /** Prevent user notifications overlapping with region main settings menu */
 #user-notifications {
     display: block;
@@ -69,14 +73,15 @@ $font-size-xs: ($font-size-base * .75) !default;
     text-align: left;
     padding-left: 20px;
 }
-    
+
 .mdl-right {
     text-align: right;
 }
 
 /*rtl:ignore*/
 .text-ltr {
-    direction: ltr !important; /* stylelint-disable-line declaration-no-important */
+    direction: ltr !important;
+    /* stylelint-disable-line declaration-no-important */
 }
 
 #add,
@@ -111,17 +116,21 @@ a.dimmed_text:visited,
 #page-footer a:not([class]),
 .arrow_link,
 a:not([class]),
-.activityinstance > a {
+.activityinstance>a {
+
     &.focus,
     &:focus {
         outline: $btn-focus-width solid transparent;
         color: $gray-900;
-        background-color: lighten($primary, 50%);
-        box-shadow: 0 -#{$btn-focus-width} lighten($primary, 50%), 0 $btn-focus-width $gray-800;
-    }
-    &:focus:hover {
-        text-decoration: none;
-    }
+        background-color: lighten($primary, 50%
+        );
+    box-shadow: 0 -#{$btn-focus-width} lighten($primary, 50%),
+    0 $btn-focus-width $gray-800;
+}
+
+&:focus:hover {
+    text-decoration: none;
+}
 }
 
 // Accessible focus styling for buttons like elements that do not use the .btn class. Add
@@ -144,11 +153,13 @@ a.dropdown-toggle,
 button.close,
 .form-autocomplete-selection,
 [role="treeitem"]:not([aria-expanded="true"]) {
+
     &.focus,
     &:focus {
         outline: 0;
         box-shadow: $input-btn-focus-box-shadow;
     }
+
     &:focus:hover {
         text-decoration: none;
     }
@@ -156,6 +167,7 @@ button.close,
 
 // Modal dialogs border should be rounded too.
 .modal-dialog[tabindex="0"] {
+
     &.focus,
     &:focus {
         @include border-radius($modal-content-border-radius);
@@ -165,13 +177,15 @@ button.close,
 // We don't want to highlight the whole li when it's expanded. Only the first child is highlighted.
 [role="treeitem"][aria-expanded="true"] {
     outline: 0;
+
     &.focus,
     &:focus {
-        > *:first-child {
+        >*:first-child {
             outline: 0;
             box-shadow: $input-btn-focus-box-shadow;
         }
     }
+
     &:focus:hover {
         text-decoration: none;
     }
@@ -185,8 +199,10 @@ button.close,
 
 // Safari does not allow custom styling of checkboxes.
 .safari {
+
     input[type="checkbox"],
     input[type="radio"] {
+
         &.focus,
         &:focus {
             outline: auto;
@@ -257,10 +273,12 @@ button.close,
 
 a.autolink {
     @extend .aalink;
+
     &.glossary:hover {
         cursor: help;
     }
 }
+
 /* Block which is hidden if javascript enabled, prevents fickering visible when JS from footer used! */
 .collapsibleregioncaption {
     white-space: nowrap;
@@ -279,6 +297,7 @@ a.autolink {
 }
 
 @include media-breakpoint-down(sm) {
+
     .pagelayout-mydashboard,
     .pagelayout-login {
         #region-main-box {
@@ -371,6 +390,7 @@ img.resize {
     height: 0.9em;
     width: 0.8em;
 }
+
 /* Icon styles */
 img.activityicon {
     height: 24px;
@@ -389,10 +409,12 @@ img.activityicon {
 }
 
 img.uihint {
-// Make first column cells in participants table body white
-.userlist table#participants tbody th {
-    background-color: white !important;
-}
+
+    // Make first column cells in participants table body white
+    .userlist table#participants tbody th {
+        background-color: white !important;
+    }
+
     cursor: help;
 }
 
@@ -413,18 +435,20 @@ form.popupform div {
 .arrow_button input {
     overflow: hidden;
 }
+
 .no-overflow {
     overflow: auto;
 }
 
 // Position required for table sizing inside a flex container.
-.no-overflow > .generaltable {
+.no-overflow>.generaltable {
     margin-bottom: 0;
 }
 
 .no-overflow,
 .table-responsive {
     .generaltable {
+
         .sr-only,
         .accesshide {
             position: relative;
@@ -445,6 +469,7 @@ div.hide,
 .hidden {
     display: none;
 }
+
 // Accessibility: Skip block link, for keyboard-only users.
 a.skip-block,
 a.skip {
@@ -467,6 +492,7 @@ a.skip:active {
     height: 1px;
     overflow: hidden;
 }
+
 // Blogs
 .addbloglink {
     text-align: center;
@@ -484,6 +510,7 @@ a.skip:active {
 .blog_entry .content {
     margin-left: 43px;
 }
+
 // Group
 
 #doc-contents h1 {
@@ -702,6 +729,7 @@ table.mod_index {
 .jsenabled .comment-report-selectall {
     display: inline;
 }
+
 /**
 * Completion progress report
 */
@@ -726,6 +754,7 @@ table.mod_index {
 .completion-expired .completion-expected {
     font-weight: bold;
 }
+
 /**
 * Tags
 */
@@ -1077,7 +1106,7 @@ tr.flagged-tag a {
     padding: 3px;
     margin: 3px;
 
-    > a:hover {
+    >a:hover {
         border-bottom: 1px solid #666;
     }
 }
@@ -1148,16 +1177,18 @@ tr.flagged-tag a {
     /* Creates a series of .mod-indent-# rule declarations based on indent size and number of indent levels. */
 
     @for $i from 1 through 16 {
-        $width: ($i * $mod-indent-size);
+        $width: (
+            $i * $mod-indent-size
+        );
 
-        .mod-indent-#{$i} {
-            width: $width;
-        }
+    .mod-indent-#{$i} {
+        width: $width;
     }
+}
 
-    .mod-indent-huge {
-        width: (16 * $mod-indent-size);
-    }
+.mod-indent-huge {
+    width: (16 * $mod-indent-size);
+}
 }
 
 /* Audio player size in 'block' mode (can only change width, height is hardcoded in JS) */
@@ -1169,10 +1200,12 @@ tr.flagged-tag a {
 .resourcecontent audio.mediaplugin_html5audio {
     width: 600px;
 }
+
 /** Large resource images should avoid hidden overflow **/
 .resourceimage {
     max-width: 100%;
 }
+
 /* Audio player size in 'inline' mode (can only change width, as above) */
 .mediaplugin_mp3 object {
     height: 15px;
@@ -1182,6 +1215,7 @@ tr.flagged-tag a {
 audio.mediaplugin_html5audio {
     width: 300px;
 }
+
 /* TinyMCE moodle media preview frame should not have padding */
 .core_media_preview.pagelayout-embedded #content {
     padding: 0;
@@ -1224,6 +1258,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
         .moodle-dialogue-lightbox {
             background-color: transparent;
         }
+
         .moodle-dialogue {
             box-shadow: $popover-box-shadow;
         }
@@ -1303,10 +1338,12 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
     background-image: none;
     box-shadow: none;
     opacity: 0.7;
+
     &:hover,
     &:active {
         opacity: 1;
     }
+
     &::after {
         content: "×";
     }
@@ -1314,6 +1351,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 
 .moodle-dialogue-base .moodle-dialogue .moodle-dialogue-bd {
     padding: 0.5rem;
+
     body {
         background-color: $body-bg;
     }
@@ -1429,6 +1467,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
     text-align: center;
     padding: 10% 0;
 }
+
 /* Apply a default max-height on tooltip text */
 .moodle-dialogue .tooltiptext {
     max-height: 300px;
@@ -1464,11 +1503,13 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 
     @include border-bottom-radius(10px);
 }
+
 /* Center the submit buttons within the area */
 .choosercontainer #chooseform .submitbuttons {
     padding: 0.7em 0;
     text-align: right;
 }
+
 /* Fixed for safari browser on iPhone4S with ios7@mixin */
 
 @media (max-height: 639px) {
@@ -1481,11 +1522,13 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
     min-width: 100px;
     margin: 0 0.5em;
 }
+
 /* Various settings for the options area */
 .choosercontainer #chooseform .options {
     position: relative;
     border-bottom: 1px solid #bbb;
 }
+
 /* Only set these options if we're showing the js container */
 .jschooser .choosercontainer #chooseform .alloptions {
     overflow-x: hidden;
@@ -1503,6 +1546,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
         }
     }
 }
+
 /* Settings for option rows and option subtypes */
 .choosercontainer #chooseform .moduletypetitle,
 .choosercontainer #chooseform .option,
@@ -1524,7 +1568,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
     padding: 0 0 0 0.5em;
 }
 
-.choosercontainer #chooseform .modicon + .typename {
+.choosercontainer #chooseform .modicon+.typename {
     padding-left: 0;
 }
 
@@ -1559,6 +1603,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 .choosercontainer #chooseform .subtype .typename {
     margin: 0 0 0 0.2em;
 }
+
 /* The instruction/help area */
 .jschooser .choosercontainer #chooseform .instruction,
 .jschooser .choosercontainer #chooseform .typesummary {
@@ -1575,6 +1620,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
     overflow-y: auto;
     line-height: 2em;
 }
+
 /* Selected option settings */
 .jschooser .choosercontainer #chooseform .instruction,
 .choosercontainer #chooseform .selected .typesummary {
@@ -1619,6 +1665,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
     .carousel-item.active {
         display: flex;
     }
+
     .chooser-container {
         display: flex;
         flex-direction: column;
@@ -1627,6 +1674,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 
     .loading-icon {
         opacity: 1;
+
         .icon {
             display: block;
             font-size: 3em;
@@ -1634,9 +1682,11 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
             width: 1em;
         }
     }
+
     .carousel-item .loading-icon .icon {
         margin: 1em auto;
     }
+
     .searchbar {
         width: 100%;
     }
@@ -1645,6 +1695,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 .modchooser .modal-footer {
     height: 70px;
     background: $modal-content-bg;
+
     .moodlenet-logo {
         .icon {
             height: 2.5rem;
@@ -1661,21 +1712,26 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 .modchoosercontainer .optionscontainer,
 .modchoosercontainer .searchresultitemscontainer {
     overflow-x: hidden;
+
     .option {
         // 2 items per line.
         flex-basis: calc(50% - 0.5rem);
+
         .optionactions {
             .optionaction {
                 cursor: pointer;
                 color: $gray-600;
+
                 i {
                     margin: 0;
                 }
             }
         }
+
         .optioninfo {
             a {
                 color: $gray-700;
+
                 &:hover {
                     text-decoration: none;
                 }
@@ -1692,6 +1748,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 
     .content {
         overflow-y: auto;
+
         .heading {
             .icon {
                 height: 32px;
@@ -1709,6 +1766,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 }
 
 @include media-breakpoint-down(xs) {
+
     .path-course-view .modal-dialog.modal-lg,
     .path-course-view .modal-content,
     .modchooser .modal-body,
@@ -1723,15 +1781,18 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
         height: 100%;
         overflow-y: auto;
     }
+
     .path-course-view .modal-dialog.modal-lg {
         margin: 0;
     }
+
     .modchooser .modal-body .searchresultitemscontainer-wrapper {
         min-height: auto;
     }
 }
 
 @include media-breakpoint-up(sm) {
+
     .modchoosercontainer .optionscontainer .option,
     .modchoosercontainer .searchresultitemscontainer .option {
         // Three items per line.
@@ -1740,6 +1801,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 }
 
 @include media-breakpoint-up(lg) {
+
     .modchoosercontainer .optionscontainer .option,
     .modchoosercontainer .searchresultitemscontainer .option {
         // Six items per line.
@@ -1849,7 +1911,7 @@ ul.badges {
     padding: 5px;
 }
 
-.badges li > img {
+.badges li>img {
     position: absolute;
 }
 
@@ -2031,8 +2093,10 @@ img#persona_signin {
     h1.h2 {
         font-weight: bold;
     }
+
     .logo {
         margin: $spacer 0;
+
         img {
             max-height: 75px;
         }
@@ -2154,6 +2218,7 @@ nav.navbar .logo img {
     .nav-item {
         display: flex;
     }
+
     .usermenu .dropdown-toggle {
         padding: 0 0.5rem;
     }
@@ -2171,7 +2236,7 @@ nav.navbar .logo img {
     display: flex;
 
     .page-header-image {
-        & > a {
+        &>a {
             display: inline-block;
         }
     }
@@ -2228,9 +2293,9 @@ dd:after {
 
 // Active tabs with links should have a different
 // cursor to indicate they are clickable.
-.nav-tabs > .active > a[href],
-.nav-tabs > .active > a[href]:hover,
-.nav-tabs > .active > a[href]:focus {
+.nav-tabs>.active>a[href],
+.nav-tabs>.active>a[href]:hover,
+.nav-tabs>.active>a[href]:focus {
     cursor: pointer;
 }
 
@@ -2247,11 +2312,13 @@ dd:after {
             right: auto;
             white-space: nowrap;
         }
+
         @include media-breakpoint-up(sm) {
             input {
                 width: 330px;
                 vertical-align: text-bottom;
                 margin-bottom: 0;
+
                 &[role="combobox"] {
                     width: auto;
                 }
@@ -2309,11 +2376,13 @@ h3.sectionname .inplaceeditable.inplaceeditingon .editinstructions {
         .chart-output-htmltable caption {
             white-space: nowrap;
         }
+
         /** When accessible, we display the table only. */
         &.accesshide {
             .chart-table-expand {
                 display: none;
             }
+
             .chart-table-data {
                 display: block;
             }
@@ -2402,10 +2471,12 @@ h3.sectionname .inplaceeditable.inplaceeditingon .editinstructions {
 #region-flat-nav {
     padding-right: 0;
     padding-left: 0;
+
     .nav {
         margin-right: $grid-gutter-width * 0.5;
         background-color: $card-bg;
     }
+
     @include media-breakpoint-down(sm) {
         .nav {
             margin-top: $grid-gutter-width;
@@ -2449,13 +2520,16 @@ $footer-link-color: $bg-inverse-link-color !default;
 .popover.footer {
     .popover-body {
         padding: 0;
+
         .footer-section {
             a {
                 color: $body-color;
                 text-decoration: underline;
+
                 .icon {
                     color: $body-color;
                 }
+
                 &:focus {
                     text-decoration: none;
                 }
@@ -2472,6 +2546,7 @@ $footer-link-color: $bg-inverse-link-color !default;
     .jsenabled #page-footer .footer-content-popover {
         display: none;
     }
+
     .jsenabled .btn-footer-popover {
         display: block;
         z-index: $zindex-dropdown;
@@ -2481,6 +2556,7 @@ $footer-link-color: $bg-inverse-link-color !default;
 .bg-inverse a {
     color: $bg-inverse-link-color;
     text-decoration: underline;
+
     .icon {
         color: $bg-inverse-link-color;
     }
@@ -2499,6 +2575,7 @@ $footer-link-color: $bg-inverse-link-color !default;
         width: 100%;
         color: $body-color;
     }
+
     &.active,
     &:active,
     &:hover,
@@ -2507,15 +2584,18 @@ $footer-link-color: $bg-inverse-link-color !default;
         outline: 0;
         background-color: $dropdown-link-active-bg;
         color: $dropdown-link-active-color;
+
         a {
             color: $dropdown-link-active-color;
         }
     }
+
     &[aria-current="true"],
     &[aria-selected="true"] {
         position: relative;
         display: flex;
         align-items: center;
+
         &:before {
             @include fa-icon();
             content: $fa-var-check;
@@ -2537,6 +2617,7 @@ $footer-link-color: $bg-inverse-link-color !default;
 }
 
 .sr-only-focusable {
+
     &:active,
     &:focus {
         z-index: 1031;
@@ -2591,9 +2672,11 @@ $footer-link-color: $bg-inverse-link-color !default;
     0% {
         background-color: $gray-100;
     }
+
     50% {
         background-color: darken($gray-100, 5%);
     }
+
     100% {
         background-color: $gray-100;
     }
@@ -2601,7 +2684,8 @@ $footer-link-color: $bg-inverse-link-color !default;
 
 @each $size, $length in $spacers {
     .line-height-#{$size} {
-        line-height: $length !important; /* stylelint-disable-line declaration-no-important */
+        line-height: $length !important;
+        /* stylelint-disable-line declaration-no-important */
     }
 }
 
@@ -2625,9 +2709,11 @@ body.h5p-embed {
     #page-content {
         display: inherit;
     }
+
     #maincontent {
         display: none;
     }
+
     .h5pmessages {
         min-height: 230px; // This should be the same height as default core_h5p iframes.
     }
@@ -2638,6 +2724,7 @@ body.h5p-embed {
 }
 
 #page.drawers {
+
     form#h5peditor,
     form#coolh5peditor,
     .core_contentbank_viewcontent {
@@ -2647,44 +2734,54 @@ body.h5p-embed {
 }
 
 .text-decoration-none {
-    text-decoration: none !important; /* stylelint-disable-line declaration-no-important */
+    text-decoration: none !important;
+    /* stylelint-disable-line declaration-no-important */
 }
 
 .colour-inherit {
-    color: inherit !important; /* stylelint-disable-line declaration-no-important */
+    color: inherit !important;
+    /* stylelint-disable-line declaration-no-important */
 }
 
 .position-right {
-    right: 0 !important; /* stylelint-disable-line declaration-no-important */
+    right: 0 !important;
+    /* stylelint-disable-line declaration-no-important */
 }
 
 .overflow-hidden {
-    overflow: hidden !important; /* stylelint-disable-line declaration-no-important */
+    overflow: hidden !important;
+    /* stylelint-disable-line declaration-no-important */
 }
 
 .text-break {
-    overflow-wrap: break-word !important; /* stylelint-disable-line declaration-no-important */
+    overflow-wrap: break-word !important;
+    /* stylelint-disable-line declaration-no-important */
 }
 
 .word-break {
-    word-break: break-word !important; /* stylelint-disable-line declaration-no-important */
+    word-break: break-word !important;
+    /* stylelint-disable-line declaration-no-important */
 }
 
 .z-index-0 {
-    z-index: 0 !important; /* stylelint-disable-line declaration-no-important */
+    z-index: 0 !important;
+    /* stylelint-disable-line declaration-no-important */
 }
 
 .z-index-1 {
-    z-index: 1 !important; /* stylelint-disable-line declaration-no-important */
+    z-index: 1 !important;
+    /* stylelint-disable-line declaration-no-important */
 }
 
 // These floats are deprecated in Bootstrap 4.3.1. It is still okay to use them in Moodle.
 .float-left {
-    float: left !important; /* stylelint-disable-line declaration-no-important */
+    float: left !important;
+    /* stylelint-disable-line declaration-no-important */
 }
 
 .float-right {
-    float: right !important; /* stylelint-disable-line declaration-no-important */
+    float: right !important;
+    /* stylelint-disable-line declaration-no-important */
 }
 
 .img-responsive {
@@ -2827,6 +2924,7 @@ $picker-emojis-per-row: 7 !default;
         a {
             color: darken(theme-color-level($color, $alert-color-level), 10%);
         }
+
         // Darken the close button text colour inside notification alerts for better contrast.
         .close {
             color: darken(theme-color-level($color, $alert-color-level), 20%);
@@ -2834,6 +2932,7 @@ $picker-emojis-per-row: 7 !default;
         }
     }
 }
+
 .alert a {
     font-weight: $font-weight-bold;
 }
@@ -2851,12 +2950,14 @@ $picker-emojis-per-row: 7 !default;
         width: 100%;
         flex-wrap: nowrap;
         margin-bottom: $spacer * 0.5;
+
         .breadcrumb-item {
             padding-top: $spacer * 0.33333;
             padding-bottom: $spacer * 0.33333;
             display: inline-flex;
             overflow: hidden;
         }
+
         .breadcrumb-item a,
         .breadcrumb-item span {
             overflow: hidden;
@@ -2870,38 +2971,47 @@ $picker-emojis-per-row: 7 !default;
         padding-right: 15px;
         padding-left: 15px;
     }
+
     .pagination {
         flex-wrap: wrap;
         justify-content: center;
     }
+
     .custom-select {
         max-width: 100%;
     }
+
     .card .card-body {
         padding: $card-spacer-x * 0.5;
     }
+
     #page-header {
         .card {
             border: 0;
+
             .card-body {
                 padding: 0;
             }
         }
     }
+
     .nav-tabs:not(.more-nav),
     .nav-pills {
         margin: 0;
         border: 0;
         padding: $spacer * 0.125;
         background-color: $gray-200;
+
         .nav-item {
             flex: 1 1 auto;
             text-align: center;
         }
+
         .nav-link {
             background: $white;
             border: 0;
             margin: $spacer * 0.125;
+
             &.active {
                 @include button-outline-variant($gray-600);
                 border-color: $gray-600;
@@ -2914,6 +3024,7 @@ $picker-emojis-per-row: 7 !default;
     div#page {
         margin-top: 0;
     }
+
     .navbar.fixed-top {
         position: relative;
         z-index: inherit;
@@ -2922,6 +3033,7 @@ $picker-emojis-per-row: 7 !default;
 
 .link-underline {
     text-decoration: underline;
+
     &:focus {
         text-decoration: none;
     }
@@ -2931,6 +3043,7 @@ $picker-emojis-per-row: 7 !default;
     .cta-icon {
         .icon {
             padding: 0.3rem;
+
             &.fa {
                 border-radius: 50%;
                 border-style: solid;
@@ -2939,6 +3052,7 @@ $picker-emojis-per-row: 7 !default;
         }
     }
 }
+
 .core_payment_gateways_modal .custom-control-label::before,
 .core_payment_gateways_modal .custom-control-label::after {
     top: 45%;
@@ -2946,20 +3060,24 @@ $picker-emojis-per-row: 7 !default;
 
 $scrollbar-thumb: $primary;
 $scrollbar-track: lighten($primary, 40%);
+
 // simple scrollbars
 .visual-scroll-x {
     scrollbar-width: thin;
     scrollbar-color: $scrollbar-thumb $scrollbar-track;
     -ms-overflow-style: -ms-autohiding-scrollbar;
+
     &::-webkit-scrollbar {
         height: 8px; // for horizontal scrollbars
         -webkit-appearance: none;
         appearance: none;
     }
+
     &::-webkit-scrollbar-thumb {
         background-color: $scrollbar-thumb;
         border-right: $border-width solid $white;
     }
+
     &::-webkit-scrollbar-track {
         background-color: $scrollbar-track;
         border-right: $border-width solid $white;
@@ -3037,6 +3155,7 @@ body.dragging {
     .waitstate {
         display: inherit;
     }
+
     .whilenostate {
         display: none;
     }
@@ -3047,11 +3166,13 @@ body.dragging {
 .collapse-list {
     .collapse-list-item {
         padding: $collapse-list-item-padding-y $collapse-list-item-padding-x;
+
         @include hover-focus() {
             background-color: $collapse-list-item-hover-bg;
             border-color: $collapse-list-item-hover-border;
         }
     }
+
     .collapse-list-item-content {
         .collapse-list-item {
             padding-left: calc(#{$collapse-list-item-padding-x} * 3);
@@ -3062,10 +3183,14 @@ body.dragging {
 .drawers {
     .block_myoverview {
         border: 0;
-        & > .card-body {
-            padding-top: 0 !important; /* stylelint-disable-line declaration-no-important */
-            padding-left: 0 !important; /* stylelint-disable-line declaration-no-important */
-            padding-right: 0 !important; /* stylelint-disable-line declaration-no-important */
+
+        &>.card-body {
+            padding-top: 0 !important;
+            /* stylelint-disable-line declaration-no-important */
+            padding-left: 0 !important;
+            /* stylelint-disable-line declaration-no-important */
+            padding-right: 0 !important;
+            /* stylelint-disable-line declaration-no-important */
         }
     }
 }
@@ -3111,16 +3236,19 @@ body.dragging {
     ul[role="group"] {
         padding: 0.3rem 0 0 0;
         margin: 0;
+
         li:first-child {
             cursor: default;
             color: $gray-600;
             padding: 0.25rem 1.5rem;
             display: block;
         }
+
         .dropdown-item {
             padding-left: 2.5rem;
         }
     }
+
     .dropdown-item {
         cursor: pointer;
 
@@ -3132,7 +3260,8 @@ body.dragging {
 }
 
 .initialbargroups ul {
-             -webkit-margin-start: 0; /* stylelint-disable-line */
+    -webkit-margin-start: 0;
+    /* stylelint-disable-line */
     margin-right: -1px;
 }
 
@@ -3143,23 +3272,28 @@ body.dragging {
                 @include border-left-radius(0);
                 @include border-right-radius(0);
             }
+
             .initialbargroups .pagination-lg:first-child & {
                 @include border-left-radius($pagination-border-radius-lg);
             }
+
             .initialbargroups .pagination-sm:first-child & {
                 @include border-left-radius($pagination-border-radius-sm);
             }
         }
     }
+
     &:last-child {
         .page-link {
             .initialbargroups & {
                 @include border-left-radius(0);
                 @include border-right-radius(0);
             }
+
             .initialbargroups .pagination-lg:last-child & {
                 @include border-right-radius($pagination-border-radius-lg);
             }
+
             .initialbargroups .pagination-sm:last-child & {
                 @include border-right-radius($pagination-border-radius-sm);
             }
@@ -3241,7 +3375,7 @@ body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid:has(ul.list-unstyl
     border-radius: 12px !important;
     padding: 1.25rem !important;
     margin: 1.5rem auto !important;
-    border-color: #CCCCCC ;
+    border-color: #CCCCCC;
     max-width: 650px !important;
     display: flex !important;
     flex-direction: column !important;
@@ -3319,12 +3453,12 @@ body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid ul.list-unstyled l
         margin: 1rem !important;
         padding: 1.5rem !important;
     }
-    
+
     body.pagelayout-incourse:not(.path-mod-quiz) .container-fluid .row ul.list-unstyled {
         grid-template-columns: 1fr !important;
         gap: 1rem !important;
     }
-    
+
     body.pagelayout-incourse #page-content h2:contains("Reports"),
     body.pagelayout-incourse #region-main h2:contains("Reports") {
         font-size: 2rem !important;
@@ -3337,7 +3471,7 @@ body.path-user .tertiary-navigation .card,
 body.path-user .card:has(.tertiary-navigation),
 // body.path-user #region-main .card,
 body.path-user #region-main .tertiary-navigation {
-    background-color:#F9FAFB !important;
+    background-color: #F9FAFB !important;
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
@@ -3867,151 +4001,211 @@ nav.moremenu [data-key="myhome"],
     display: none !important;
 }
 
-/* ===== Quiz Question Number Styling ===== */
-/* Question number box - Grey background */
+/***************************************************
+ Figma-Style Quiz Question Info Box - FINAL VERSION
+****************************************************/
+
+/* Main container – 2x2 grid */
 #page-mod-quiz-attempt .que .info,
-
 #page-mod-quiz-summary .que .info,
-body#page-mod-quiz-attempt .que .info,
+#page-mod-quiz-review .que .info {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    grid-template-rows: auto auto !important;
+    grid-template-areas:
+        "question flag"
+        "status edit" !important;
 
-body#page-mod-quiz-summary .que .info {
-    background-color: #D2EFFD!important;
+    gap: 0.35rem 1rem !important;
+    background-color: #D2EFFD !important;
     border: 1px solid #44B2E7 !important;
-        padding: 2rem 2.5rem !important;
-    border-radius: 8px !important;
-        display: grid;
-        grid-template-areas:
-            "question flag"
-            "status edit";
-        grid-template-columns: 2fr 1fr;
-        grid-template-rows: 1fr 1fr;
-        gap: 0 32px;
-        align-items: start;
-        min-height: 120px;
-        min-width: 700px;
+    border-radius: 10px !important;
+
+    padding: 1rem 1.3rem !important;
+    min-height: auto !important;
 }
 
-/* Question heading - "Question" text in BLACK */
+/***************************************************
+ Question Title (top-left)
+****************************************************/
 #page-mod-quiz-attempt .que .info h3.no,
-#page-mod-quiz-review .que .info h3.no,
 #page-mod-quiz-summary .que .info h3.no,
-body#page-mod-quiz-attempt .que .info h3.no,
-body#page-mod-quiz-review .que .info h3.no,
-body#page-mod-quiz-summary .que .info h3.no,
-.que .info h3.no {
+#page-mod-quiz-review .que .info h3.no {
+    grid-area: question !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #1e293b !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    margin-top: 0.2rem !important;
+    padding-top: 0 !important;
+}
+
+/* Question Number */
+#page-mod-quiz-attempt .que .info span.qno,
+#page-mod-quiz-summary .que .info span.qno,
+#page-mod-quiz-review .que .info span.qno {
     color: #1e293b !important;
     font-weight: 600 !important;
-    margin: 0 !important;
     font-size: 20px !important;
-    text-shadow: none !important;
-    text-align: left !important;
-    margin-right: 8px !important;
-    grid-area: question;
-    align-self: start;
-    justify-self: start;
 }
 
-/* Question number (large number) "1" in BLACK - Reduced size */
-#page-mod-quiz-attempt .que .info span.qno,
-#page-mod-quiz-review .que .info span.qno,
-#page-mod-quiz-summary .que .info span.qno,
-body#page-mod-quiz-attempt .que .info span.qno,
-body#page-mod-quiz-review .que .info span.qno,
-body#page-mod-quiz-summary .que .info span.qno,
-.que .info span.qno {
-    color: #1e293b !important;
-    font-weight: 700 !important;
-    font-size: 1.2em !important;
-}
+/***************************************************
+ STATUS SECTION (bottom-left)
+****************************************************/
 
-/* Status text divs - "Marked out of 1.00" in BLUE */
+/* The container with both status lines */
 #page-mod-quiz-attempt .que .info > div:not(.questionflag):not(.editquestion),
-#page-mod-quiz-review .que .info > div:not(.questionflag):not(.editquestion),
 #page-mod-quiz-summary .que .info > div:not(.questionflag):not(.editquestion),
-body#page-mod-quiz-attempt .que .info > div:not(.questionflag):not(.editquestion),
-body#page-mod-quiz-review .que .info > div:not(.questionflag):not(.editquestion),
-body#page-mod-quiz-summary .que .info > div:not(.questionflag):not(.editquestion) {
-    color: #1CB0F6 !important;
-    font-weight: 500 !important;
-    font-size: 0.9em !important;
-    margin-top: 0.5em !important;
-    grid-area: status;
-    align-self: end;
-    justify-self: start;
+#page-mod-quiz-review .que .info > div:not(.questionflag):not(.editquestion) {
+    grid-area: status !important;
+    display: flex !important;
+    flex-direction: column !important;   /* STACK vertically */
+    gap: 6px !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-/* Flag question link and Edit question link - in BLUE */
+/* Force each status item onto its own line */
+#page-mod-quiz-attempt .que .info .state,
+#page-mod-quiz-attempt .que .info .grade,
+#page-mod-quiz-summary .que .info .state,
+#page-mod-quiz-summary .que .info .grade,
+#page-mod-quiz-review .que .info .state,
+#page-mod-quiz-review .que .info .grade {
+    display: block !important;      /* OVERRIDES FLEX from theme */
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.4 !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    color: #1CB0F6 !important;
+}
+
+/* Extra override: theme applies flex to all divs, break it */
+#page-mod-quiz-attempt .que .info > div.state,
+#page-mod-quiz-attempt .que .info > div.grade,
+#page-mod-quiz-summary .que .info > div.state,
+#page-mod-quiz-summary .que .info > div.grade,
+#page-mod-quiz-review .que .info > div.state,
+#page-mod-quiz-review .que .info > div.grade {
+    display: block !important;
+}
+
+/***************************************************
+ FLAG QUESTION (top-right)
+****************************************************/
 #page-mod-quiz-attempt .que .info .questionflag,
-#page-mod-quiz-review .que .info .questionflag,
 #page-mod-quiz-summary .que .info .questionflag,
-#page-mod-quiz-attempt .que .info .editquestion,
-#page-mod-quiz-review .que .info .editquestion,
-#page-mod-quiz-summary .que .info .editquestion,
-body#page-mod-quiz-attempt .que .info .questionflag,
-body#page-mod-quiz-review .que .info .questionflag,
-body#page-mod-quiz-summary .que .info .questionflag,
-body#page-mod-quiz-attempt .que .info .editquestion,
-body#page-mod-quiz-review .que .info .editquestion,
-body#page-mod-quiz-summary .que .info .editquestion {
-    margin-top: 0.5em !important;
-    &.questionflag { grid-area: flag; justify-self: end; align-self: start; }
-    &.editquestion { grid-area: edit; justify-self: end; align-self: end; }
+#page-mod-quiz-review .que .info .questionflag {
+    grid-area: flag !important;
+    justify-self: end !important;
+    align-self: start !important;
 }
 
 #page-mod-quiz-attempt .que .info .questionflag a,
-#page-mod-quiz-review .que .info .questionflag a,
 #page-mod-quiz-summary .que .info .questionflag a,
-#page-mod-quiz-attempt .que .info .editquestion a,
-#page-mod-quiz-review .que .info .editquestion a,
-#page-mod-quiz-summary .que .info .editquestion a,
-body#page-mod-quiz-attempt .que .info .questionflag a,
-body#page-mod-quiz-review .que .info .questionflag a,
-body#page-mod-quiz-summary .que .info .questionflag a,
-body#page-mod-quiz-attempt .que .info .editquestion a,
-body#page-mod-quiz-review .que .info .editquestion a,
-body#page-mod-quiz-summary .que .info .editquestion a {
+#page-mod-quiz-review .que .info .questionflag a {
     color: #1CB0F6 !important;
-    text-decoration: none !important;
     font-weight: 500 !important;
+    font-size: 0.9rem !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 0.3em !important;
+    gap: 0.3rem !important;
+    text-decoration: none !important;
+    padding: 4px 10px !important;
+    background-color: rgba(255,255,255,0.4) !important;
+    border-radius: 6px !important;
 }
 
-#page-mod-quiz-attempt .que .info .questionflag a:hover,
-#page-mod-quiz-review .que .info .questionflag a:hover,
-#page-mod-quiz-summary .que .info .questionflag a:hover,
-#page-mod-quiz-attempt .que .info .editquestion a:hover,
-#page-mod-quiz-review .que .info .editquestion a:hover,
-#page-mod-quiz-summary .que .info .editquestion a:hover {
-    color: #0ea5e9 !important;
-    text-decoration: underline !important;
+/***************************************************
+ EDIT ICON (bottom-right)
+****************************************************/
+#page-mod-quiz-attempt .que .info .editquestion,
+#page-mod-quiz-summary .que .info .editquestion,
+#page-mod-quiz-review .que .info .editquestion {
+    grid-area: edit !important;
+    justify-self: end !important;
+    align-self: end !important;
 }
 
-/* Icons inside info box - make them visible */
+#page-mod-quiz-attempt .que .info .editquestion a,
+#page-mod-quiz-summary .que .info .editquestion a,
+#page-mod-quiz-review .que .info .editquestion a {
+    color: #1CB0F6 !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+/***************************************************
+ Icons
+****************************************************/
 #page-mod-quiz-attempt .que .info img,
-#page-mod-quiz-review .que .info img,
 #page-mod-quiz-summary .que .info img,
+#page-mod-quiz-review .que .info img,
 #page-mod-quiz-attempt .que .info .icon,
-#page-mod-quiz-review .que .info .icon,
-#page-mod-quiz-summary .que .info .icon {
-    opacity: 0.8 !important;
+#page-mod-quiz-summary .que .info .icon,
+#page-mod-quiz-review .que .info .icon {
+    opacity: 0.9 !important;
     filter: none !important;
 }
 
-/* Hide Badges and Competencies in course More navigation dropdown */
-.path-course-view .dropdown-item[href*="/badges"],
-.path-course-view .dropdown-item[data-key="competencies"] {
-    display: none !important;
+/* RESET THE BAD FLEX — your theme applied flex to all children */
+#page-mod-quiz-attempt .que .info > div.state,
+#page-mod-quiz-attempt .que .info > div.grade,
+#page-mod-quiz-summary .que .info > div.state,
+#page-mod-quiz-summary .que .info > div.grade,
+#page-mod-quiz-review .que .info > div.state,
+#page-mod-quiz-review .que .info > div.grade {
+    display: block !important;          /* break flex */
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.4 !important;
 }
 
-/* Make login link font white globally */
-.login.pl-2 a {
-    color: #fff !important;
+/* FORCE THEM TO STACK IN VERTICAL ORDER */
+#page-mod-quiz-attempt .que .info .state + .grade,
+#page-mod-quiz-summary .que .info .state + .grade,
+#page-mod-quiz-review .que .info .state + .grade {
+    margin-top: 4px !important;         /* spacing between the two lines */
 }
 
-.label.mr-2.mb-0.text-primary {
-    color: #fff !important;
+/* SUPER CRITICAL — override the theme rule that makes info children flex */
+#page-mod-quiz-attempt .que .info > div:not(.questionflag):not(.editquestion),
+#page-mod-quiz-summary .que .info > div:not(.questionflag):not(.editquestion),
+#page-mod-quiz-review .que .info > div:not(.questionflag):not(.editquestion) {
+    display: block !important;          /* override theme flex */
 }
 
+/***************************************************
+ State & Grade Horizontal Wrapper
+****************************************************/
+#page-mod-quiz-attempt .que .info .state-grade-wrapper,
+#page-mod-quiz-summary .que .info .state-grade-wrapper,
+#page-mod-quiz-review .que .info .state-grade-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 1.2rem !important;
+    grid-area: status !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
 
+#page-mod-quiz-attempt .que .info .state-grade-wrapper .state,
+#page-mod-quiz-attempt .que .info .state-grade-wrapper .grade,
+#page-mod-quiz-summary .que .info .state-grade-wrapper .state,
+#page-mod-quiz-summary .que .info .state-grade-wrapper .grade,
+#page-mod-quiz-review .que .info .state-grade-wrapper .state,
+#page-mod-quiz-review .que .info .state-grade-wrapper .grade {
+    display: flex !important;
+    align-items: center !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    color: #1CB0F6 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}

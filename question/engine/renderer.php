@@ -141,8 +141,10 @@ class core_question_renderer extends plugin_renderer_base {
             qtype_renderer $qtoutput, question_display_options $options, $number) {
         $output = '';
         $output .= $this->number($number);
+        $output .= html_writer::start_tag('div', array('class' => 'state-grade-wrapper'));
         $output .= $this->status($qa, $behaviouroutput, $options);
         $output .= $this->mark_summary($qa, $behaviouroutput, $options);
+        $output .= html_writer::end_tag('div');
         $output .= $this->question_flag($qa, $options->flags);
         $output .= $this->edit_question_link($qa, $options);
         return $output;

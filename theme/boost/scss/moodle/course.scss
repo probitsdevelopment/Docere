@@ -1629,3 +1629,9 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
         margin-top: 0;
     }
 }
+
+// Hide ascending sort icon in user table
+.icon.fa.fa-sort-asc.fa-fw[title="Ascending"] {
+  display: none !important;
+}
+

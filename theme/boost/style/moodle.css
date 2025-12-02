@@ -7585,15 +7585,41 @@ input[type=button].btn-block {
 }
 
 .page-link {
-  position: relative;
-  display: block;
+  position: relative !important;
+  /* display: block;
   padding: 0.5rem 0.75rem;
   margin-left: -1px;
   line-height: 1.25;
   color: #1CB0F6;
-  background-color: #fff;
-  border: 1px solid #dee2e6;
+  background-color: #fff; */
+  border: 1px solid #dee2e6 !important;
 }
+
+.initialbar .page-item .page-link {
+ display: inline-block !important;
+    padding: 0 !important;
+    height: 1.8em !important;
+    min-width: 1.8em !important;
+    text-align: center !important;
+    /* color: #526069; */
+    border-width: 1px !important;
+    /* border-color: #e4eaec; */
+    border-style: solid !important;
+    /* background-color: transparent; */
+    margin-right: .3em !important;
+    /* border-radius: .3em; */
+    line-height: 1.7em !important;
+
+}
+
+.pagination-sm .page-link {
+  
+    font-size: .858rem !important;
+  
+}
+.page-item:first-child .page-link {
+    margin-left: 0 !important;
+  }
 .page-link:hover {
   z-index: 2;
   color: #0883be;
@@ -22010,7 +22036,7 @@ body.path-question-type .form-group .col-form-label.sr-only:not(legend):not([for
   position: relative;
   padding: 0.75rem 1.25rem;
   margin-bottom: 1rem;
-  border: 0 solid transparent;
+  border: 1px solid #E5E7EB !important;
   border-radius: 0.5rem;
 }
 
@@ -22896,8 +22922,8 @@ table.flexible {
 table.generaltable th,
 table.flexible th {
   background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
-  border-bottom: 2px solid #e1e5e9 !important;
   border-right: 1px solid #e8ecf0 !important;
+  border-bottom: none !important;
   border-left: none !important;
   border-top: none !important;
   padding: 16px 20px !important;
@@ -23108,7 +23134,7 @@ table.flexible td {
 .userlist table#participants td .userpicture,
 .userlist table#participants td .userinitials {
   background-color: white !important;
-  background: transparent !important;
+  background: #fff !important;
 }
 
 /* Force remove gray background from all user elements */
@@ -24968,7 +24994,7 @@ img.userpicture {
   text-decoration: underline;
 }
 .path-mod-quiz #mod_quiz_navblock .qnbutton .thispageholder {
-  border: 1px solid;
+  border: 1px solid #B3B3B3 !important;
   border-radius: 3px;
   z-index: 1;
 }
@@ -29201,3 +29227,63 @@ button.bg-gray:hover,
 button.bg-gray:focus {
   background-color: #cbd3da !important;
 }
+/* Fix for participants table header wrapping */
+.userlist table#participants th,
+.path-user table th,
+table.generaltable th,
+table.flexible th {
+  white-space: nowrap !important;
+}
+
+.initialbar .page-item.active .page-link {
+    border-radius: 1.7em;
+    color: #fff;
+    border-color: #1CB0F6;
+    background-color: #1CB0F6;
+}
+/* Override quiz question grid layout to match Figma - FINAL */
+#page-mod-quiz-attempt .que .info,
+#page-mod-quiz-summary .que .info,
+body#page-mod-quiz-attempt .que .info,
+body#page-mod-quiz-summary .que .info {
+    grid-template-areas:
+        "question flag"
+        "status edit" !important;
+    grid-template-columns: 1fr auto !important;
+    grid-template-rows: auto auto !important;
+    gap: 0.25rem 1rem !important;
+    align-items: start !important;
+    padding: 1rem 1.5rem !important;
+}
+
+/* Ensure status items are left-aligned */
+#page-mod-quiz-attempt .que .info > div:not(.questionflag):not(.editquestion),
+#page-mod-quiz-summary .que .info > div:not(.questionflag):not(.editquestion),
+body#page-mod-quiz-attempt .que .info > div:not(.questionflag):not(.editquestion),
+body#page-mod-quiz-summary .que .info > div:not(.questionflag):not(.editquestion) {
+    grid-area: status !important;
+    justify-self: start !important;
+    align-self: start !important;
+    margin-top: 0 !important;
+}
+
+/* Ensure flag button is positioned correctly */
+#page-mod-quiz-attempt .que .info .questionflag,
+#page-mod-quiz-summary .que .info .questionflag,
+body#page-mod-quiz-attempt .que .info .questionflag,
+body#page-mod-quiz-summary .que .info .questionflag {
+    grid-area: flag !important;
+    justify-self: end !important;
+    align-self: start !important;
+}
+
+/* Ensure edit button is positioned correctly */
+#page-mod-quiz-attempt .que .info .editquestion,
+#page-mod-quiz-summary .que .info .editquestion,
+body#page-mod-quiz-attempt .que .info .editquestion,
+body#page-mod-quiz-summary .que .info .editquestion {
+    grid-area: edit !important;
+    justify-self: end !important;
+    align-self: start !important;
+}
+

@@ -137,7 +137,7 @@
     text-align: left;
     padding: 12px 16px !important;
     border-right: 1px solid #e5e7eb !important;
-    border-bottom: 1px solid #e5e7eb !important;
+    // border-bottom: 1px solid #e5e7eb !important;
     font-weight: 600 !important;
     font-size: 0.875rem !important;
     color: #374151 !important;
@@ -532,7 +532,7 @@ table.flexible {
 table.generaltable th,
 table.flexible th {
     // background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
-    border-bottom: 2px solid #e1e5e9 !important;
+    // border-bottom: 2px solid #e1e5e9 !important;
     border-right: 1px solid #e8ecf0 !important;
     border-left: none !important;
     border-top: none !important;
@@ -610,7 +610,7 @@ table.flexible td {
 .userlist table#participants tbody tr:hover,
 .path-user table tbody tr:hover {
     background-color: #f0f9ff !important;
-    transform: translateY(-1px) !important;
+    // transform: translateY(-1px) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
@@ -642,7 +642,7 @@ table.flexible td {
 .path-user table .badge,
 .userlist table#participants span[class*="badge"],
 .path-user table span[class*="badge"] {
-    background-color: #10b981 !important;
+    background-color: #58CC02 !important;
     color: white !important;
     font-size: 0.75rem !important;
     font-weight: 600 !important;
@@ -744,7 +744,7 @@ table.flexible td {
 .userlist table#participants td .userpicture,
 .userlist table#participants td .userinitials {
     background-color: white !important;
-    background: transparent !important;
+    background: #fff !important;
 }
 
 /* Force remove gray background from all user elements */
@@ -963,3 +963,18 @@ section.node_category.card {
         gap: 16px !important;
     }
 }
+
+.userlist table#participants th.header.c1 {
+  white-space: nowrap !important;
+}
+.userlist table#participants th.header.c1 a {
+  display: inline-block !important;
+}
+.userlist table#participants th.header.c1 {
+  vertical-align: middle !important;
+}
+.userlist table#participants th.header.c1 a {
+  vertical-align: middle !important;
+}
+
+

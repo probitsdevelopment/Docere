@@ -202,6 +202,21 @@
 .path-mod-quiz .qnbutton.incorrect .trafficlight {
     border-top: 3px solid #800;
 }
+.path-mod-quiz .othernav {
+    background-color: #1CB0F6!important; /* blue */
+    border: none !important;
+    padding: 4px 8px !important;
+    border-radius: 12px !important;
+    display: inline-block !important;
+    margin: 12px 0 !important;
+}
+
+.path-mod-quiz .othernav a {
+    color: #fff !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    text-decoration: none !important;
+}
 
 .path-mod-quiz .othernav {
     clear: both;
@@ -1279,8 +1294,8 @@ table#categoryquestions {
     border: none !important;
     border-radius: 8px !important;
     float: none !important;
-    width: 80% !important;
-    max-width: 600px !important;
+    width: 90% !important;
+    max-width: 1200px !important;
     margin: 16px auto 16px auto !important;
     /* min-height: unset !important; */
     display: flex !important;
@@ -1322,7 +1337,8 @@ table#categoryquestions {
 
 /* Main content area */
 #page-mod-quiz-attempt .que .content {
-    margin-left: 140px !important;
+    margin-left: 25px !important;
+    margin-right: 17px !important;
     padding: 16px !important;
     background: #ffffff !important;
 }
