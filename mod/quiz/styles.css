@@ -202,21 +202,28 @@
 .path-mod-quiz .qnbutton.incorrect .trafficlight {
     border-top: 3px solid #800;
 }
-.path-mod-quiz .othernav {
-    background-color: #1CB0F6!important; /* blue */
-    border: none !important;
-    padding: 4px 8px !important;
-    border-radius: 12px !important;
-    display: inline-block !important;
-    margin: 12px 0 !important;
+/* FINISH ATTEMPT button – reduce width */
+.path-mod-quiz .othernav .endtestlink {
+    display: inline-block !important;  /* MAKES BUTTON NATURAL WIDTH */
+    background: #00B7FF !important;    /* your blue color */
+    color: #fff !important;
+    padding: 10px 18px !important;
+    border-radius: 10px !important;
+    font-weight: 600;
+    text-decoration: none !important;
+    width: auto !important;            /* prevents full width */
 }
 
-.path-mod-quiz .othernav a {
-    color: #fff !important;
-    font-weight: 600 !important;
-    font-size: 14px !important;
-    text-decoration: none !important;
+/* OPTIONAL: If you want it aligned left */
+.path-mod-quiz .othernav {
+    text-align: left !important;
 }
+
+/* OPTIONAL: If you want it centered */
+.path-mod-quiz .othernav {
+    text-align: center !important;
+}
+
 
 .path-mod-quiz .othernav {
     clear: both;
