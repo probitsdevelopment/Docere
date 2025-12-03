@@ -6,20 +6,20 @@ $CFG = new stdClass();
 
 $CFG->dbtype    = 'mariadb';
 $CFG->dblibrary = 'native';
-$CFG->dbhost    = 'localhost';
-$CFG->dbname    = 'moodle42';
-$CFG->dbuser    = 'root';
-$CFG->dbpass    = '';
+$CFG->dbhost    = '127.0.0.1';
+$CFG->dbname    = 'u165158232_moodledatabase';
+$CFG->dbuser    = 'u165158232_probitstech';
+$CFG->dbpass    = 'Keys345#$%';
 $CFG->prefix    = 'mdl_';
 $CFG->dboptions = array (
   'dbpersist' => 0,
-  'dbport' => '',
+  'dbport' => '3306',
   'dbsocket' => '',
   'dbcollation' => 'utf8mb4_general_ci',
 );
 
-$CFG->wwwroot   = 'http://localhost/moodle42/moodle';
-$CFG->dataroot  = 'C:\\xampp\\moodledata';
+$CFG->wwwroot   = 'http://test.docere.pro';
+$CFG->dataroot  = '/home/u165158232/domains/docere.pro/data';
 $CFG->admin     = 'admin';
 
 $CFG->directorypermissions = 0777;
