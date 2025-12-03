@@ -222,6 +222,7 @@
 /* OPTIONAL: If you want it centered */
 .path-mod-quiz .othernav {
     text-align: left !important;
+    padding-left: 8px !important;
 }
 
 
